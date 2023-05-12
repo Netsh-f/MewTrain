@@ -59,6 +59,10 @@ class Seat(models.Model):
         verbose_name = '座位'
         verbose_name_plural = '座位'
         ordering = ['-id']
+        constraints = [
+            models.UniqueConstraint(fields=['train_id', 'carriage', 'location'],
+                                    name='unique_train_id_carriage_location')
+        ]
 
 
 class PassingStation(models.Model):

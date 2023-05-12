@@ -44,3 +44,23 @@ class User(models.Model):
         verbose_name = '用户'
         verbose_name_plural = '用户'
         ordering = ['-id']
+
+
+class Admin(models.Model):
+    admin_type_choices = (
+        ('systemAdmin', '系统管理员'),
+        ('railwayAdmin', '铁路系统员'),
+    )
+
+    username = models.CharField(max_length=128, unique=True, verbose_name="用户名")
+    password = models.CharField(max_length=256, verbose_name="密码")
+    admin_type = models.CharField(max_length=16, choices=admin_type_choices, default='systemAdmin',
+                                  verbose_name='管理员类型')
+
+    def __str__(self):
+        return '<id=%s> %s %s' % (self.id, self.admin_type, self.username)
+
+    class Meta:
+        verbose_name = '管理员'
+        verbose_name_plural = '管理员'
+        ordering = ['-id']
