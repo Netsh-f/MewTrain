@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "user",
     "train",
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

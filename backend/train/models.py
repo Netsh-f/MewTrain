@@ -66,14 +66,10 @@ class Seat(models.Model):
 
 
 class PassingStation(models.Model):
-    train_id = models.ForeignKey(Train, verbose_name='车次')
-    station_id = models.ForeignKey(Station, verbose_name='车站')
-    arrival_time = models.DateTimeField(datetime_format='%Y-%m-%d %H:%M', verbose_name='到达时间')
-    departureTime = models.DateTimeField(datetime_format='%Y-%m-%d %H:%M', verbose_name='出发时间')
-
-    @property
-    def stop_time(self):
-        return self.departureTime - self.arrival_time
+    train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE)
+    station_id = models.ForeignKey(Station, verbose_name='车站', on_delete=models.CASCADE)
+    arrival_time = models.DateTimeField(verbose_name='到达时间')
+    departureTime = models.DateTimeField(verbose_name='出发时间')
 
     def __str__(self):
         return '<id=%s> train=%s station=%s %s %s' % (
@@ -86,11 +82,11 @@ class PassingStation(models.Model):
 
 
 class Order(models.Model):
-    user_id = models.ForeignKey(User, verbose_name='用户')
-    train_id = models.ForeignKey(Train, verbose_name='车次')
-    seat_id = models.ForeignKey(Seat, verbose_name='座位')
-    departure_station = models.ForeignKey(PassingStation, verbose_name='出发站')
-    arrival_station = models.ForeignKey(PassingStation, verbose_name='到达站')
+    user_id = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE)
+    train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE)
+    seat_id = models.ForeignKey(Seat, verbose_name='座位', on_delete=models.CASCADE)
+    departure_station = models.ForeignKey(PassingStation, verbose_name='出发站', related_name='arrivals', on_delete=models.CASCADE)
+    arrival_station = models.ForeignKey(PassingStation, verbose_name='到达站', related_name='departures', on_delete=models.CASCADE)
     create_time = models.DateTimeField(verbose_name='创建时间')
 
     def __str__(self):

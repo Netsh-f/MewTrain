@@ -1,7 +1,15 @@
 from django.db import models
 
 
-class User(models.Model):
+class AbstractUser(models.Model):
+    username = models.CharField(max_length=128, unique=True, verbose_name="用户名")
+    password = models.CharField(max_length=256, verbose_name="密码")
+
+    def __str__(self):
+        return '<id=%s> %s' % (self.id, self.username)
+
+
+class User(AbstractUser):
     id_type_choices = (
         ('chinese_id_card', '中国居民身份证'),
         ('hkm_travel_permit', '港澳居民来往内地通行证'),
@@ -25,8 +33,6 @@ class User(models.Model):
         ('886', '+886'),
     )
 
-    username = models.CharField(max_length=128, unique=True, verbose_name="用户名")
-    password = models.CharField(max_length=256, verbose_name="密码")
     id_type = models.CharField(max_length=32, choices=id_type_choices, default='chinese_id_card',
                                verbose_name="证件类型")
     name = models.CharField(max_length=128, verbose_name="姓名")
@@ -37,30 +43,21 @@ class User(models.Model):
     phone_number = models.CharField(max_length=32, verbose_name="手机号码")
     email = models.EmailField(unique=True, null=True, verbose_name="邮箱地址")
 
-    def __str__(self):
-        return '<id=%s> %s' % (self.id, self.name)
-
     class Meta:
         verbose_name = '用户'
         verbose_name_plural = '用户'
         ordering = ['-id']
 
 
-class Admin(models.Model):
-    admin_type_choices = (
-        ('systemAdmin', '系统管理员'),
-        ('railwayAdmin', '铁路系统员'),
-    )
-
-    username = models.CharField(max_length=128, unique=True, verbose_name="用户名")
-    password = models.CharField(max_length=256, verbose_name="密码")
-    admin_type = models.CharField(max_length=16, choices=admin_type_choices, default='systemAdmin',
-                                  verbose_name='管理员类型')
-
-    def __str__(self):
-        return '<id=%s> %s %s' % (self.id, self.admin_type, self.username)
-
+class SystemAdmin(AbstractUser):
     class Meta:
-        verbose_name = '管理员'
-        verbose_name_plural = '管理员'
+        verbose_name = '系统管理员'
+        verbose_name_plural = '系统管理员'
+        ordering = ['-id']
+
+
+class RailwayAdmin(AbstractUser):
+    class Meta:
+        verbose_name = '铁路系统员'
+        verbose_name_plural = '铁路系统员'
         ordering = ['-id']
