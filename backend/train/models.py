@@ -69,7 +69,7 @@ class PassingStation(models.Model):
     train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE)
     station_id = models.ForeignKey(Station, verbose_name='车站', on_delete=models.CASCADE)
     arrival_time = models.DateTimeField(verbose_name='到达时间')
-    departureTime = models.DateTimeField(verbose_name='出发时间')
+    departure_time = models.DateTimeField(verbose_name='出发时间')
 
     def __str__(self):
         return '<id=%s> train=%s station=%s %s %s' % (

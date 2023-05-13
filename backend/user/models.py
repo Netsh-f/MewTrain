@@ -10,6 +10,15 @@ class AbstractUser(models.Model):
 
 
 class User(AbstractUser):
+    email = models.EmailField(null=True, verbose_name="邮箱地址")
+
+    class Meta:
+        verbose_name = '用户'
+        verbose_name_plural = '用户'
+        ordering = ['-id']
+
+
+class Passenger(models.Model):
     id_type_choices = (
         ('chinese_id_card', '中国居民身份证'),
         ('hkm_travel_permit', '港澳居民来往内地通行证'),
@@ -41,11 +50,14 @@ class User(AbstractUser):
                                    verbose_name="优惠(待)类型")
     phone_region = models.CharField(max_length=8, choices=phone_region_choices, default='86', verbose_name="地区")
     phone_number = models.CharField(max_length=32, verbose_name="手机号码")
-    email = models.EmailField(unique=True, null=True, verbose_name="邮箱地址")
+    user_id = models.ForeignKey(User, verbose_name='关联用户', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '<id=%s> %s' % (self.id, self.name)
 
     class Meta:
-        verbose_name = '用户'
-        verbose_name_plural = '用户'
+        verbose_name = '乘车人'
+        verbose_name_plural = '乘车人'
         ordering = ['-id']
 
 
