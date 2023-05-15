@@ -2,8 +2,8 @@ from django.db import models
 
 
 class AbstractUser(models.Model):
-    username = models.CharField(max_length=128, unique=True, verbose_name="用户名")
-    password = models.CharField(max_length=256, verbose_name="密码")
+    username = models.CharField(max_length=128, unique=True, verbose_name="用户名", null=False)
+    password = models.CharField(max_length=256, verbose_name="密码", null=False)
 
     def __str__(self):
         return '<id=%s> %s' % (self.id, self.username)
@@ -43,14 +43,15 @@ class Passenger(models.Model):
     )
 
     id_type = models.CharField(max_length=32, choices=id_type_choices, default='chinese_id_card',
-                               verbose_name="证件类型")
-    name = models.CharField(max_length=128, verbose_name="姓名")
-    id_number = models.CharField(max_length=32, verbose_name="证件号码")
+                               verbose_name="证件类型", null=False)
+    name = models.CharField(max_length=128, verbose_name="姓名", null=False)
+    id_number = models.CharField(max_length=32, verbose_name="证件号码", null=False)
     ticket_type = models.CharField(max_length=16, choices=ticket_type_choices, default='adult',
-                                   verbose_name="优惠(待)类型")
-    phone_region = models.CharField(max_length=8, choices=phone_region_choices, default='86', verbose_name="地区")
-    phone_number = models.CharField(max_length=32, verbose_name="手机号码")
-    user_id = models.ForeignKey(User, verbose_name='关联用户', on_delete=models.CASCADE)
+                                   verbose_name="优惠(待)类型", null=False)
+    phone_region = models.CharField(max_length=8, choices=phone_region_choices, default='86', verbose_name="地区",
+                                    null=False)
+    phone_number = models.CharField(max_length=32, verbose_name="手机号码", null=False)
+    user_id = models.ForeignKey(User, verbose_name='关联用户', on_delete=models.CASCADE, null=False)
 
     def __str__(self):
         return '<id=%s> %s' % (self.id, self.name)

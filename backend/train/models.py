@@ -5,8 +5,14 @@ from user.models import User
 
 
 class Station(models.Model):
-    name = models.CharField(max_length=128, unique=True, verbose_name="站名")
-    city = models.CharField(max_length=128, verbose_name="城市")
+    pinyin_3 = models.CharField(max_length=3, verbose_name="拼音3字母简写")
+    name = models.CharField(max_length=5, unique=True, verbose_name="车站名", null=False)
+    code = models.CharField(max_length=3, unique=True, verbose_name="车站代码", null=False)
+    pinyin_full = models.CharField(max_length=18, verbose_name="拼音全称")
+    pinyin_head = models.CharField(max_length=5, verbose_name="拼音首字母简写")
+    station_num = models.PositiveSmallIntegerField(unique=True, verbose_name="车站编号")
+    city_num = models.PositiveSmallIntegerField(verbose_name="城市编号")
+    city_name = models.CharField(max_length=10, verbose_name="城市名", null=False)
 
     def __str__(self):
         return '<id=%s> %s' % (self.id, self.name)
@@ -14,17 +20,18 @@ class Station(models.Model):
     class Meta:
         verbose_name = '车站'
         verbose_name_plural = '车站'
-        ordering = ['-name']
+        ordering = ['-station_num']
 
 
 class Train(models.Model):
     train_type_choices = (
-        ('HS', '高铁'),
-        ('regular', '普通车'),
+        ('HSR', '高铁'),
+        ('REG', '普通车'),
     )
 
-    name = models.CharField(max_length=128, unique=True, verbose_name="车次")
-    train_type = models.CharField(max_length=8, choices=train_type_choices, default="HS", verbose_name="车次类型")
+    name = models.CharField(max_length=128, unique=True, verbose_name="车次", null=False)
+    train_type = models.CharField(max_length=8, choices=train_type_choices, default="HSR", verbose_name="车次类型",
+                                  null=False)
 
     def __str__(self):
         return '<id=%s> %s' % (self.id, self.name)
@@ -46,11 +53,13 @@ class Seat(models.Model):
         ('hardSeat', '硬座'),
     )
 
-    train_id = models.ForeignKey(Train, on_delete=models.CASCADE, verbose_name='车次')
-    carriage = models.IntegerField(verbose_name='车厢号')
-    seat_type = models.CharField(max_length=16, choices=seat_type_choices, default='second', verbose_name='座位类型')
+    train_id = models.ForeignKey(Train, on_delete=models.CASCADE, verbose_name='车次', null=False)
+    carriage = models.PositiveSmallIntegerField(verbose_name='车厢号', null=False)
+    seat_type = models.CharField(max_length=16, choices=seat_type_choices, default='second', verbose_name='座位类型',
+                                 null=False)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'), verbose_name='价格')
-    location = models.CharField(max_length=4, verbose_name='位置')
+    location = models.CharField(max_length=4, verbose_name='位置', null=False)
+    is_available = models.BooleanField(verbose_name='是否可用')
 
     def __str__(self):
         return '<id=%s> %s %s' % (self.id, self.train_id, self.location)
@@ -65,11 +74,13 @@ class Seat(models.Model):
         ]
 
 
-class PassingStation(models.Model):
-    train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE)
-    station_id = models.ForeignKey(Station, verbose_name='车站', on_delete=models.CASCADE)
-    arrival_time = models.DateTimeField(verbose_name='到达时间')
-    departure_time = models.DateTimeField(verbose_name='出发时间')
+class Stop(models.Model):
+    train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE, null=False)
+    station_id = models.ForeignKey(Station, verbose_name='车站', on_delete=models.CASCADE, null=False)
+    arrival_time = models.TimeField(verbose_name='到达时间')
+    duration = models.DurationField(verbose_name='停留时间')
+    # 出发时间根据上面两项计算，以处理跨天的情况
+    sequence = models.IntegerField(verbose_name='序号', null=False)
 
     def __str__(self):
         return '<id=%s> train=%s station=%s %s %s' % (
@@ -82,12 +93,16 @@ class PassingStation(models.Model):
 
 
 class Order(models.Model):
-    user_id = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE)
-    train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE)
-    seat_id = models.ForeignKey(Seat, verbose_name='座位', on_delete=models.CASCADE)
-    departure_station = models.ForeignKey(PassingStation, verbose_name='出发站', related_name='arrivals', on_delete=models.CASCADE)
-    arrival_station = models.ForeignKey(PassingStation, verbose_name='到达站', related_name='departures', on_delete=models.CASCADE)
-    create_time = models.DateTimeField(verbose_name='创建时间')
+    user_id = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE, null=False)
+    train_id = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE, null=False)
+    seat_id = models.ForeignKey(Seat, verbose_name='座位', on_delete=models.CASCADE, null=False)
+    departure_station = models.ForeignKey(Stop, verbose_name='出发站', related_name='arrivals',
+                                          on_delete=models.CASCADE)
+    departure_time = models.DateTimeField(verbose_name='出发时间')
+    arrival_station = models.ForeignKey(Stop, verbose_name='到达站', related_name='departures',
+                                        on_delete=models.CASCADE)
+    arrival_time = models.DateTimeField(verbose_name='到达时间')
+    create_time = models.DateTimeField(verbose_name='创建时间', null=False)
 
     def __str__(self):
         return '<id=%s> train=%s station=%s seat=%s %s %s' % (
