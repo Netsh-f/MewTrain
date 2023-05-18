@@ -12,7 +12,6 @@ def register(request):
     try:
         data = request.data
         username = data['username']
-        password = data['password']
 
         same_name_user = User.objects.filter(username=username)
         if same_name_user:
@@ -21,10 +20,28 @@ def register(request):
 
         user = User()
         user.username = username
-        user.password = make_password(password)
-        if 'email' in data and data['email']:
-            user.email = data['email']
+        user.password = make_password(data['password'])
+        user.email = data['email']
+        user.save()
 
+        message = '用户注册成功'
+        return Response({'message': message}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def add_passenger(request):
+    try:
+        identity = request.session.get('identity', None)
+        if identity != 'user' and identity != 'system_admin':
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data
+        user_id = data['user_id']
+        user = User.objects.get(id=user_id)
         passenger = Passenger(
             id_type=data['id_type'],
             name=data['name'],
@@ -34,9 +51,8 @@ def register(request):
             phone_number=data['phone_number'],
         )
         passenger.user = user
-        user.save()
         passenger.save()
-        message = '用户注册成功'
+        message = '添加乘车员成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -86,6 +102,88 @@ def logout(request):
         request.session.flush()
         message = '登出成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_user_list(request):
+    try:
+        if request.session.get('identity', None) != 'system_admin':
+            message = '请先登录系统管理员账户'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        users = User.objects.all().values()
+        system_admins = SystemAdmin.objects.all().values()
+        railway_admins = RailwayAdmin.objects.all().values()
+
+        user_data = list(users)
+        system_admin_data = list(system_admins)
+        railway_admin_data = list(railway_admins)
+
+        message = '获取用户列表成功'
+        response_data = {
+            'message': message,
+            'users': user_data,
+            'system_admins': system_admin_data,
+            'railway_admins': railway_admin_data
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def add_user(request):
+    try:
+        if request.session.get('identity', None) != 'system_admin':
+            message = '请先登录系统管理员账户'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data
+        user_type = data.get('user_type')
+
+        if user_type == 'user':
+            username = data.get('username')
+            password = data.get('password')
+            email = data.get('email')
+
+            # 创建 User 模型对象
+            user = User.objects.create(
+                username=username,
+                password=password,
+                email=email
+            )
+
+        elif user_type == 'system_admin':
+            username = data.get('username')
+            password = data.get('password')
+
+            # 创建 SystemAdmin 模型对象
+            system_admin = SystemAdmin.objects.create(
+                username=username,
+                password=password
+            )
+
+        elif user_type == 'railway_admin':
+            username = data.get('username')
+            password = data.get('password')
+
+            # 创建 RailwayAdmin 模型对象
+            railway_admin = RailwayAdmin.objects.create(
+                username=username,
+                password=password
+            )
+
+        else:
+            message = '无效的用户类型'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        message = '添加用户成功'
+        return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
