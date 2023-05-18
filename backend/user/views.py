@@ -1,9 +1,10 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 
-from user.models import User, Passenger
+from user.models import User, Passenger, SystemAdmin, RailwayAdmin
 
 
 @api_view(['POST'])
@@ -42,7 +43,7 @@ def register(request):
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view['POST']
+@api_view(['POST'])
 def login(request):
     try:
         if request.session.get('is_login', None):
@@ -52,14 +53,20 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         try:
-            user = User.objects.get(username=username)
-        except Exception as e:
+            user = User.objects.get(Q(username=username) | Q(username=username) | Q(username=username))
+        except (User.DoesNotExist, SystemAdmin.DoesNotExist, RailwayAdmin.DoesNotExist):
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         if check_password(password, user.password):
             request.session['is_login'] = True
             request.session['user_id'] = user.id
             request.session['username'] = user.username
+            if isinstance(user, SystemAdmin):
+                request.session['identity'] = 'system_admin'
+            elif isinstance(user, RailwayAdmin):
+                request.session['identity'] = 'railway_admin'
+            else:
+                request.session['identity'] = 'user'
             message = '登录成功'
             return Response({'message': message}, status=status.HTTP_200_OK)
         else:
@@ -70,7 +77,7 @@ def login(request):
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view['GET']
+@api_view(['GET'])
 def logout(request):
     try:
         if not request.session.get('is_login', None):
