@@ -75,7 +75,7 @@ def update_user_info(request):
     try:
         # 检查用户身份
         identity = request.session.get('identity', None)
-        if identity is None or identity not in ['user', 'system_admin']:
+        if identity is None or identity != 'user':
             message = '无效权限'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -374,6 +374,56 @@ def add_user(request):
 
         message = '添加用户成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def update_user_info_system_admin(request):
+    try:
+        # 检查用户身份
+        identity = request.session.get('identity', None)
+        if identity != 'system_admin':
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 获取请求体中的数据
+        data = request.data
+        user_id = data['user_id']
+        user_type = data['user_type']
+
+        if user_type == 'user':
+            user = User.objects.get(id=user_id)
+        elif user_type == 'system_admin':
+            user = SystemAdmin.objects.get(id=user_id)
+        elif user_type == 'railway_admin':
+            user = RailwayAdmin.objects.get(id=user_id)
+        else:
+            message = '无效的用户类型'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 更新密码
+        if 'password' in data:
+            new_password = data['password']
+            user.password = make_password(new_password)
+
+        # 更新其他字段
+        if 'username' in data:
+            user.username = data['username']
+        if user_type == 'user' and 'email' in data:
+            user.email = data['email']
+
+        # 保存用户信息
+        user.save()
+
+        message = '用户信息更新成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        message = '用户不存在'
+        return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
