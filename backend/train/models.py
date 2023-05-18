@@ -5,11 +5,8 @@ from user.models import User
 
 
 class Station(models.Model):
-    pinyin_3 = models.CharField(max_length=3, verbose_name="拼音3字母简写")
     name = models.CharField(max_length=5, unique=True, verbose_name="车站名", null=False)
     code = models.CharField(max_length=3, unique=True, verbose_name="车站代码", null=False)
-    pinyin_full = models.CharField(max_length=18, verbose_name="拼音全称")
-    pinyin_head = models.CharField(max_length=5, verbose_name="拼音首字母简写")
     station_num = models.PositiveSmallIntegerField(unique=True, verbose_name="车站编号")
     city_num = models.PositiveSmallIntegerField(verbose_name="城市编号")
     city_name = models.CharField(max_length=10, verbose_name="城市名", null=False)

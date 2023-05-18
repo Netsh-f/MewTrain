@@ -11,6 +11,7 @@ class AbstractUser(models.Model):
 
 class User(AbstractUser):
     email = models.EmailField(null=True, verbose_name="邮箱地址")
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     class Meta:
         verbose_name = '用户'

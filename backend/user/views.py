@@ -32,6 +32,44 @@ def register(request):
 
 
 @api_view(['POST'])
+def get_user_detail(request):
+    try:
+        user_id = request.data.get('user_id')
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            message = '用户不存在'
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+
+        user_detail = {
+            'username': user.username,
+            'email': user.email,
+            'balance': user.balance,
+        }
+
+        passengers = Passenger.objects.filter(user=user)
+
+        passenger_list = []
+        for passenger in passengers:
+            passenger_info = {
+                'name': passenger.name,
+                'id_type': passenger.id_type,
+                'id_number': passenger.id_number,
+                'ticket_type': passenger.ticket_type,
+                'phone_region': passenger.phone_region,
+                'phone_number': passenger.phone_number,
+            }
+            passenger_list.append(passenger_info)
+
+        user_detail['passengers'] = passenger_list
+        return Response(user_detail, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
 def add_passenger(request):
     try:
         identity = request.session.get('identity', None)
@@ -107,6 +145,24 @@ def logout(request):
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['POST'])
+def logoff(request):
+    try:
+        user_id = request.data.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            message = '用户不存在'
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+        user.delete()
+
+        message = '注销成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 def get_user_list(request):
     try:
@@ -157,6 +213,7 @@ def add_user(request):
                 password=password,
                 email=email
             )
+            user.save()
 
         elif user_type == 'system_admin':
             username = data.get('username')
@@ -167,6 +224,7 @@ def add_user(request):
                 username=username,
                 password=password
             )
+            system_admin.save()
 
         elif user_type == 'railway_admin':
             username = data.get('username')
@@ -177,6 +235,7 @@ def add_user(request):
                 username=username,
                 password=password
             )
+            railway_admin.save()
 
         else:
             message = '无效的用户类型'
@@ -184,6 +243,75 @@ def add_user(request):
 
         message = '添加用户成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def recharge(request):
+    try:
+        user_id = request.data.get('user_id')
+        amount = request.data.get('amount')
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            message = '用户不存在'
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+        user.balance += amount
+        user.save()
+
+        message = '充值成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def remove_user(request):
+    try:
+        if request.session.get('identity', None) != 'system_admin':
+            message = '请先登录系统管理员账户'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+        user_id = data['user_id']
+        user_type = data['user_type']
+
+        if user_type == 'user':
+            try:
+                user = User.objects.get(id=user_id)
+                user.delete()
+                message = '删除用户成功'
+                return Response({'message': message}, status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                message = '用户不存在'
+                return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+
+        elif user_type == 'system_admin':
+            try:
+                system_admin = SystemAdmin.objects.get(id=user_id)
+                system_admin.delete()
+                message = '删除系统管理员成功'
+                return Response({'message': message}, status=status.HTTP_200_OK)
+            except SystemAdmin.DoesNotExist:
+                message = '系统管理员不存在'
+                return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+
+        elif user_type == 'railway_admin':
+            try:
+                railway_admin = RailwayAdmin.objects.get(id=user_id)
+                railway_admin.delete()
+                message = '删除铁路系统员成功'
+                return Response({'message': message}, status=status.HTTP_200_OK)
+            except RailwayAdmin.DoesNotExist:
+                message = '铁路系统员不存在'
+                return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+
+        else:
+            message = '无效的用户类型'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
