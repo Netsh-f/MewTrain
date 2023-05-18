@@ -32,7 +32,7 @@ def register(request):
 
 
 @api_view(['POST'])
-def get_user_detail(request):
+def get_user_info(request):
     try:
         user_id = request.data.get('user_id')
 
@@ -53,6 +53,7 @@ def get_user_detail(request):
         passenger_list = []
         for passenger in passengers:
             passenger_info = {
+                'id': passenger.id,
                 'name': passenger.name,
                 'id_type': passenger.id_type,
                 'id_number': passenger.id_number,
@@ -70,6 +71,50 @@ def get_user_detail(request):
 
 
 @api_view(['POST'])
+def update_user_info(request):
+    try:
+        # 检查用户身份
+        identity = request.session.get('identity', None)
+        if identity is None or identity not in ['user', 'system_admin']:
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 获取请求体中的数据
+        data = request.data
+        user_id = data['user_id']
+        user = User.objects.get(id=user_id)
+
+        # 检查是否要修改密码
+        if 'password' in data:
+            current_password = data['password'].get('current_password')
+            new_password = data['password'].get('new_password')
+
+            # 验证当前密码是否正确
+            if not check_password(current_password, user.password):
+                message = '原密码不正确'
+                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 更新密码为新密码
+            user.password = make_password(new_password)
+
+        # 更新其他字段
+        if 'username' in data:
+            user.username = data['username']
+        if 'email' in data:
+            user.email = data['email']
+
+        # 保存用户信息
+        request.user.save()
+
+        message = '用户信息更新成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
 def add_passenger(request):
     try:
         identity = request.session.get('identity', None)
@@ -79,7 +124,12 @@ def add_passenger(request):
 
         data = request.data
         user_id = data['user_id']
-        user = User.objects.get(id=user_id)
+        user = User.objects.filter(id=user_id).first()
+
+        if not user:
+            message = '用户不存在'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         passenger = Passenger(
             id_type=data['id_type'],
             name=data['name'],
@@ -92,6 +142,61 @@ def add_passenger(request):
         passenger.save()
         message = '添加乘车员成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def remove_passenger(request):
+    try:
+        identity = request.session.get('identity', None)
+        if identity != 'user' and identity != 'system_admin':
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data
+        user_id = data['user_id']
+        passenger_id = data['passenger_id']
+
+        user = User.objects.get(id=user_id)
+        passenger = Passenger.objects.get(id=passenger_id, user=user)
+        passenger.delete()
+
+        message = '删除乘车员成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+    except (User.DoesNotExist, Passenger.DoesNotExist):
+        message = '用户或乘车员不存在'
+        return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def update_passenger(request):
+    try:
+        identity = request.session.get('identity', None)
+        if identity != 'user' and identity != 'system_admin':
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data
+        passenger_id = data['passenger_id']
+        passenger = Passenger.objects.get(id=passenger_id)
+
+        if 'ticket_type' in data:
+            passenger.ticket_type = data['ticket_type']
+        if 'phone_number' in data:
+            passenger.phone_number = data['phone_number']
+
+        passenger.save()
+
+        message = '乘车员信息更新成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+    except Passenger.DoesNotExist:
+        message = '乘车员不存在'
+        return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -137,6 +242,7 @@ def logout(request):
         if not request.session.get('is_login', None):
             message = '请先登录'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         request.session.flush()
         message = '登出成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
@@ -148,7 +254,11 @@ def logout(request):
 @api_view(['POST'])
 def logoff(request):
     try:
-        user_id = request.data.get('user_id')
+        if not request.session.get('is_login', None):
+            message = '请先登录'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = request.session.get('user_id')
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -158,6 +268,27 @@ def logoff(request):
 
         message = '注销成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def recharge(request):
+    try:
+        user_id = request.data.get('user_id')
+        amount = request.data.get('amount')
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            message = '用户不存在'
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+        user.balance += amount
+        user.save()
+
+        message = '充值成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -243,27 +374,6 @@ def add_user(request):
 
         message = '添加用户成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        message = '发生错误：{}'.format(str(e))
-        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['POST'])
-def recharge(request):
-    try:
-        user_id = request.data.get('user_id')
-        amount = request.data.get('amount')
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            message = '用户不存在'
-            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
-        user.balance += amount
-        user.save()
-
-        message = '充值成功'
-        return Response({'message': message}, status=status.HTTP_200_OK)
-
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
