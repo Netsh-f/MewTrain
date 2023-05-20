@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from decimal import Decimal
 
@@ -12,7 +14,7 @@ class Station(models.Model):
     class Meta:
         verbose_name = '车站'
         verbose_name_plural = '车站'
-        ordering = ['-station_num']
+        ordering = ['-id']
 
 
 class Train(models.Model):
@@ -24,12 +26,12 @@ class Train(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name="车次", null=False)
     train_type = models.CharField(max_length=8, choices=train_type_choices, default="HSR", verbose_name="车次类型",
                                   null=False)
-    departure_time = models.DateTimeField(verbose_name='出发日期')
+    departure_time = models.DateTimeField(verbose_name='出发日期', default=datetime(2023, 5, 20, 8, 0, 0))
 
     class Meta:
         verbose_name = '列车'
         verbose_name_plural = '列车'
-        ordering = ['-name']
+        ordering = ['-id']
 
 
 class Stop(models.Model):
@@ -84,11 +86,11 @@ class Carriage(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE, null=False)
     train = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE, null=False)
-    carriage_num = models.PositiveSmallIntegerField(verbose_name='车厢号')
-    seat_num = models.CharField(max_length=3, verbose_name='座位位置')
+    carriage_num = models.PositiveSmallIntegerField(default=0, verbose_name='车厢号')
+    seat_num = models.CharField(default=0, max_length=3, verbose_name='座位位置')
     departure_station = models.ForeignKey(Stop, verbose_name='出发站', related_name='arrivals',
                                           on_delete=models.CASCADE)
-    departure_time = models.DateTimeField(verbose_name='出发时间')
+    departure_time = models.DateTimeField(verbose_name='出发时间', default=datetime(2023, 5, 20, 8, 0, 0))
     arrival_station = models.ForeignKey(Stop, verbose_name='到达站', related_name='departures',
                                         on_delete=models.CASCADE)
     arrival_time = models.DateTimeField(verbose_name='到达时间')

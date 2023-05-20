@@ -87,3 +87,19 @@ def add_train(request):
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_info(request):
+    datas = {
+        "name": "MewTrain",
+        "staff": [
+            "GongYihui",
+            "ZhangWenjin",
+            "WangXi",
+            "WangZishen",
+            "YouShibo"
+        ]
+    }
+    message = '你好，前端'
+    return Response({'message': message, 'datas': datas}, status=status.HTTP_200_OK)
