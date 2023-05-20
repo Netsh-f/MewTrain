@@ -81,7 +81,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         'OPTIONS': {
-            'read_default_file': 'D:/cnf/MewTrain.cnf'
+            # 'read_default_file': 'D:/cnf/MewTrain.cnf'
+            'read_default_file': '~/.config/django/MewTrain.cnf'
         }
     }
 }
