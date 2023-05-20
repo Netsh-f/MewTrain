@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "user",
     "train",
     'django_extensions',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
