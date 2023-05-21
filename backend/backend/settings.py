@@ -132,7 +132,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS_ALLOW_ALL_ORIGINS = False  # 关闭允许所有源
 #
 # CORS_ALLOW_CREDENTIALS = True  # 允许携带凭证
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 
