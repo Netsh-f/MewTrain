@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "user",
     "train",
     'django_extensions',
-    'corsheaders',
+    'corsheaders', # 解决跨域
 ]
 
 MIDDLEWARE = [

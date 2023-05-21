@@ -65,6 +65,7 @@ def add_train(request):
                 train=train,
                 seats=seats
             )
+            carriage.save()
 
         for stop_data in stops:
             station_name = stop_data.get("station_name")
@@ -81,9 +82,91 @@ def add_train(request):
                 duration=duration,
                 sequence=sequence
             )
+            stop.save()
 
         message = '列车添加成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def get_train_list(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def remove_train(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def update_train(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def query_train(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def create_order(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def pay_order(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def get_order_list(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def return_order(request):
+    try:
+        pass
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def rebook(request):
+    try:
+        pass
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
