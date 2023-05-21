@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     "user",
     "train",
     'django_extensions',
-    # 'corsheaders',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # 解决跨域问题
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -49,7 +50,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -132,3 +132,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS_ALLOW_ALL_ORIGINS = False  # 关闭允许所有源
 #
 # CORS_ALLOW_CREDENTIALS = True  # 允许携带凭证
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
