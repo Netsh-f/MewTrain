@@ -24,7 +24,8 @@ SECRET_KEY = "django-insecure-3^(n+fi!(as8n*!z5ht0n_)t53f3*%=bp%tvm%4hv#nh6o^$2d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['101.43.215.188']
+ALLOWED_HOSTS = ['101.43.215.188',
+                 '127.0.0.1']
 
 # Application definition
 
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     "user",
     "train",
     'django_extensions',
-    'corsheaders', # 解决跨域
+    'corsheaders',  # 解决跨域
 ]
 
 MIDDLEWARE = [

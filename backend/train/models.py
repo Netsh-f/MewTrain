@@ -26,7 +26,6 @@ class Train(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name="车次", null=False)
     train_type = models.CharField(max_length=8, choices=train_type_choices, default="HSR", verbose_name="车次类型",
                                   null=False)
-    departure_time = models.DateTimeField(verbose_name='出发日期', default=datetime(2023, 5, 20, 8, 0, 0))
 
     class Meta:
         verbose_name = '列车'
@@ -61,8 +60,7 @@ class Carriage(models.Model):
     carriage_num = models.PositiveSmallIntegerField(verbose_name='车厢号')
     type = models.CharField(max_length=3, choices=TYPE_CHOICES, verbose_name='车厢类型')
     total_num = models.PositiveSmallIntegerField(verbose_name='座位总数')
-    total_available = models.PositiveSmallIntegerField(verbose_name='剩余座位数')
-    seats = models.JSONField(default=dict, verbose_name='座位分布')
+    # seats = models.JSONField(default=dict, verbose_name='座位分布')  # 如果是BUS, FST, SND那么用这个字段来记录每个位置(ABCDF)有多少个座位
     train = models.ForeignKey(Train, on_delete=models.CASCADE, verbose_name='所属车次')
     price = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'), verbose_name='价格')
 
@@ -71,16 +69,28 @@ class Carriage(models.Model):
         verbose_name_plural = '车厢'
         ordering = ['-id']
 
-    def save(self, *args, **kwargs):
-        if not self.seats:
-            self.seats = {
-                'A': 0,
-                'B': 0,
-                'C': 0,
-                'D': 0,
-                'F': 0,
-            }
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.seats:
+    #         self.seats = {
+    #             'A': 0,
+    #             'B': 0,
+    #             'C': 0,
+    #             'D': 0,
+    #             'F': 0,
+    #         }
+    #     super().save(*args, **kwargs)
+
+
+class Ticket(models.Model):
+    date = models.DateField()
+    train = models.ForeignKey(Train, on_delete=models.CASCADE)
+    carriage = models.ForeignKey(Carriage, on_delete=models.CASCADE)
+    remaining_count = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = '车票'
+        verbose_name_plural = '车票'
+        ordering = ['-id']
 
 
 class Order(models.Model):
