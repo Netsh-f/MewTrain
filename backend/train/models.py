@@ -1,14 +1,11 @@
-from datetime import datetime
-
 from django.db import models
 from decimal import Decimal
 
-from user.models import User
+from user.models import User, Passenger
 
 
 class Station(models.Model):
     name = models.CharField(max_length=5, unique=True, verbose_name="车站名", null=False)
-    code = models.CharField(max_length=3, unique=True, verbose_name="车站代码", null=False)
     city = models.CharField(max_length=10, verbose_name="城市名", null=False)
 
     class Meta:
@@ -48,7 +45,7 @@ class Stop(models.Model):
 
 
 class Carriage(models.Model):
-    TYPE_CHOICES = (
+    type_choices = (
         ('BUS', '商务舱'),
         ('FST', '一等舱'),
         ('SND', '二等舱'),
@@ -58,9 +55,8 @@ class Carriage(models.Model):
     )
 
     carriage_num = models.PositiveSmallIntegerField(verbose_name='车厢号')
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES, verbose_name='车厢类型')
+    type = models.CharField(max_length=3, choices=type_choices, verbose_name='车厢类型')
     total_num = models.PositiveSmallIntegerField(verbose_name='座位总数')
-    # seats = models.JSONField(default=dict, verbose_name='座位分布')  # 如果是BUS, FST, SND那么用这个字段来记录每个位置(ABCDF)有多少个座位
     train = models.ForeignKey(Train, on_delete=models.CASCADE, verbose_name='所属车次')
     price = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'), verbose_name='价格')
 
@@ -68,17 +64,6 @@ class Carriage(models.Model):
         verbose_name = '车厢'
         verbose_name_plural = '车厢'
         ordering = ['-id']
-
-    # def save(self, *args, **kwargs):
-    #     if not self.seats:
-    #         self.seats = {
-    #             'A': 0,
-    #             'B': 0,
-    #             'C': 0,
-    #             'D': 0,
-    #             'F': 0,
-    #         }
-    #     super().save(*args, **kwargs)
 
 
 class Ticket(models.Model):
@@ -94,23 +79,36 @@ class Ticket(models.Model):
 
 
 class Order(models.Model):
+    order_status_choices = (
+        ('PAD', '已支付'),
+        ('UPD', '未支付'),
+        ('EXP', '已过期'),  # Expired
+    )
+
     user = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE, null=False)
     train = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE, null=False)
-    carriage_num = models.PositiveSmallIntegerField(default=0, verbose_name='车厢号')
-    carriage_type = models.CharField(max_length=3, choices=Carriage.TYPE_CHOICES, verbose_name='车厢类型')
-    seat_num = models.PositiveSmallIntegerField(verbose_name='座位号')
-    seat_location = models.CharField(default=0, max_length=1, verbose_name='座位位置')
-    # departure_station = models.ForeignKey(Stop, verbose_name='出发站', related_name='arrivals',
-    #                                       on_delete=models.CASCADE)
-    # departure_time = models.DateTimeField(verbose_name='出发时间', default=datetime(2023, 5, 20, 8, 0, 0))
-    # arrival_station = models.ForeignKey(Stop, verbose_name='到达站', related_name='departures',
-    #                                     on_delete=models.CASCADE)
-    # arrival_time = models.DateTimeField(verbose_name='到达时间')
     start_stop = models.ForeignKey(Stop, on_delete=models.CASCADE, related_name='start_stop_order')
     end_stop = models.ForeignKey(Stop, on_delete=models.CASCADE, related_name='end_stop_order')
     create_time = models.DateTimeField(verbose_name='创建时间', null=False)
+    total_price = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'), verbose_name='价格')
+    order_status = models.CharField(max_length=3, verbose_name='订单状态')
 
     class Meta:
         verbose_name = '订单'
         verbose_name_plural = '订单'
         ordering = ['-id']
+
+
+class Seat(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    seat_num = models.PositiveSmallIntegerField()
+    seat_location = models.CharField(max_length=1)
+    is_available = models.BooleanField(default=True)
+
+
+class PassengerOrder(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    passenger = models.ForeignKey(Passenger, on_delete=models.CASCADE)
+    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'), verbose_name='价格')
+    is_rebooked = models.BooleanField(default=False)
