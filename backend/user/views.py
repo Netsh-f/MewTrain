@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 
+
 from user.models import User, Passenger, SystemAdmin, RailwayAdmin
 
 
@@ -146,7 +147,7 @@ def add_passenger(request):
             phone_region=data['phone_region'],
             phone_number=data['phone_number'],
         )
-        if Passenger.objects.filter(user_id=user_id,id_number=passenger.id_number):
+        if Passenger.objects.filter(user_id=user_id, id_number=passenger.id_number):
             message = '该乘车人已存在'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -223,11 +224,20 @@ def login(request):
 
         username = request.data.get('username')
         password = request.data.get('password')
+
         try:
-            user = User.objects.get(Q(username=username) | Q(username=username) | Q(username=username))
-        except (User.DoesNotExist, SystemAdmin.DoesNotExist, RailwayAdmin.DoesNotExist):
-            message = '用户不存在'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            # 依次尝试查询User、SystemAdmin和RailwayAdmin模型，查找匹配的用户
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            try:
+                user = SystemAdmin.objects.get(username=username)
+            except SystemAdmin.DoesNotExist:
+                try:
+                    user = RailwayAdmin.objects.get(username=username)
+                except RailwayAdmin.DoesNotExist:
+                    message = '用户不存在'
+                    return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         if check_password(password, user.password):
             request.session['is_login'] = True
             request.session['user_id'] = user.id
@@ -348,6 +358,7 @@ def add_user(request):
         if user_type == 'user':
             username = data.get('username')
             password = data.get('password')
+            password = make_password(password)
             email = data.get('email')
 
             # 创建 User 模型对象
