@@ -1,3 +1,5 @@
+import decimal
+
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -82,6 +84,12 @@ def update_user_info(request):
         # 获取请求体中的数据
         data = request.data
         user_id = data['user_id']
+
+        session_id = request.session.get('user_id', None)
+        if session_id != user_id:
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=user_id)
 
         # 检查是否要修改密码
@@ -104,7 +112,7 @@ def update_user_info(request):
             user.email = data['email']
 
         # 保存用户信息
-        request.user.save()
+        user.save()
 
         message = '用户信息更新成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
@@ -138,9 +146,13 @@ def add_passenger(request):
             phone_region=data['phone_region'],
             phone_number=data['phone_number'],
         )
+        if Passenger.objects.filter(user_id=user_id,id_number=passenger.id_number):
+            message = '该乘车人已存在'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         passenger.user = user
         passenger.save()
-        message = '添加乘车员成功'
+        message = '添加乘车人成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -163,10 +175,10 @@ def remove_passenger(request):
         passenger = Passenger.objects.get(id=passenger_id, user=user)
         passenger.delete()
 
-        message = '删除乘车员成功'
+        message = '删除乘车人成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except (User.DoesNotExist, Passenger.DoesNotExist):
-        message = '用户或乘车员不存在'
+        message = '用户或乘车人不存在'
         return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -192,10 +204,10 @@ def update_passenger(request):
 
         passenger.save()
 
-        message = '乘车员信息更新成功'
+        message = '乘车人信息更新成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Passenger.DoesNotExist:
-        message = '乘车员不存在'
+        message = '乘车人不存在'
         return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -209,8 +221,8 @@ def login(request):
             message = '不允许重复登录'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.data.get('username')
+        password = request.data.get('password')
         try:
             user = User.objects.get(Q(username=username) | Q(username=username) | Q(username=username))
         except (User.DoesNotExist, SystemAdmin.DoesNotExist, RailwayAdmin.DoesNotExist):
@@ -283,7 +295,7 @@ def recharge(request):
         except User.DoesNotExist:
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
-        user.balance += amount
+        user.balance += decimal.Decimal(amount)
         user.save()
 
         message = '充值成功'
