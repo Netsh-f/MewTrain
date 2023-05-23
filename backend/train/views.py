@@ -235,17 +235,22 @@ def query_train(request):
 
             start_stop = start_stops.filter(train=train).first()
             end_stop = end_stops.filter(train=train).first()
+            is_next_day = False
             if start_stop and end_stop:
-                if end_stop.arrival_time >= start_stop.departure_time:
-                    total_duration = end_stop.arrival_time - start_stop.departure_time
+                if end_stop.arrival_time >= start_stop.arrival_time:
+                    total_duration = end_stop.arrival_time - start_stop.arrival_time
                 else:
                     # 处理跨天情况
+                    is_next_day = True
                     next_day = timedelta(days=1)
-                    total_duration = (end_stop.arrival_time + next_day) - start_stop.departure_time
+                    total_duration = (end_stop.arrival_time + next_day) - start_stop.arrival_time
 
             train_data.append({
                 'train_name': train.name,
                 'train_type': train.train_type,
+                'departure_time': start_stop.arrival_time,
+                'arrival_time': end_stop.arrival_time,
+                'is_next_day': is_next_day,
                 'total_duration': total_duration,
                 'ticket': carriage_data
             })
@@ -261,7 +266,16 @@ def query_train(request):
 @api_view(['POST'])
 def create_order(request):
     try:
-        pass
+        if not request.session.get('is_login'):
+            return Response({'message': '用户未登录'}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.session.get('user_id')
+        data = request.data
+        train_name = data.get('train_name')
+        carriage_type = data.get('carriage_type')
+
+        train = Train.object.get(name=train_name)
+        carriages = train.carriage_set.filter(type=carriage_type)
+
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

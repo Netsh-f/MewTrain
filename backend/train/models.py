@@ -97,7 +97,9 @@ class Order(models.Model):
     user = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE, null=False)
     train = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE, null=False)
     carriage_num = models.PositiveSmallIntegerField(default=0, verbose_name='车厢号')
-    seat_num = models.CharField(default=0, max_length=3, verbose_name='座位位置')
+    carriage_type = models.CharField(max_length=3, choices=Carriage.TYPE_CHOICES, verbose_name='车厢类型')
+    seat_line = models.PositiveSmallIntegerField(verbose_name='座位行数')
+    seat_location = models.CharField(default=0, max_length=1, verbose_name='座位位置')
     departure_station = models.ForeignKey(Stop, verbose_name='出发站', related_name='arrivals',
                                           on_delete=models.CASCADE)
     departure_time = models.DateTimeField(verbose_name='出发时间', default=datetime(2023, 5, 20, 8, 0, 0))
