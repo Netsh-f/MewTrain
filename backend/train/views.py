@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+from random import randint, choice
 
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 
-from .models import Station, Train, Carriage, Stop, Ticket
+from user.models import User
+from .models import Station, Train, Carriage, Stop, Ticket, Order
 
 
 @api_view(['POST'])
@@ -248,11 +250,15 @@ def query_train(request):
             train_data.append({
                 'train_name': train.name,
                 'train_type': train.train_type,
+                'departure_station_name': start_stop.station.name,
                 'departure_time': start_stop.arrival_time,
+                'arrival_station_name': end_stop.station.name,
                 'arrival_time': end_stop.arrival_time,
                 'is_next_day': is_next_day,
                 'total_duration': total_duration,
-                'ticket': carriage_data
+                'ticket': carriage_data,
+                'start_stop_id': start_stop.id,
+                'end_stop_id': end_stop.id
             })
 
         message = '查询列车信息成功'
@@ -269,13 +275,64 @@ def create_order(request):
         if not request.session.get('is_login'):
             return Response({'message': '用户未登录'}, status=status.HTTP_400_BAD_REQUEST)
         user_id = request.session.get('user_id')
+        user = User.object.get(id=user_id)
         data = request.data
         train_name = data.get('train_name')
         carriage_type = data.get('carriage_type')
+        date = data.get('date')
+        start_stop_id = data.get('start_stop_id')
+        end_stop_id = data.get('end_stop_id')
 
+        start_stop = Stop.object.get(id=start_stop_id)
+        end_stop = Stop.object.get(id=end_stop_id)
         train = Train.object.get(name=train_name)
         carriages = train.carriage_set.filter(type=carriage_type)
+        available_carriage = None
+        ticket = None
+        for carriage in carriages:
+            ticket = carriage.ticket_set.filter(date=date).first()
+            if ticket.remaining_count > 0:
+                available_carriage = carriage
+                break
+        if not ticket or not available_carriage:
+            message = '无可用座位'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
+        seat_num = 0
+        seat_location = None
+        if available_carriage.type == 'BUS':
+            seat_num = randint(1, available_carriage.total_num / 3 + 1)
+            seat_location = choice(['A', 'B', 'C'])
+        elif available_carriage.type == 'FST':
+            seat_num = randint(1, available_carriage.total_num / 4 + 1)
+            seat_location = choice(['A', 'B', 'C', 'D'])
+        elif available_carriage.type == 'SND':
+            seat_num = randint(1, available_carriage.total_num / 5 + 1)
+            seat_location = choice(['A', 'B', 'C', 'D', 'F'])
+        elif available_carriage.type == 'HAW':
+            seat_num = randint(1, available_carriage.total_num / 3 + 1)
+            seat_location = choice(['上', '中', '下'])
+        elif available_carriage.type == 'SOF':
+            seat_num = randint(1, available_carriage.total_num / 2 + 1)
+            seat_location = choice(['上', '下'])
+        else:
+            seat_num = randint(1, available_carriage.total_num)
+            seat_location = ''  # 硬座只有座位编号，用seat_num记录
+
+        Order.objects.create(
+            user=user,
+            train=train,
+            carriage_num=available_carriage.carriage_num,
+            carriage_type=available_carriage.type,
+            seat_num=seat_num,
+            seat_location=seat_location,
+            start_stop=start_stop,
+            end_stop=end_stop,
+            create_time=datetime.now()
+        )
+
+        message = '订单创建成功'
+        return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

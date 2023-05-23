@@ -98,14 +98,16 @@ class Order(models.Model):
     train = models.ForeignKey(Train, verbose_name='车次', on_delete=models.CASCADE, null=False)
     carriage_num = models.PositiveSmallIntegerField(default=0, verbose_name='车厢号')
     carriage_type = models.CharField(max_length=3, choices=Carriage.TYPE_CHOICES, verbose_name='车厢类型')
-    seat_line = models.PositiveSmallIntegerField(verbose_name='座位行数')
+    seat_num = models.PositiveSmallIntegerField(verbose_name='座位号')
     seat_location = models.CharField(default=0, max_length=1, verbose_name='座位位置')
-    departure_station = models.ForeignKey(Stop, verbose_name='出发站', related_name='arrivals',
-                                          on_delete=models.CASCADE)
-    departure_time = models.DateTimeField(verbose_name='出发时间', default=datetime(2023, 5, 20, 8, 0, 0))
-    arrival_station = models.ForeignKey(Stop, verbose_name='到达站', related_name='departures',
-                                        on_delete=models.CASCADE)
-    arrival_time = models.DateTimeField(verbose_name='到达时间')
+    # departure_station = models.ForeignKey(Stop, verbose_name='出发站', related_name='arrivals',
+    #                                       on_delete=models.CASCADE)
+    # departure_time = models.DateTimeField(verbose_name='出发时间', default=datetime(2023, 5, 20, 8, 0, 0))
+    # arrival_station = models.ForeignKey(Stop, verbose_name='到达站', related_name='departures',
+    #                                     on_delete=models.CASCADE)
+    # arrival_time = models.DateTimeField(verbose_name='到达时间')
+    start_stop = models.ForeignKey(Stop, on_delete=models.CASCADE, related_name='start_stop_order')
+    end_stop = models.ForeignKey(Stop, on_delete=models.CASCADE, related_name='end_stop_order')
     create_time = models.DateTimeField(verbose_name='创建时间', null=False)
 
     class Meta:
