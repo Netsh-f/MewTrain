@@ -7,6 +7,8 @@ const Login = () => import('../components/Login.vue');
 const page1 = () => import('../components/page1.vue');
 const page2 = () => import('../components/page2.vue');
 const page3 = () => import('../components/page3.vue');
+const TicketInquiry = () => import('../components/TicketInquiry.vue')
+const TicketOrder = () => import('../components/TicketOrder.vue')
 
 
 const routes= [
@@ -21,15 +23,23 @@ const routes= [
     component:Home,
     redirect: {name: "page1"},
     children:[
-      // {
-      //   path: "/TicketInquiry",
-      //   name: "TicketInquiry",
-      //   component: TicketInquiry,
-      //   meta: {
-      //     title: "车票查询"
-      //   }
-      // },
-      //以下界面都是哪来测试跳转的
+      {
+        path: "/TicketInquiry",
+        name: "TicketInquiry",
+        component: TicketInquiry,
+        meta: {
+          title: "车票查询"
+        }
+      },
+      {
+        path: "/TicketOrder",
+        name: "TicketOrder",
+        component: TicketOrder,
+        meta: {
+          title: "车票订购"
+        }
+      },
+     // 以下界面都是哪来测试跳转的
       {
         path: "/page1",
         name: "page1",

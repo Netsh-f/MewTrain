@@ -23,12 +23,16 @@
         <el-menu-item index="page1">
           <template #title>
             <el-icon><location /></el-icon>
-            <span>Navigator One</span>
-          </template>
+            <span>首页   WELCOME</span>
+          </template> 
         </el-menu-item>
-        <el-menu-item index="page2">
+        <el-menu-item index="TicketInquiry">
+          <el-icon><document /></el-icon>
+          <span>列车信息查询</span>
+        </el-menu-item>
+        <el-menu-item index="TicketOrder">
           <el-icon><setting /></el-icon>
-          <span>Navigator Two</span>
+          <span>购票界面</span>
         </el-menu-item>
         <el-menu-item index="page3">
           <el-icon><document /></el-icon>
