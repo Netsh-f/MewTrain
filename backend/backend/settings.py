@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
+from configparser import ConfigParser
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     "user",
     "train",
     'django_extensions',
-    'corsheaders', # 解决跨域
+    'corsheaders',  # 解决跨域
 ]
 
 MIDDLEWARE = [
@@ -58,8 +59,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates']
-        ,
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -126,7 +126,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CORS_ALLOW_ALL_ORIGINS = True
+# 解决跨域问题
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
@@ -138,4 +138,17 @@ CORS_ALLOW_METHODS = [
     'DELETE',
 ]
 
-CORS_ALLOW_HEADERS = ('*')
+CORS_ALLOW_HEADERS = '*'
+
+# 进行发送邮件的设置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True  # 是否使用TLS安全传输协议(用于在两个通信应用程序之间提供保密性和数据完整性。)
+EMAIL_USE_SSL = False  # 是否使用SSL加密，qq企业邮箱要求使用
+EMAIL_HOST = 'smtp.yeah.net'  # 发送邮件的邮箱 的 SMTP服务器，这里用了163邮箱
+EMAIL_PORT = 25  # 发件箱的SMTP服务器端口
+
+config_file = os.path.expanduser('~/.config/django/MewTrain.cnf')
+config = ConfigParser()
+config.read(config_file)
+EMAIL_HOST_USER = config.get('Email', 'EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config.get('Email', 'EMAIL_HOST_PASSWORD')  # 这是授权码
