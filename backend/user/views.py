@@ -264,7 +264,6 @@ def logout(request):
         if not request.session.get('is_login', None):
             message = '请先登录'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         request.session.flush()
         message = '登出成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
