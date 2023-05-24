@@ -1,6 +1,4 @@
 <template>
-    <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
-        href1=#/mesdeal1 href2=#/mesdeal2 href3=#/mesdeal3 href4=#/mesdeal4 href5=#/ ></fornav>
     <h1>查询信息</h1>
     <hr>
     <div style="text-align:center;vertical-align:middel;">
@@ -31,7 +29,6 @@
 
 
 <script scoped>
-import fornav from './fornav.vue';
 import { ElMessage } from 'element-plus'
 const tableData = [
     {
@@ -137,9 +134,6 @@ export default {
         open3,
         open4,
     },
-    components: {
-        fornav,
-    }
 }
 </script>
 

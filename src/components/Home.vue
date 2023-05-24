@@ -18,30 +18,37 @@
         class="el-menu-vertical-demo"
         @open="handleOpen"
         @close="handleClose"
-        router="true"
-      >
-        <el-menu-item index="page1">
+        router="true">
+        <el-menu-item index="WELCOME">
           <template #title>
             <el-icon><location /></el-icon>
-            <span>首页</span>
+            <span class="ItemName">首页</span>
           </template> 
         </el-menu-item>
         <el-menu-item index="TicketInquiry">
           <el-icon><document /></el-icon>
-          <span>列车信息查询</span>
+          <span class="ItemName">列车信息查询</span>
         </el-menu-item>
         <el-menu-item index="TicketOrder">
           <el-icon><setting /></el-icon>
-          <span>购票界面</span>
+          <span class="ItemName">购票界面</span>
         </el-menu-item>
         <el-sub-menu index="">
           <template #title>
             <el-icon><location /></el-icon>
-            <span>管理员界面</span>
+            <span class="ItemName">管理员界面</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="mesdeal1">系统管理员</el-menu-item>
-            <el-menu-item index="1-2">车次管理员</el-menu-item>
+            <el-menu-item index="mesdeal_home">
+              <span class="ItemName">
+                系统管理员
+              </span>
+            </el-menu-item>
+            <el-menu-item index="mesdeal_setting">
+              <span class="ItemName">
+                车次管理员
+              </span>
+            </el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
       </el-menu>
@@ -65,9 +72,13 @@ export default{
 }
 </script>
 <style lang="less" scoped>
-  .el-menu-vertical-demo {
-    background-color: white;
+  .ItemName{
     color: white;
+  }
+  .el-menu-vertical-demo {
+    --text-color: white;
+    background-color: #373d41;
+    --text-color: white;
   }
   .home-container{
   height: 100%;
@@ -75,6 +86,10 @@ export default{
   .LogoutButton{
   align-items: center;
 }
+  .el-menu-item-group
+  {
+    background-color: #373d41;
+  }
   .el-header{
     color: #ffff;
     align-items: right;

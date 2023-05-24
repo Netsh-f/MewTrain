@@ -629,10 +629,7 @@
                 this.high_seat_price= this.$route.query.high_seat_price;
                 this.medium_seat_price= this.$route.query.medium_seat_price;
                 this.low_seat_price= this.$route.query.low_seat_price;
-
             }
-
-
 
         },
 
