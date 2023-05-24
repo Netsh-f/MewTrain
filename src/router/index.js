@@ -9,10 +9,10 @@ const page2 = () => import('../components/page2.vue');
 const page3 = () => import('../components/page3.vue');
 const TicketInquiry = () => import('../components/TicketInquiry.vue')
 const TicketOrder = () => import('../components/TicketOrder.vue')
-const xxgl_home = () => import('../components/xxgl/xxgl_home.vue')
-const xxgl_check = () => import('../components/xxgl/xxgl_check.vue')
-const xxgl_message = () => import('../components/xxgl/xxgl_message.vue')
-const xxgl_setting = () => import('../components/xxgl/xxgl_setting.vue')
+const mesdeal_home = () => import('../components/mesdeal/mesdeal_home.vue')
+const mesdeal_check = () => import('../components/mesdeal/mesdeal_check.vue')
+const mesdeal_message = () => import('../components/mesdeal/mesdeal_message.vue')
+const mesdeal_setting = () => import('../components/mesdeal/mesdeal_setting.vue')
 
 const routes= [
     {
@@ -72,24 +72,24 @@ const routes= [
     },
     //信息管理
     {
-      path:'/xxgl1',
-      name: 'xxgl_home',
-      component:xxgl_home,
+      path:'/mesdeal1',
+      name: 'mesdeal_home',
+      component:mesdeal_home,
     },
     {
-      path: '/xxgl2',
-      name:'xxgl_message',
-      component:xxgl_message,
+      path: '/mesdeal2',
+      name:'mesdeal_message',
+      component:mesdeal_message,
     },
     {
-      path: '/xxgl3',
-      name:'xxgl_check',
-      component:xxgl_check,
+      path: '/mesdeal3',
+      name:'mesdeal_check',
+      component:mesdeal_check,
     },
     {
-      path: '/xxgl4',
-      name:'xxgl_setting',
-      component:xxgl_setting,
+      path: '/mesdeal4',
+      name:'mesdeal_setting',
+      component:mesdeal_setting,
     },
 
 ]

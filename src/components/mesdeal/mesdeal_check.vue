@@ -1,6 +1,6 @@
 <template>
     <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
-        href1=#/xxgl1 href2=#/xxgl2 href3=#/xxgl3 href4=#/xxgl4 href5=#/ ></fornav>
+        href1=#/mesdeal1 href2=#/mesdeal2 href3=#/mesdeal3 href4=#/mesdeal4 href5=#/ ></fornav>
     <h1>查询信息</h1>
     <hr>
     <div style="text-align:center;vertical-align:middel;">
@@ -123,7 +123,7 @@ const reop = ($rme) => {
     }
 }
 export default {
-    name: "My_xxgl_check",
+    name: "My_mesdeal_check",
     data() {
         return {
             tableData,
