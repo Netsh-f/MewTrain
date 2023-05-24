@@ -34,10 +34,16 @@
           <el-icon><setting /></el-icon>
           <span>购票界面</span>
         </el-menu-item>
-        <el-menu-item index="page3">
-          <el-icon><document /></el-icon>
-          <span>Navigator Three</span>
-        </el-menu-item>
+        <el-sub-menu index="">
+          <template #title>
+            <el-icon><location /></el-icon>
+            <span>管理员界面</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="xxgl1">系统管理员</el-menu-item>
+            <el-menu-item index="1-2">车次管理员</el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
       </el-menu>
         </el-aside>
         <!-- 右侧内容主体 -->
