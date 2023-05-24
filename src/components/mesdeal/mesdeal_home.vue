@@ -26,6 +26,12 @@ export default {
             ]
         }
     },
+<<<<<<< HEAD
+=======
+    components: {
+        fornav,
+    },
+>>>>>>> d59bbcf3ae8e6211febbdcc7592938b00d68817f
     methods: {
     },
 }
