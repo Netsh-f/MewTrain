@@ -4,7 +4,7 @@
       <!--  头部 -->
       <el-header>
         <div>
-          <img src="../assets/logo.png" alt="图片">
+          <img src="" alt="">
           <span>MewTrain MewTrain MewTrain MewTrain </span>
         </div>
         <el-button class="LogoutButton" type="info" @click="logout">退出</el-button>
@@ -23,7 +23,7 @@
         <el-menu-item index="page1">
           <template #title>
             <el-icon><location /></el-icon>
-            <span>首页   WELCOME</span>
+            <span>首页</span>
           </template> 
         </el-menu-item>
         <el-menu-item index="TicketInquiry">
