@@ -473,7 +473,7 @@ def pay_order(request):
             msg += '\n\n祝您旅途愉快！'
             send_mail(subject, msg, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             message += '已发送通知邮件'
-        except smtplib.SMTPException as e:
+        except smtplib.SMTPException:
             message += '未成功发送通知邮件'
 
         return Response({'message': message}, status=status.HTTP_200_OK)
@@ -554,7 +554,7 @@ def return_order(request):  # 这是取消订单
             msg += '\n\n期待下次与您相遇。'
             send_mail(subject, msg, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             message += '已发送通知邮件'
-        except smtplib.SMTPException as e:
+        except smtplib.SMTPException:
             message += '未成功发送通知邮件'
 
         return Response({'message': message}, status=status.HTTP_200_OK)
@@ -623,7 +623,7 @@ def rebook(request):
             msg += '\n\n祝您旅途愉快！'
             send_mail(subject, msg, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             message += '已发送通知邮件'
-        except smtplib.SMTPException as e:
+        except smtplib.SMTPException:
             message += '未成功发送通知邮件'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -658,7 +658,6 @@ def test_send_email(request):
         message = '已发送通知邮件'
         print(message)
         return Response({'message': message}, status=status.HTTP_200_OK)
-    except smtplib.SMTPException as e:
+    except smtplib.SMTPException:
         message = '未成功发送通知邮件'
-        print(f'{message}:{e}')
         return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
