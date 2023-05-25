@@ -50,7 +50,7 @@ def add_train(request):
         stops = data.get("stops", None)  # 应该是一个列表
 
         train = Train.objects.create(
-            train_name=train_name,
+            name=train_name,
             train_type=train_type
         )
 
@@ -72,9 +72,10 @@ def add_train(request):
         for stop_data in stops:  # 遍历列表
             station_name = stop_data.get("station_name", None)
             arrival_time = stop_data.get("arrival_time", None)
-            duration = stop_data.get("duration", None)
+            duration_str = stop_data.get("duration", None)
             sequence = stop_data.get("sequence", None)
-
+            value = int(duration_str)
+            duration = timedelta(minutes=value)
             # 获取对应的站点对象
             station = Station.objects.get(name=station_name)
             Stop.objects.create(
@@ -105,8 +106,11 @@ def add_ticket(request):
         start_date = datetime.strptime(data.get('start_date', None), "%Y-%m-%d")
         end_date = datetime.strptime(data.get('end_date', None), "%Y-%m-%d")  # 包含开始日期和结束日期，它们可以是同一天，将创建两个日期中间所有日期的票
         train_name = data.get('train_name', None)
-
         train = Train.objects.get(name=train_name)
+        # 重复判断
+        if Ticket.objects.filter(train=train):
+            message = '不可重复添加'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         carriages = train.carriage_set.all()
 
         current_date = start_date
@@ -121,19 +125,19 @@ def add_ticket(request):
                 max_rows = 0  # 总行数，这里就要求上面add_train的时候total_num是某个数的整数倍
                 seat_locations = []  # 位置的名称，硬座此项为空
                 if carriage.type == 'BUS':  # 为创建Seat做准备，分六种车型
-                    max_rows = carriage.total_num / 3
+                    max_rows = carriage.total_num // 3
                     seat_locations = ['A', 'B', 'C']
                 elif carriage.type == 'FST':
-                    max_rows = carriage.total_num / 4
+                    max_rows = carriage.total_num // 4
                     seat_locations = ['A', 'B', 'C', 'D']
                 elif carriage.type == 'SND':
-                    max_rows = carriage.total_num / 5
+                    max_rows = carriage.total_num // 5
                     seat_locations = ['A', 'B', 'C', 'D', 'F']
                 elif carriage.type == 'HAW':
-                    max_rows = carriage.total_num / 3
+                    max_rows = carriage.total_num // 3
                     seat_locations = ['下', '中', '上']
                 elif carriage.type == 'SOF':
-                    max_rows = carriage.total_num / 2
+                    max_rows = carriage.total_num // 2
                     seat_locations = ['下', '上']
                 elif carriage.type == 'HAZ':
                     max_rows = carriage.total_num
@@ -147,6 +151,8 @@ def add_ticket(request):
                             is_available=True
                         )
             current_date += timedelta(days=1)
+        message = '车票添加成功'
+        return Response({'message': message}, status=status.HTTP_201_CREATED)
 
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -169,11 +175,15 @@ def get_train_list(request):
 
             stop_data = []  # 将返回一个列表
             for stop in sorted(stops, key=lambda x: x.sequence):
+                duration_seconds = stop.duration.total_seconds()
+                minutes = int(duration_seconds // 60)
+                arrival_time = stop.arrival_time.strftime('%H:%M')
+
                 stop_data.append({
                     'sequence': stop.sequence,
                     'station_name': stop.station.name,
-                    'arrival_time': stop.arrival_time,
-                    'duration': stop.duration
+                    'arrival_time': arrival_time,
+                    'duration': minutes
                 })
 
             carriage_data = []  # 将返回一个列表
@@ -230,7 +240,9 @@ def query_train(request):
         data = request.data
         departure_city = data.get('departure_city', None)
         arrival_city = data.get('arrival_city', None)
-        date = data.get('date', None)
+        date_str = data.get('date', None)
+
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         start_stops = Stop.objects.filter(station__city=departure_city)
         end_stops = Stop.objects.filter(station__city=arrival_city)
@@ -247,9 +259,11 @@ def query_train(request):
             carriage_data = {}  # 这个不是列表但类似列表，每个元素名为车厢(座位)的类型，其每个类型的内容格式相同
             carriages = train.carriage_set.all()
             total_duration = 0
-
             for carriage in carriages:
                 ticket = carriage.ticket_set.filter(date=date).first()
+                if ticket is None:
+                    message = '存在未设置车票的车厢'
+                    return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
                 if carriage.type not in carriage_data:
                     carriage_data[carriage.type] = {
                         'price': carriage.price,
@@ -262,22 +276,35 @@ def query_train(request):
             is_next_day = False
             if start_stop and end_stop:
                 if end_stop.arrival_time >= start_stop.arrival_time:
-                    total_duration = end_stop.arrival_time - start_stop.arrival_time
+                    total_duration = datetime.combine(date, end_stop.arrival_time) - datetime.combine(date,
+                                                                                                      start_stop.arrival_time)
                 else:
                     # 处理跨天情况，默认一列车总时长不会超过24小时
                     is_next_day = True
                     next_day = timedelta(days=1)
-                    total_duration = (end_stop.arrival_time + next_day) - start_stop.arrival_time
+                    total_duration = datetime.combine(date + next_day, end_stop.arrival_time) - datetime.combine(date,
+                                                                                                                 start_stop.arrival_time)
+
+            total_duration_seconds = total_duration.total_seconds()
+            hours = int(total_duration_seconds // 3600)
+            minutes = int((total_duration_seconds % 3600) // 60)
+            if minutes == 0:
+                duration_string = f"{hours}时整"
+            else:
+                duration_string = f"{hours}时{minutes}分"
+
+            departure_time = start_stop.arrival_time.strftime('%H:%M')
+            arrival_time = end_stop.arrival_time.strftime('%H:%M')
 
             train_data.append({
                 'train_name': train.name,
                 'train_type': train.train_type,
                 'departure_station_name': start_stop.station.name,
-                'departure_time': start_stop.arrival_time,
+                'departure_time': departure_time,
                 'arrival_station_name': end_stop.station.name,
-                'arrival_time': end_stop.arrival_time,
+                'arrival_time': arrival_time,
                 'is_next_day': is_next_day,  # 是否跨天
-                'total_duration': total_duration,
+                'total_duration': duration_string,
                 'ticket': carriage_data,
                 'start_stop_id': start_stop.id,  # create_order中会用到
                 'end_stop_id': end_stop.id  # create_order中会用到
