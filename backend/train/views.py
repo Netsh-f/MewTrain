@@ -1,5 +1,6 @@
 import smtplib
 from datetime import datetime, timedelta
+from itertools import zip_longest
 
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -307,6 +308,7 @@ def create_order_function(user_id, data):
     start_stop_id = data.get('start_stop_id', None)
     end_stop_id = data.get('end_stop_id', None)
     passenger_ids = data.get('passenger_ids', None)
+    seat_locations = data.get('seat_locations', None)  # 存放预期座位位置信息，是个列表，其个数小于等于乘车人数
 
     passengers = Passenger.objects.filter(id__in=passenger_ids)  # 查找得到一个集合
     start_stop = Stop.objects.get(id=start_stop_id)
@@ -328,17 +330,26 @@ def create_order_function(user_id, data):
     )
 
     total_price = 0
-    for passenger in passengers:
+    for passenger, seat_location in zip_longest(passengers, seat_locations,
+                                                fillvalue=None):  # 如果预期座位位置数小于乘车人，多的乘车人对应的seat_location会赋值为None
         available_carriage = None
         ticket = None
+        seat = None
+
         for carriage in carriages:
             ticket = carriage.ticket_set.filter(date=date).first()
-            if ticket.remaining_count > 0:
+            if seat_location is not None:
+                seat = ticket.seat_set.filter(seat_location=seat_location, is_available=True).first()  # 处理有预期座位位置的情况
+            else:
+                seat = ticket.seat_set.filter(is_available=True).first()
+            if seat is not None:
                 available_carriage = carriage
                 break
-            if not ticket or not available_carriage:
-                message = '无可用座位'
-                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        if seat is None:
+            message = '无可用座位'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         if passenger.ticket_type in ['CHI', 'DOM'] or (  # 分情况进行优惠，学生如果购买普通列车是5折，购买高铁是7.5折。这里没有考虑学生一年只能买4张等限制
                 passenger.ticket_type == 'STU' and train.train_type == 'REG'):
             price = available_carriage.price * 0.5
@@ -347,7 +358,6 @@ def create_order_function(user_id, data):
         else:
             price = available_carriage.price
 
-        seat = ticket.seat_set.filter(is_available=True).first()
         seat.is_available = False  # 更新座位状态
         ticket.remaining_count -= 1  # 更新剩余座位信息
         total_price += price
@@ -359,7 +369,7 @@ def create_order_function(user_id, data):
         )
 
     order.total_price = total_price
-    order.save()
+    order.save()  # 修改了order，记得保存
     return order
 
 
