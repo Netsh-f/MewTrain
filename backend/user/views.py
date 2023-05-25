@@ -137,7 +137,7 @@ def add_passenger(request):
 
         if not user:
             message = '用户不存在'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
         passenger = Passenger(
             id_type=data['id_type'],
@@ -180,7 +180,7 @@ def remove_passenger(request):
         return Response({'message': message}, status=status.HTTP_200_OK)
     except (User.DoesNotExist, Passenger.DoesNotExist):
         message = '用户或乘车人不存在'
-        return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -236,7 +236,7 @@ def login(request):
                     user = RailwayAdmin.objects.get(username=username)
                 except RailwayAdmin.DoesNotExist:
                     message = '用户不存在'
-                    return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
         if check_password(password, user.password):
             request.session['is_login'] = True
@@ -371,6 +371,7 @@ def add_user(request):
         elif user_type == 'system_admin':
             username = data.get('username')
             password = data.get('password')
+            password = make_password(password)
 
             # 创建 SystemAdmin 模型对象
             system_admin = SystemAdmin.objects.create(
@@ -382,6 +383,7 @@ def add_user(request):
         elif user_type == 'railway_admin':
             username = data.get('username')
             password = data.get('password')
+            password = make_password(password)
 
             # 创建 RailwayAdmin 模型对象
             railway_admin = RailwayAdmin.objects.create(
@@ -444,7 +446,7 @@ def update_user_info_system_admin(request):
 
     except User.DoesNotExist:
         message = '用户不存在'
-        return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
