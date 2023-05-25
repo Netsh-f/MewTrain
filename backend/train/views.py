@@ -1,11 +1,15 @@
+import smtplib
 from datetime import datetime, timedelta
+from itertools import zip_longest
 
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 
+from backend import settings
 from user.models import User, Passenger
 from .models import Station, Train, Carriage, Stop, Ticket, Order, Seat, PassengerOrder
+from django.core.mail import send_mail
 
 
 @api_view(['POST'])
@@ -48,6 +52,10 @@ def add_train(request):
         train_type = data.get("train_type", None)
         carriages = data.get("carriages", None)  # 应该传来一个列表，列表内元素看下面
         stops = data.get("stops", None)  # 应该是一个列表
+
+        if Train.objects.get(name=train_name):  # 添加“不能为同一趟车次创建不同的火车信息”的判断
+            message = '火车信息已存在'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         train = Train.objects.create(
             name=train_name,
@@ -327,6 +335,7 @@ def create_order_function(user_id, data):
     start_stop_id = data.get('start_stop_id', None)
     end_stop_id = data.get('end_stop_id', None)
     passenger_ids = data.get('passenger_ids', None)
+    seat_locations = data.get('seat_locations', None)  # 存放预期座位位置信息，是个列表，其个数小于等于乘车人数
 
     passengers = Passenger.objects.filter(id__in=passenger_ids)  # 查找得到一个集合
     start_stop = Stop.objects.get(id=start_stop_id)
@@ -348,17 +357,26 @@ def create_order_function(user_id, data):
     )
 
     total_price = 0
-    for passenger in passengers:
+    for passenger, seat_location in zip_longest(passengers, seat_locations,
+                                                fillvalue=None):  # 如果预期座位位置数小于乘车人，多的乘车人对应的seat_location会赋值为None
         available_carriage = None
         ticket = None
+        seat = None
+
         for carriage in carriages:
             ticket = carriage.ticket_set.filter(date=date).first()
-            if ticket.remaining_count > 0:
+            if seat_location is not None:
+                seat = ticket.seat_set.filter(seat_location=seat_location, is_available=True).first()  # 处理有预期座位位置的情况
+            else:
+                seat = ticket.seat_set.filter(is_available=True).first()
+            if seat is not None:
                 available_carriage = carriage
                 break
-            if not ticket or not available_carriage:
-                message = '无可用座位'
-                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        if seat is None:
+            message = '无可用座位'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         if passenger.ticket_type in ['CHI', 'DOM'] or (  # 分情况进行优惠，学生如果购买普通列车是5折，购买高铁是7.5折。这里没有考虑学生一年只能买4张等限制
                 passenger.ticket_type == 'STU' and train.train_type == 'REG'):
             price = available_carriage.price * 0.5
@@ -367,7 +385,6 @@ def create_order_function(user_id, data):
         else:
             price = available_carriage.price
 
-        seat = ticket.seat_set.filter(is_available=True).first()
         seat.is_available = False  # 更新座位状态
         ticket.remaining_count -= 1  # 更新剩余座位信息
         total_price += price
@@ -379,7 +396,7 @@ def create_order_function(user_id, data):
         )
 
     order.total_price = total_price
-    order.save()
+    order.save()  # 修改了order，记得保存
     return order
 
 
@@ -475,7 +492,27 @@ def pay_order(request):
 
         user.balance -= order.total_price
         order.order_status = 'PAD'
+
         message = '支付成功'
+
+        try:
+            subject = '购票成功通知'
+            msg = f'尊敬的用户，您已成功购票。\n\n以下是您的购票详情：\n\n'
+            msg += f'车次：{order.train.name}\n'
+            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{order.start_stop.arrival_time}'
+            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{order.end_stop.arrival_time}\n\n'
+            msg += f'以下是乘车人详情：\n\n'
+            passenger_orders = order.passengerorder_set
+            for passenger_order in passenger_orders:
+                msg += f'姓名：{passenger_order.passenger.name} '
+                msg += f'{passenger_order.seat.ticket.carriage.carriage_num}车 '
+                msg += f'{passenger_order.seat.seat_num} {passenger_order.seat.seat_location}\n'
+            msg += '\n\n祝您旅途愉快！'
+            send_mail(subject, msg, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            message += '已发送通知邮件'
+        except smtplib.SMTPException:
+            message += '未成功发送通知邮件'
+
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -483,7 +520,35 @@ def pay_order(request):
 
 
 @api_view(['POST'])
-def return_order(request):
+def remove_order(request):  # 这是删除订单
+    try:
+        identity = request.session.get('identity', None)
+        if identity != 'user':
+            message = '用户未登录'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+        order_id = data.get('order_id', None)
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            message = '订单不存在'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        if order.order_status not in ['UPD', 'EXP']:
+            message = '订单不可删除'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        order.delete()
+        message = '订单删除成功'
+        return Response({'message': message}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def return_order(request):  # 这是取消订单
     try:
         identity = request.session.get('identity', None)
         if identity != 'user':
@@ -510,6 +575,25 @@ def return_order(request):
 
         order.delete()
         message = '取消订单成功'
+
+        try:
+            subject = '取消订单成功通知'
+            msg = f'尊敬的用户，您已成功取消订单。\n\n以下是您的订单详情：\n\n'
+            msg += f'车次：{order.train.name}\n'
+            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{order.start_stop.arrival_time}'
+            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{order.end_stop.arrival_time}\n\n'
+            msg += f'以下是乘车人详情：\n\n'
+            passenger_orders = order.passengerorder_set
+            for passenger_order in passenger_orders:
+                msg += f'姓名：{passenger_order.passenger.name} '
+                msg += f'{passenger_order.seat.ticket.carriage.carriage_num}车 '
+                msg += f'{passenger_order.seat.seat_num} {passenger_order.seat.seat_location}\n'
+            msg += '\n\n期待下次与您相遇。'
+            send_mail(subject, msg, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            message += '已发送通知邮件'
+        except smtplib.SMTPException:
+            message += '未成功发送通知邮件'
+
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -558,6 +642,26 @@ def rebook(request):
             return Response({'message': message}, status=status.HTTP_402_PAYMENT_REQUIRED)
 
         message = '改签成功'
+        try:
+            subject = '改签成功通知'
+            msg = f'尊敬的用户，您已成功改签。\n\n以下是您的改签详情：\n\n'
+            msg += f'原车次：{original_order.train.name}\n'
+            msg += f'出发站：{original_order.start_stop.station.name}\n出发时间：{original_order.start_stop.arrival_time}'
+            msg += f'到达站：{original_order.end_stop.station.name}\n到达时间：{original_order.end_stop.arrival_time}\n\n'
+            msg += f'改签车次：{order.train.name}\n'
+            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{order.start_stop.arrival_time}'
+            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{order.end_stop.arrival_time}\n\n'
+            msg += f'以下是乘车人详情：\n\n'
+            passenger_orders = order.passengerorder_set
+            for passenger_order in passenger_orders:
+                msg += f'姓名：{passenger_order.passenger.name} '
+                msg += f'{passenger_order.seat.ticket.carriage.carriage_num}车 '
+                msg += f'{passenger_order.seat.seat_num} {passenger_order.seat.seat_location}\n'
+            msg += '\n\n祝您旅途愉快！'
+            send_mail(subject, msg, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            message += '已发送通知邮件'
+        except smtplib.SMTPException:
+            message += '未成功发送通知邮件'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -578,3 +682,19 @@ def get_info(request):
     }
     message = '你好，前端'
     return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def test_send_email(request):
+    try:
+        subject = '购票成功通知'
+        msg = f'尊敬的用户，您已成功购票。\n\n以下是您的购票详情：\n\n'
+        msg += f'车次：G103\n出发站：北京南\n到达站：枣庄\n\n'
+        msg += '祝您旅途愉快！'
+        send_mail(subject, msg, settings.EMAIL_HOST_USER, ['zwj1813@163.com'], fail_silently=False)
+        message = '已发送通知邮件'
+        print(message)
+        return Response({'message': message}, status=status.HTTP_200_OK)
+    except smtplib.SMTPException:
+        message = '未成功发送通知邮件'
+        return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
