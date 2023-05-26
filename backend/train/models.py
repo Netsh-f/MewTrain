@@ -92,6 +92,7 @@ class Order(models.Model):
     create_time = models.DateTimeField(verbose_name='创建时间', null=False)
     total_price = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'), verbose_name='价格')
     order_status = models.CharField(max_length=3, verbose_name='订单状态')
+    date = models.DateField()
 
     class Meta:
         verbose_name = '订单'

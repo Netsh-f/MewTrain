@@ -53,15 +53,10 @@ def add_train(request):
         carriages = data.get("carriages", None)  # 应该传来一个列表，列表内元素看下面
         stops = data.get("stops", None)  # 应该是一个列表
 
-        if Train.objects.get(name=train_name):  # 添加“不能为同一趟车次创建不同的火车信息”的判断
-            message = '火车信息已存在'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         train = Train.objects.create(
             name=train_name,
             train_type=train_type
         )
-
         for carriage_data in carriages:  # 遍历列表
             carriage_num = carriage_data.get("carriage_num", None)
             total_num = carriage_data.get("total_num", None)
@@ -337,7 +332,7 @@ def create_order_function(user_id, data):
     passenger_ids = data.get('passenger_ids', None)
     seat_locations = data.get('seat_locations', None)  # 存放预期座位位置信息，是个列表，其个数小于等于乘车人数
 
-    passengers = Passenger.objects.filter(id__in=passenger_ids)  # 查找得到一个集合
+    passengers = Passenger.objects.filter(id__in=passenger_ids, user_id=user_id)  # 查找得到一个集合
     start_stop = Stop.objects.get(id=start_stop_id)
     end_stop = Stop.objects.get(id=end_stop_id)
     train = Train.objects.get(name=train_name)
@@ -354,6 +349,7 @@ def create_order_function(user_id, data):
         end_stop=end_stop,
         create_time=datetime.now(),
         order_status='UPD',
+        date=date,
     )
 
     total_price = 0
@@ -372,7 +368,6 @@ def create_order_function(user_id, data):
             if seat is not None:
                 available_carriage = carriage
                 break
-
         if seat is None:
             message = '无可用座位'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
@@ -386,7 +381,9 @@ def create_order_function(user_id, data):
             price = available_carriage.price
 
         seat.is_available = False  # 更新座位状态
+        seat.save()
         ticket.remaining_count -= 1  # 更新剩余座位信息
+        ticket.save()
         total_price += price
         PassengerOrder.objects.create(  # 储存一个订单下，每个乘车人的订单信息，一个订单可能包含不止一位乘车人
             order=order,
@@ -410,7 +407,10 @@ def create_order(request):
 
         user_id = request.session.get('user_id')
 
-        create_order_function(user_id, request.data)  # 下面要复用，所以写成了函数
+        response = create_order_function(user_id, request.data)  # 下面要复用，所以写成了函数
+
+        if isinstance(response, Response):
+            return response
 
         message = '订单创建成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
@@ -442,21 +442,29 @@ def get_order_list(request):
                     'passenger_id_type': passenger.id_type,
                     'ticket_type': passenger.ticket_type,
                     'carriage_num': seat.ticket.carriage.carriage_num,
+                    'carriage_type': seat.ticket.carriage.type,
                     'seat_num': seat.seat_num,
                     'seat_location': seat.seat_location,
                     'price': passenger_order.price
                 })
-            if datetime.now() > order.end_stop.arrival_time:  # 更新订单状态，判断是否为过期订单
+
+            if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
                 order.order_status = 'EXP'
+                order.save()
+
+            departure_time = order.start_stop.arrival_time.strftime('%H:%M')
+            arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
+
             order_data.append({
                 'order_id': order.id,
                 'train_name': order.train.name,
+                'date': order.date,
                 'departure_station_name': order.start_stop.station.name,
-                'departure_time': order.start_stop.arrival_time,
+                'departure_time': departure_time,
                 'arrival_station_name': order.end_stop.station.name,
-                'arrival_time': order.end_stop.arrival_time,
+                'arrival_time': arrival_time,
                 'total_price': order.total_price,
-                'order_statis': order.order_status,
+                'order_status': order.order_status,
                 'passenger_order_data': passenger_order_data  # 列表
             })
         message = '获取订单列表成功'
@@ -480,7 +488,7 @@ def pay_order(request):
         order = user.order_set.filter(id=order_id).first()
 
         if not order:
-            message = '订单未找到'
+            message = '订单不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
         if order.order_status != 'UPD':
             message = '非未支付订单'
@@ -492,17 +500,20 @@ def pay_order(request):
 
         user.balance -= order.total_price
         order.order_status = 'PAD'
+        user.save()
+        order.save()
 
         message = '支付成功'
-
         try:
             subject = '购票成功通知'
             msg = f'尊敬的用户，您已成功购票。\n\n以下是您的购票详情：\n\n'
             msg += f'车次：{order.train.name}\n'
-            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{order.start_stop.arrival_time}'
-            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{order.end_stop.arrival_time}\n\n'
+            departure_time = order.start_stop.arrival_time.strftime('%H:%M')
+            arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
+            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{departure_time}\n'
+            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{arrival_time}\n\n'
             msg += f'以下是乘车人详情：\n\n'
-            passenger_orders = order.passengerorder_set
+            passenger_orders = order.passengerorder_set.all()
             for passenger_order in passenger_orders:
                 msg += f'姓名：{passenger_order.passenger.name} '
                 msg += f'{passenger_order.seat.ticket.carriage.carriage_num}车 '
@@ -532,7 +543,7 @@ def remove_order(request):  # 这是删除订单
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
             message = '订单不存在'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
         if order.order_status not in ['UPD', 'EXP']:
             message = '订单不可删除'
@@ -558,32 +569,40 @@ def return_order(request):  # 这是取消订单
         user = User.objects.get(id=user_id)
         data = request.data
         order_id = data.get('order_id', None)
-        order = user.order_set.filter(id=order_id).first()
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            message = '订单不存在'
+            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
-        if datetime.now() > order.start_stop.arrival_time - timedelta(hours=1):  # 如果距离发车时间小于1小时，或者已经过了发车时间则不能取消订单
+        if datetime.now() > (datetime.combine(order.date, order.start_stop.arrival_time) - timedelta(hours=1)):  # 如果距离发车时间小于1小时，或者已经过了发车时间则不能取消订单
             message = '超过了取消订单的时间'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        passenger_orders = order.passengerorder_set
+        passenger_orders = order.passengerorder_set.all()
         for passenger_order in passenger_orders:
             seat = passenger_order.seat
             seat.is_available = True  # 更新座位状态
             seat.ticket.remaining_count += 1  # 更新剩余座位信息
+            seat.save()
 
         if order.order_status == 'PAD':  # 如果是已支付的状态就退钱
             user.balance += order.total_price
+            user.save()
 
-        order.delete()
+        # order.delete()
         message = '取消订单成功'
 
         try:
             subject = '取消订单成功通知'
             msg = f'尊敬的用户，您已成功取消订单。\n\n以下是您的订单详情：\n\n'
             msg += f'车次：{order.train.name}\n'
-            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{order.start_stop.arrival_time}'
-            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{order.end_stop.arrival_time}\n\n'
+            departure_time = order.start_stop.arrival_time.strftime('%H:%M')
+            arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
+            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{departure_time}\n'
+            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{arrival_time}\n\n'
             msg += f'以下是乘车人详情：\n\n'
-            passenger_orders = order.passengerorder_set
+            passenger_orders = order.passengerorder_set.all()
             for passenger_order in passenger_orders:
                 msg += f'姓名：{passenger_order.passenger.name} '
                 msg += f'{passenger_order.seat.ticket.carriage.carriage_num}车 '
@@ -593,7 +612,7 @@ def return_order(request):  # 这是取消订单
             message += '已发送通知邮件'
         except smtplib.SMTPException:
             message += '未成功发送通知邮件'
-
+        order.delete()
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
@@ -629,9 +648,12 @@ def rebook(request):
 
         order = create_order_function(user_id, data)  # 这里复用了
 
+        if isinstance(order, Response):
+            return order
+
         return_price = 0
         passenger_ids = data.get('passenger_ids')
-        passenger_orders = original_order.passengerorder_set.filter(id__in=passenger_ids)
+        passenger_orders = original_order.passengerorder_set.filter(passenger_id__in=passenger_ids)
         for passenger_order in passenger_orders:
             passenger_order.is_rebooked = True
             return_price += passenger_order.price
@@ -640,19 +662,24 @@ def rebook(request):
             order.delete()
             message = '余额不足'
             return Response({'message': message}, status=status.HTTP_402_PAYMENT_REQUIRED)
-
+        user.balance -= div_price
+        user.save()
         message = '改签成功'
         try:
             subject = '改签成功通知'
             msg = f'尊敬的用户，您已成功改签。\n\n以下是您的改签详情：\n\n'
             msg += f'原车次：{original_order.train.name}\n'
-            msg += f'出发站：{original_order.start_stop.station.name}\n出发时间：{original_order.start_stop.arrival_time}'
-            msg += f'到达站：{original_order.end_stop.station.name}\n到达时间：{original_order.end_stop.arrival_time}\n\n'
+            origin_departure_time = original_order.start_stop.arrival_time.strftime('%H:%M')
+            origin_arrival_time = original_order.end_stop.arrival_time.strftime('%H:%M')
+            msg += f'出发站：{original_order.start_stop.station.name}\n出发时间：{origin_departure_time}\n'
+            msg += f'到达站：{original_order.end_stop.station.name}\n到达时间：{origin_arrival_time}\n\n'
             msg += f'改签车次：{order.train.name}\n'
-            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{order.start_stop.arrival_time}'
-            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{order.end_stop.arrival_time}\n\n'
+            departure_time = order.start_stop.arrival_time.strftime('%H:%M')
+            arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
+            msg += f'出发站：{order.start_stop.station.name}\n出发时间：{departure_time}\n'
+            msg += f'到达站：{order.end_stop.station.name}\n到达时间：{arrival_time}\n\n'
             msg += f'以下是乘车人详情：\n\n'
-            passenger_orders = order.passengerorder_set
+            passenger_orders = order.passengerorder_set.all()
             for passenger_order in passenger_orders:
                 msg += f'姓名：{passenger_order.passenger.name} '
                 msg += f'{passenger_order.seat.ticket.carriage.carriage_num}车 '

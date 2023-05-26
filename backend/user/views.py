@@ -37,7 +37,11 @@ def register(request):
 @api_view(['POST'])
 def get_user_info(request):
     try:
-        user_id = request.data.get('user_id')
+        identity = request.session.get('identity', None)
+        if identity != 'user':
+            message = '请先登录'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.session.get('user_id')
 
         try:
             user = User.objects.get(id=user_id)
@@ -84,12 +88,7 @@ def update_user_info(request):
 
         # 获取请求体中的数据
         data = request.data
-        user_id = data['user_id']
-
-        session_id = request.session.get('user_id', None)
-        if session_id != user_id:
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.session.get('user_id', None)
 
         user = User.objects.get(id=user_id)
 
@@ -297,13 +296,10 @@ def logoff(request):
 @api_view(['POST'])
 def recharge(request):
     try:
-        user_id = request.data.get('user_id')
+        user_id = request.session.get('user_id', None)
         amount = request.data.get('amount')
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            message = '用户不存在'
-            return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
+        user = User.objects.get(id=user_id)
+
         user.balance += decimal.Decimal(amount)
         user.save()
 
