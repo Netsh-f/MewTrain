@@ -126,6 +126,11 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8080',
+    'http://101.43.215.188:8000'
+]
+
 # 解决跨域问题
 CORS_ORIGIN_ALLOW_ALL = True
 
