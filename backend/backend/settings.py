@@ -136,6 +136,7 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
     'DELETE',
+    'OPTIONS',
 ]
 
 CORS_ALLOW_HEADERS = '*'
