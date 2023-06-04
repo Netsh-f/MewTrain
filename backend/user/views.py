@@ -151,7 +151,10 @@ def add_passenger(request):
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
-        user_id = data['user_id']
+        if identity == 'system_admin':
+            user_id = data['user_id']
+        else:
+            user_id = request.session.get('user_id', None)
         user = User.objects.filter(id=user_id).first()
 
         if not user:
@@ -188,7 +191,10 @@ def remove_passenger(request):
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
-        user_id = data['user_id']
+        if identity == 'system_admin':
+            user_id = data['user_id']
+        else:
+            user_id = request.session.get('user_id')
         passenger_id = data['passenger_id']
 
         user = User.objects.get(id=user_id)
@@ -305,7 +311,7 @@ def logoff(request):
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
         user.delete()
-
+        request.session.flush()
         message = '注销成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:

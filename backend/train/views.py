@@ -1,3 +1,4 @@
+import decimal
 import smtplib
 from datetime import datetime, timedelta
 from itertools import zip_longest
@@ -383,7 +384,6 @@ def create_order_function(user_id, data):
         order_status='UPD',
         date=date,
     )
-
     total_price = 0
     for passenger, seat_location in zip_longest(passengers, seat_locations,
                                                 fillvalue=None):  # 如果预期座位位置数小于乘车人，多的乘车人对应的seat_location会赋值为None
@@ -402,16 +402,16 @@ def create_order_function(user_id, data):
                 break
         if seat is None:
             message = '无可用座位'
+            order.delete()
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         if passenger.ticket_type in ['CHI', 'DOM'] or (  # 分情况进行优惠，学生如果购买普通列车是5折，购买高铁是7.5折。这里没有考虑学生一年只能买4张等限制
                 passenger.ticket_type == 'STU' and train.train_type == 'REG'):
-            price = available_carriage.price * 0.5
+            price = float(available_carriage.price) * 0.5
         elif passenger.ticket_type == 'STU' and train.train_type == 'HSR':
-            price = available_carriage.price * 0.75
+            price = float(available_carriage.price) * 0.75
         else:
-            price = available_carriage.price
-
+            price = float(available_carriage.price)
         seat.is_available = False  # 更新座位状态
         seat.save()
         ticket.remaining_count -= 1  # 更新剩余座位信息
@@ -581,6 +581,13 @@ def remove_order(request):  # 这是删除订单
             message = '订单不可删除'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
+        if order.order_status == 'UPD':
+            passenger_orders = order.passengerorder_set.all()
+            for passenger_order in passenger_orders:
+                passenger_order.seat.is_available = True
+                passenger_order.seat.save()
+                passenger_order.seat.ticket.remaining_count += 1
+                passenger_order.seat.ticket.save()
         order.delete()
         message = '订单删除成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
@@ -617,6 +624,7 @@ def return_order(request):  # 这是取消订单
             seat = passenger_order.seat
             seat.is_available = True  # 更新座位状态
             seat.ticket.remaining_count += 1  # 更新剩余座位信息
+            seat.ticket.save()
             seat.save()
 
         if order.order_status == 'PAD':  # 如果是已支付的状态就退钱
@@ -689,14 +697,21 @@ def rebook(request):
         passenger_orders = original_order.passengerorder_set.filter(passenger_id__in=passenger_ids)
         for passenger_order in passenger_orders:
             passenger_order.is_rebooked = True
+            passenger_order.save()
+            passenger_order.seat.is_available = True
+            passenger_order.seat.save()
+            passenger_order.seat.ticket.remaining_count += 1
+            passenger_order.seat.ticket.save()
             return_price += passenger_order.price
-        div_price = order.total_price - return_price
+        div_price = float(order.total_price) - float(return_price)
         if user.balance < div_price:  # 如果余额不足
             order.delete()
             message = '余额不足'
             return Response({'message': message}, status=status.HTTP_402_PAYMENT_REQUIRED)
-        user.balance -= div_price
+        user.balance -= decimal.Decimal(div_price)
         user.save()
+        order.order_status = 'PAD'
+        order.save()
         message = '改签成功'
         try:
             subject = '改签成功通知'
@@ -711,6 +726,7 @@ def rebook(request):
             arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
             msg += f'出发站：{order.start_stop.station.name}\n出发时间：{departure_time}\n'
             msg += f'到达站：{order.end_stop.station.name}\n到达时间：{arrival_time}\n\n'
+
             msg += f'以下是乘车人详情：\n\n'
             passenger_orders = order.passengerorder_set.all()
             for passenger_order in passenger_orders:
