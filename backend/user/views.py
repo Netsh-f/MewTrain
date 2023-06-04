@@ -266,15 +266,15 @@ def login(request):
                     return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
         if check_password(password, user.password):
-            request.session['is_login'] = True
-            request.session['user_id'] = user.id
-            request.session['username'] = user.username
-            if isinstance(user, SystemAdmin):
-                request.session['identity'] = 'system_admin'
-            elif isinstance(user, RailwayAdmin):
-                request.session['identity'] = 'railway_admin'
-            else:
-                request.session['identity'] = 'user'
+            # request.session['is_login'] = True
+            # request.session['user_id'] = user.id
+            # request.session['username'] = user.username
+            # if isinstance(user, SystemAdmin):
+            #     request.session['identity'] = 'system_admin'
+            # elif isinstance(user, RailwayAdmin):
+            #     request.session['identity'] = 'railway_admin'
+            # else:
+            #     request.session['identity'] = 'user'
             data = {
                 'user_id': user.id,
                 'username': user.username
@@ -318,7 +318,7 @@ def logoff(request):
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
         user.delete()
-        request.session.flush()
+        # request.session.flush()
         message = '注销成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
