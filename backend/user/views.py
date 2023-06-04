@@ -36,14 +36,16 @@ def register(request):
 @api_view(['POST'])
 def get_user_info(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '请先登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.session.get('user_id')
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '请先登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # user_id = request.session.get('user_id')
+        username = request.data.get('username')
 
         try:
-            user = User.objects.get(id=user_id)
+            # user = User.objects.get(id=user_id)
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
@@ -332,9 +334,9 @@ def recharge(request):
 @api_view(['GET'])
 def get_user_list(request):
     try:
-        if request.session.get('identity', None) != 'system_admin':
-            message = '请先登录系统管理员账户'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # if request.session.get('identity', None) != 'system_admin':
+        #     message = '请先登录系统管理员账户'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         users = User.objects.all().values()
         system_admins = SystemAdmin.objects.all().values()
