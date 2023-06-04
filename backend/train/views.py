@@ -3,8 +3,6 @@ import smtplib
 from datetime import datetime, timedelta
 from itertools import zip_longest
 
-from django.db.models import F
-from django.db.models.functions import Lower
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response

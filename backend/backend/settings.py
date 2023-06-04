@@ -148,11 +148,7 @@ CORS_ALLOW_METHODS = [
     'OPTIONS',
 ]
 
-CORS_ALLOW_HEADERS = [
-    'Accept',
-    'Content-Type',
-    'Authorization'
-]
+CORS_ALLOW_HEADERS = '*'
 
 # 进行发送邮件的设置
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

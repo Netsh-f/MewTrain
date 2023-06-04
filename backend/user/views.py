@@ -243,9 +243,9 @@ def update_passenger(request):
 @api_view(['POST'])
 def login(request):
     try:
-        if request.session.get('is_login', None):
-            message = '不允许重复登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # if request.session.get('is_login', None):
+        #     message = '不允许重复登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         username = request.data.get('username')
         password = request.data.get('password')
@@ -273,6 +273,7 @@ def login(request):
                 request.session['identity'] = 'railway_admin'
             else:
                 request.session['identity'] = 'user'
+
             message = '登录成功'
             return Response({'message': message}, status=status.HTTP_200_OK)
         else:
