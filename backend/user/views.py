@@ -101,14 +101,15 @@ def get_admin_info(request):
 def update_user_info(request):
     try:
         # 检查用户身份
-        identity = request.session.get('identity', None)
-        if identity is None or identity != 'user':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity is None or identity != 'user':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         # 获取请求体中的数据
         data = request.data
-        user_id = request.session.get('user_id', None)
+        # user_id = request.session.get('user_id', None)
+        user_id = data.get('user_id')
 
         user = User.objects.get(id=user_id)
 
