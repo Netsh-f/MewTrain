@@ -6,8 +6,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 
-
-from user.models import User, Passenger, SystemAdmin, RailwayAdmin
+from user.models import User, Passenger, SystemAdmin, RailwayAdmin, AbstractUser
 
 
 @api_view(['POST'])
@@ -72,6 +71,25 @@ def get_user_info(request):
 
         user_detail['passengers'] = passenger_list
         return Response(user_detail, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_admin_info(request):
+    try:
+        identity = request.session.get('identity', None)
+        if identity not in ['system_admin', 'railway_admin']:
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.session.get('user_id', None)
+        user = AbstractUser.objects.get(id=user_id)
+        data = {
+            'username': user.username,
+        }
+        message = '获取管理员信息成功'
+        return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
