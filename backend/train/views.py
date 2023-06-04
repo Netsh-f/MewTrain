@@ -35,6 +35,7 @@ def add_station(request):
         return Response({'message': message}, status=status.HTTP_201_CREATED)
 
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -53,6 +54,7 @@ def get_station_list(request):
         message = '获取车站列表成功'
         return Response({'message': message, 'stations': station_names}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -65,6 +67,7 @@ def get_city_list(request):
         message = '获取城市列表成功'
         return Response({'message': message, 'city_list': city_list}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -123,6 +126,7 @@ def add_train(request):
         message = '列车添加成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -189,6 +193,7 @@ def add_ticket(request):
         return Response({'message': message}, status=status.HTTP_201_CREATED)
 
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -239,6 +244,7 @@ def get_train_list(request):
         message = '获取列车列表信息成功'
         return Response({'message': message, 'data': train_data}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -264,6 +270,7 @@ def remove_train(request):
         message = '列车删除成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -348,6 +355,7 @@ def query_train(request):
         return Response({'message': message, 'data': train_data}, status=status.HTTP_200_OK)
 
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -445,6 +453,7 @@ def create_order(request):
         message = '订单创建成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -501,6 +510,7 @@ def get_order_list(request):
         message = '获取订单列表成功'
         return Response({'message': message, 'data': order_data}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -558,6 +568,7 @@ def pay_order(request):
 
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -593,6 +604,7 @@ def remove_order(request):  # 这是删除订单
         return Response({'message': message}, status=status.HTTP_200_OK)
 
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -657,6 +669,7 @@ def return_order(request):  # 这是取消订单
         order.delete()
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -670,8 +683,8 @@ def rebook(request):
         #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         # user_id = request.session.get('user_id')
 
-        # user = User.objects.get(id=user_id)
         user_id = request.data.get('user_id')
+        user = User.objects.get(id=user_id)
 
         data = request.data
         original_order_id = request.data.get('original_order_id', None)  # 相比create_order视图，多了这一项
@@ -743,6 +756,7 @@ def rebook(request):
             message += '未成功发送通知邮件'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
+        print(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

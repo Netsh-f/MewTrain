@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "train",
     'django_extensions',
     'corsheaders',  # 解决跨域
+    'rest_framework',  # JWT
 ]
 
 MIDDLEWARE = [
@@ -87,8 +88,6 @@ DATABASES = {
     }
 }
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -128,6 +127,17 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+config_file = os.path.expanduser('~/.config/django/MewTrain.cnf')
+config = ConfigParser()
+config.read(config_file)
+# JWT
+SECRETS = {
+    'signing': {
+        'key': 123,
+        'salt': 123
+    }
+}
+
 # CORS_ORIGIN_WHITELIST = [
 #     'http://localhost:8080',
 #     'http://101.43.215.188:8000',
@@ -157,8 +167,5 @@ EMAIL_USE_SSL = False  # 是否使用SSL加密，qq企业邮箱要求使用
 EMAIL_HOST = 'smtp.yeah.net'  # 发送邮件的邮箱 的 SMTP服务器，这里用了163邮箱
 EMAIL_PORT = 25  # 发件箱的SMTP服务器端口
 
-config_file = os.path.expanduser('~/.config/django/MewTrain.cnf')
-config = ConfigParser()
-config.read(config_file)
 EMAIL_HOST_USER = config.get('Email', 'EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config.get('Email', 'EMAIL_HOST_PASSWORD')  # 这是授权码
