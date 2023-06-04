@@ -286,7 +286,8 @@ def login(request):
 @api_view(['GET'])
 def logout(request):
     try:
-        print(f'logout:session={request.session}')
+        for key, value in request.session.items():
+            print(f'logout: session[{key}] = {value}')
         if not request.session.get('is_login', None):
             message = '请先登录'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
