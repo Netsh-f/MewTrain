@@ -1,4 +1,5 @@
 import decimal
+import logging
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -7,6 +8,8 @@ from rest_framework.response import Response
 
 from user import token
 from user.models import User, Passenger, SystemAdmin, RailwayAdmin, AbstractUser
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -29,7 +32,7 @@ def register(request):
         message = '用户注册成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -74,7 +77,7 @@ def get_user_info(request):
         user_detail['passengers'] = passenger_list
         return Response(user_detail, status=status.HTTP_200_OK)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -95,7 +98,7 @@ def get_admin_info(request):
         message = '获取管理员信息成功'
         return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -142,7 +145,7 @@ def update_user_info(request):
         return Response({'message': message}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -184,7 +187,7 @@ def add_passenger(request):
         message = '添加乘车人成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -215,7 +218,7 @@ def remove_passenger(request):
         message = '用户或乘车人不存在'
         return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -245,7 +248,7 @@ def update_passenger(request):
         message = '乘车人不存在'
         return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -296,7 +299,7 @@ def login(request):
             message = '用户名或密码错误'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -311,7 +314,7 @@ def logout(request):
         message = '登出成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -335,7 +338,7 @@ def logoff(request):
         message = '注销成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -355,7 +358,7 @@ def recharge(request):
         return Response({'message': message}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -385,7 +388,7 @@ def get_user_list(request):
 
         return Response(response_data, status=status.HTTP_200_OK)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -445,7 +448,7 @@ def add_user(request):
         message = '添加用户成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -496,7 +499,7 @@ def update_user_info_system_admin(request):
         return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -545,6 +548,6 @@ def remove_user(request):
             message = '无效的用户类型'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
