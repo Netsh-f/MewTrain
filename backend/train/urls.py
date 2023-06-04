@@ -19,4 +19,6 @@ urlpatterns = [
     path('return_order/', views.return_order, name='return_order'),
     path('rebook/', views.rebook, name='rebook'),
     path('test_send_email/', views.test_send_email),
+    path('get_station_list/', views.get_station_list),
+    path('get_city_list/', views.get_city_list)
 ]
