@@ -303,6 +303,8 @@ def query_train(request):
             carriage_data = {}  # 这个不是列表但类似列表，每个元素名为车厢(座位)的类型，其每个类型的内容格式相同
             carriages = train.carriage_set.all()
             total_duration = 0
+            if carriages[0].ticket_set.filter(date=date).first() is None:
+                continue
             for carriage in carriages:
                 ticket = carriage.ticket_set.filter(date=date).first()
                 if ticket is None:
