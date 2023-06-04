@@ -17,10 +17,10 @@ from django.core.mail import send_mail
 def add_station(request):
     try:
         # 检查用户身份
-        identity = request.session.get('identity', None)
-        if identity != 'railway_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'railway_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         # 获取请求体中的数据
         data = request.data
@@ -42,10 +42,10 @@ def add_station(request):
 @api_view(['GET'])
 def get_station_list(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'system_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'system_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         stations = Station.objects.all()
 
         station_names = [station.name for station in stations]
@@ -72,10 +72,10 @@ def get_city_list(request):
 @api_view(['POST'])
 def add_train(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'railway_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'railway_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
 
@@ -130,10 +130,10 @@ def add_train(request):
 @api_view(['POST'])
 def add_ticket(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'railway_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'railway_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
 
@@ -196,10 +196,10 @@ def add_ticket(request):
 @api_view(['POST'])
 def get_train_list(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'railway_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'railway_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         trains = Train.objects.all()
         train_data = []
@@ -246,10 +246,10 @@ def get_train_list(request):
 @api_view(['POST'])
 def remove_train(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'railway_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'railway_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         train_name = request.data.get('train_name', None)
 
@@ -430,13 +430,13 @@ def create_order_function(user_id, data):
 @api_view(['POST'])
 def create_order(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '用户未登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '用户未登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_id = request.session.get('user_id')
-
+        # user_id = request.session.get('user_id')
+        user_id = request.data.get('user_id')
         response = create_order_function(user_id, request.data)  # 下面要复用，所以写成了函数
 
         if isinstance(response, Response):
@@ -452,12 +452,13 @@ def create_order(request):
 @api_view(['POST'])
 def get_order_list(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '用户未登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '用户未登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_id = request.session.get('user_id')
+        # user_id = request.session.get('user_id')
+        user_id = request.data.get('user_id')
         user = User.objects.get(id=user_id)
         orders = user.order_set.all()
         order_data = []  # 将返回一个列表
@@ -507,11 +508,12 @@ def get_order_list(request):
 @api_view(['POST'])
 def pay_order(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '用户未登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.session.get('user_id')
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '用户未登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # user_id = request.session.get('user_id')
+        user_id = request.data.get('user_id')
         user = User.objects.get(id=user_id)
         data = request.data
         order_id = data.get('order_id', None)
@@ -563,10 +565,10 @@ def pay_order(request):
 @api_view(['POST'])
 def remove_order(request):  # 这是删除订单
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '用户未登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '用户未登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         data = request.data
         order_id = data.get('order_id', None)
         try:
@@ -598,11 +600,12 @@ def remove_order(request):  # 这是删除订单
 @api_view(['POST'])
 def return_order(request):  # 这是取消订单
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '用户未登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.session.get('user_id')
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '用户未登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # user_id = request.session.get('user_id')
+        user_id = request.data.get('user_id')
         user = User.objects.get(id=user_id)
         data = request.data
         order_id = data.get('order_id', None)
@@ -661,12 +664,14 @@ def return_order(request):  # 这是取消订单
 @api_view(['POST'])
 def rebook(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '用户未登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.session.get('user_id')
-        user = User.objects.get(id=user_id)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '用户未登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # user_id = request.session.get('user_id')
+
+        # user = User.objects.get(id=user_id)
+        user_id = request.data.get('user_id')
 
         data = request.data
         original_order_id = request.data.get('original_order_id', None)  # 相比create_order视图，多了这一项

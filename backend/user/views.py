@@ -40,11 +40,10 @@ def get_user_info(request):
         #     message = '请先登录'
         #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         # user_id = request.session.get('user_id')
-        username = request.data.get('username')
+        user_id = request.data.get('user_id')
 
         try:
-            # user = User.objects.get(id=user_id)
-            user = User.objects.get(username=username)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
@@ -77,14 +76,15 @@ def get_user_info(request):
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def get_admin_info(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity not in ['system_admin', 'railway_admin']:
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.session.get('user_id', None)
+        # identity = request.session.get('identity', None)
+        # if identity not in ['system_admin', 'railway_admin']:
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # user_id = request.session.get('user_id', None)
+        user_id = request.data.get('user_id')
         user = AbstractUser.objects.get(id=user_id)
         data = {
             'username': user.username,
@@ -145,16 +145,17 @@ def update_user_info(request):
 @api_view(['POST'])
 def add_passenger(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user' and identity != 'system_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user' and identity != 'system_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
-        if identity == 'system_admin':
-            user_id = data['user_id']
-        else:
-            user_id = request.session.get('user_id', None)
+        # if identity == 'system_admin':
+        #     user_id = data['user_id']
+        # else:
+        #     user_id = request.session.get('user_id', None)
+        user_id = data['user_id']
         user = User.objects.filter(id=user_id).first()
 
         if not user:
@@ -185,16 +186,17 @@ def add_passenger(request):
 @api_view(['POST'])
 def remove_passenger(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user' and identity != 'system_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user' and identity != 'system_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
-        if identity == 'system_admin':
-            user_id = data['user_id']
-        else:
-            user_id = request.session.get('user_id')
+        # if identity == 'system_admin':
+        #     user_id = data['user_id']
+        # else:
+        #     user_id = request.session.get('user_id')
+        user_id = data['user_id']
         passenger_id = data['passenger_id']
 
         user = User.objects.get(id=user_id)
@@ -214,10 +216,10 @@ def remove_passenger(request):
 @api_view(['POST'])
 def update_passenger(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user' and identity != 'system_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'user' and identity != 'system_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
         passenger_id = data['passenger_id']
@@ -273,9 +275,12 @@ def login(request):
                 request.session['identity'] = 'railway_admin'
             else:
                 request.session['identity'] = 'user'
-
+            data = {
+                'user_id': user.id,
+                'username': user.username
+            }
             message = '登录成功'
-            return Response({'message': message}, status=status.HTTP_200_OK)
+            return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
         else:
             message = '用户名或密码错误'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
@@ -287,12 +292,10 @@ def login(request):
 @api_view(['GET'])
 def logout(request):
     try:
-        for key, value in request.session.items():
-            print(f'logout: session[{key}] = {value}')
-        if not request.session.get('is_login', None):
-            message = '请先登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        request.session.flush()
+        # if not request.session.get('is_login', None):
+        #     message = '请先登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # request.session.flush()
         message = '登出成功'
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -303,11 +306,12 @@ def logout(request):
 @api_view(['POST'])
 def logoff(request):
     try:
-        if not request.session.get('is_login', None):
-            message = '请先登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # if not request.session.get('is_login', None):
+        #     message = '请先登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_id = request.session.get('user_id')
+        # user_id = request.session.get('user_id')
+        user_id = request.data.get('user_id')
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -325,7 +329,8 @@ def logoff(request):
 @api_view(['POST'])
 def recharge(request):
     try:
-        user_id = request.session.get('user_id', None)
+        # user_id = request.session.get('user_id', None)
+        user_id = request.data.get('user_id')
         amount = request.data.get('amount')
         user = User.objects.get(id=user_id)
 
@@ -372,9 +377,9 @@ def get_user_list(request):
 @api_view(['POST'])
 def add_user(request):
     try:
-        if request.session.get('identity', None) != 'system_admin':
-            message = '请先登录系统管理员账户'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # if request.session.get('identity', None) != 'system_admin':
+        #     message = '请先登录系统管理员账户'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
         user_type = data.get('user_type')
@@ -432,10 +437,10 @@ def add_user(request):
 def update_user_info_system_admin(request):
     try:
         # 检查用户身份
-        identity = request.session.get('identity', None)
-        if identity != 'system_admin':
-            message = '无效权限'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # identity = request.session.get('identity', None)
+        # if identity != 'system_admin':
+        #     message = '无效权限'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         # 获取请求体中的数据
         data = request.data
@@ -481,9 +486,9 @@ def update_user_info_system_admin(request):
 @api_view(['POST'])
 def remove_user(request):
     try:
-        if request.session.get('identity', None) != 'system_admin':
-            message = '请先登录系统管理员账户'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # if request.session.get('identity', None) != 'system_admin':
+        #     message = '请先登录系统管理员账户'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         data = request.data
         user_id = data['user_id']
         user_type = data['user_type']
