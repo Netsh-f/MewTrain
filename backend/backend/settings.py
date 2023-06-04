@@ -129,7 +129,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8080',
     'http://101.43.215.188:8000',
-    'http://10.193.4.96:8080'
+    'http://10.193.4.96:8080',
+    'http://10.193.62.10:8080'
 ]
 
 # 解决跨域问题
