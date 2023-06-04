@@ -6,8 +6,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 
-
-from user.models import User, Passenger, SystemAdmin, RailwayAdmin
+from user.models import User, Passenger, SystemAdmin, RailwayAdmin, AbstractUser
 
 
 @api_view(['POST'])
@@ -37,14 +36,16 @@ def register(request):
 @api_view(['POST'])
 def get_user_info(request):
     try:
-        identity = request.session.get('identity', None)
-        if identity != 'user':
-            message = '请先登录'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.session.get('user_id')
+        # identity = request.session.get('identity', None)
+        # if identity != 'user':
+        #     message = '请先登录'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # user_id = request.session.get('user_id')
+        username = request.data.get('username')
 
         try:
-            user = User.objects.get(id=user_id)
+            # user = User.objects.get(id=user_id)
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
             message = '用户不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
@@ -72,6 +73,25 @@ def get_user_info(request):
 
         user_detail['passengers'] = passenger_list
         return Response(user_detail, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_admin_info(request):
+    try:
+        identity = request.session.get('identity', None)
+        if identity not in ['system_admin', 'railway_admin']:
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.session.get('user_id', None)
+        user = AbstractUser.objects.get(id=user_id)
+        data = {
+            'username': user.username,
+        }
+        message = '获取管理员信息成功'
+        return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -320,9 +340,9 @@ def recharge(request):
 @api_view(['GET'])
 def get_user_list(request):
     try:
-        if request.session.get('identity', None) != 'system_admin':
-            message = '请先登录系统管理员账户'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # if request.session.get('identity', None) != 'system_admin':
+        #     message = '请先登录系统管理员账户'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         users = User.objects.all().values()
         system_admins = SystemAdmin.objects.all().values()

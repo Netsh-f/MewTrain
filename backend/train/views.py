@@ -3,6 +3,8 @@ import smtplib
 from datetime import datetime, timedelta
 from itertools import zip_longest
 
+from django.db.models import F
+from django.db.models.functions import Lower
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
@@ -34,6 +36,36 @@ def add_station(request):
         message = '车站添加成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
 
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_station_list(request):
+    try:
+        identity = request.session.get('identity', None)
+        if identity != 'system_admin':
+            message = '无效权限'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        stations = Station.objects.all()
+
+        station_names = [station.name for station in stations]
+
+        message = '获取车站列表成功'
+        return Response({'message': message, 'stations': station_names}, status=status.HTTP_200_OK)
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_city_list(request):
+    try:
+        cities = Station.objects.values_list('city', flat=True)
+        city_list = list(set(cities))
+        message = '获取城市列表成功'
+        return Response({'message': message, 'city_list': city_list}, status=status.HTTP_200_OK)
     except Exception as e:
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -582,7 +614,8 @@ def return_order(request):  # 这是取消订单
             message = '订单不存在'
             return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
-        if datetime.now() > (datetime.combine(order.date, order.start_stop.arrival_time) - timedelta(hours=1)):  # 如果距离发车时间小于1小时，或者已经过了发车时间则不能取消订单
+        if datetime.now() > (datetime.combine(order.date, order.start_stop.arrival_time) - timedelta(
+                hours=1)):  # 如果距离发车时间小于1小时，或者已经过了发车时间则不能取消订单
             message = '超过了取消订单的时间'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
