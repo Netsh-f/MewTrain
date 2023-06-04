@@ -1,6 +1,5 @@
 import decimal
 
-from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
@@ -287,6 +286,7 @@ def login(request):
 @api_view(['GET'])
 def logout(request):
     try:
+        print(f'logout:session={request.session}')
         if not request.session.get('is_login', None):
             message = '请先登录'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
