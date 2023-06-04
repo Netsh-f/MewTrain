@@ -306,8 +306,9 @@ def query_train(request):
             for carriage in carriages:
                 ticket = carriage.ticket_set.filter(date=date).first()
                 if ticket is None:
-                    message = '存在未设置车票的车厢'
-                    return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+                    # message = '存在未设置车票的车厢'
+                    # return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+                    continue
                 if carriage.type not in carriage_data:
                     carriage_data[carriage.type] = {
                         'price': carriage.price,
