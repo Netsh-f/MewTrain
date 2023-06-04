@@ -81,6 +81,7 @@ def add_train(request):
         #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
+        print(data)
 
         train_name = data.get("train_name", None)
         train_type = data.get("train_type", None)
