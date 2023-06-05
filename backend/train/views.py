@@ -15,6 +15,7 @@ from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 
+
 @api_view(['POST'])
 def add_station(request):
     try:
@@ -194,6 +195,39 @@ def add_ticket(request):
             current_date += timedelta(days=1)
         message = '车票添加成功'
         return Response({'message': message}, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        logger.error(str(e))
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def query_ticket(request):
+    try:
+        data = request.data
+        train_id = data.get('train_id')
+        date_str = data.get('date', None)
+
+        train = Train.objects.filter(id=train_id).first()
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        carriage_data = {}  # 这个不是列表但类似列表，每个元素名为车厢(座位)的类型，其每个类型的内容格式相同
+        carriages = train.carriage_set.all()
+        if carriages[0].ticket_set.filter(date=date).first() is not None:
+            for carriage in carriages:
+                ticket = carriage.ticket_set.filter(date=date).first()
+                if ticket is None:
+                    continue
+                if carriage.type not in carriage_data:
+                    carriage_data[carriage.type] = {
+                        'price': carriage.price,
+                        'count': 0
+                    }
+                carriage_data[carriage.type]['count'] += ticket.remaining_count  # 累加每种座的剩余数
+
+        message = '查询余票信息成功'
+        return Response({'message': message, 'data': carriage_data}, status=status.HTTP_200_OK)
 
     except Exception as e:
         logger.error(str(e))
