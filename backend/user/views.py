@@ -526,10 +526,11 @@ def update_user_info_system_admin(request):
         # 更新其他字段
         if 'username' in data:
             username = data['username']
-            same_user = AbstractUser.objects.filter(username=username).first()
-            if same_user is not None:
-                message = '用户名已存在'
-                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            if username != user.username:
+                same_user = AbstractUser.objects.filter(username=username).first()
+                if same_user is not None:
+                    message = '用户名已存在'
+                    return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
             user.username = username
         if user_type == 'user' and 'email' in data:
             user.email = data['email']
