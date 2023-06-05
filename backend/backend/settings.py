@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import logging
 import os
+import secrets
+import string
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -133,11 +135,18 @@ config_file = os.path.expanduser('~/.config/django/MewTrain.cnf')
 config = ConfigParser()
 config.read(config_file)
 
+
+def generate_salt(length=16):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    salt = ''.join(secrets.choice(characters) for _ in range(length))
+    return salt
+
+
 # JWT
 SECRETS = {
     'signing': {
-        'key': 'KEY',
-        'salt': 'SALT',
+        'key': config.get('Email', 'EMAIL_HOST_PASSWORD'),
+        'salt': generate_salt(length=16),
     }
 }
 

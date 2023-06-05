@@ -6,8 +6,8 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 
-from user import token
 from user.models import User, Passenger, SystemAdmin, RailwayAdmin, AbstractUser
+from user.token import generate_token, verify_token, get_identity_from_token
 
 logger = logging.getLogger(__name__)
 
@@ -151,8 +151,8 @@ def update_user_info(request):
 
     except Exception as e:
         logger.error(str(e))
-    message = '发生错误：{}'.format(str(e))
-    return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -318,11 +318,11 @@ def login(request):
             # else:
             #     request.session['identity'] = 'user'
 
-            # new_token = token.generate_token(user.id)
+            new_token = generate_token(user.id)
             data = {
                 'user_id': user.id,
                 'username': user.username,
-                # 'token': new_token
+                'token': new_token,
             }
             message = '登录成功'
             return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
@@ -342,8 +342,18 @@ def logout(request):
         #     message = '请先登录'
         #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         # request.session.flush()
-        message = '登出成功'
-        return Response({'message': message}, status=status.HTTP_200_OK)
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            # 获取用户ID
+            user_id = get_identity_from_token(user_token)
+            user = User.objects.filter(id=user_id).first()
+            message = f'{user_id}:{user.username}登出成功'
+            logger.info(message)
+            return Response({'message': message}, status=status.HTTP_200_OK)
+        else:
+            message = 'token无效'
+            logger.info(message)
+            return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
@@ -515,7 +525,12 @@ def update_user_info_system_admin(request):
 
         # 更新其他字段
         if 'username' in data:
-            user.username = data['username']
+            username = data['username']
+            same_user = AbstractUser.objects.filter(username=username).first()
+            if same_user is not None:
+                message = '用户名已存在'
+                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            user.username = username
         if user_type == 'user' and 'email' in data:
             user.email = data['email']
 
