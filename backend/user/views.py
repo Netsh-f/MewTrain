@@ -119,6 +119,12 @@ def update_user_info(request):
 
         user = User.objects.get(id=user_id)
 
+        username = data['username']
+        same_user = User.objects.filter(username=username).first()
+        if same_user is not None:
+            message = '用户名已存在'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
         # 检查是否要修改密码
         if 'password' in data:
             current_password = data['password'].get('current_password')
@@ -134,7 +140,7 @@ def update_user_info(request):
 
         # 更新其他字段
         if 'username' in data:
-            user.username = data['username']
+            user.username = username
         if 'email' in data:
             user.email = data['email']
 
@@ -146,8 +152,8 @@ def update_user_info(request):
 
     except Exception as e:
         logger.error(str(e))
-        message = '发生错误：{}'.format(str(e))
-        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    message = '发生错误：{}'.format(str(e))
+    return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -163,7 +169,6 @@ def add_passenger(request):
         #     user_id = data['user_id']
         # else:
         #     user_id = request.session.get('user_id', None)
-        logger.info(f'add_passenger data:{data}')
         user_id = data['user_id']
         user = User.objects.filter(id=user_id).first()
 
@@ -252,6 +257,7 @@ def update_passenger(request):
         logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 def get_passenger_list(request):
