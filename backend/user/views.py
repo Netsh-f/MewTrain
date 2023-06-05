@@ -163,6 +163,7 @@ def add_passenger(request):
         #     user_id = data['user_id']
         # else:
         #     user_id = request.session.get('user_id', None)
+        logger.info(f'add_passenger data:{data}')
         user_id = data['user_id']
         user = User.objects.filter(id=user_id).first()
 

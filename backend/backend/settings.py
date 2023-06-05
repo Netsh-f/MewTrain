@@ -85,7 +85,6 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         'OPTIONS': {
-            # 'read_default_file': 'D:/cnf/MewTrain.cnf'
             'read_default_file': '~/.config/django/MewTrain.cnf'
         }
     }
@@ -133,11 +132,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 config_file = os.path.expanduser('~/.config/django/MewTrain.cnf')
 config = ConfigParser()
 config.read(config_file)
+
 # JWT
 SECRETS = {
     'signing': {
-        'key': 123,
-        'salt': 123
+        'key': 'KEY',
+        'salt': 'SALT',
     }
 }
 
