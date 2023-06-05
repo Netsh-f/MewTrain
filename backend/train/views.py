@@ -209,7 +209,7 @@ def query_ticket(request):
         train_name = data.get('train_name')
         date_str = data.get('date', None)
 
-        train = Train.objects.filter(id=train_name).first()
+        train = Train.objects.filter(name=train_name).first()
         if train is None:
             message = '查询无此车次'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
