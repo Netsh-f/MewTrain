@@ -518,9 +518,9 @@ def create_order(request):
                 'price': passenger_order.price,
             })
 
-        if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
-            order.order_status = 'EXP'
-            order.save()
+        # if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
+        #     order.order_status = 'EXP'
+        #     order.save()
 
         departure_time = order.start_stop.arrival_time.strftime('%H:%M')
         arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
