@@ -501,8 +501,45 @@ def create_order(request):
         if isinstance(response, Response):
             return response
 
+        order = response
+        passenger_orders = order.passengerorder_set.all()
+        passenger_order_data = []  # 列表里的列表
+        for passenger_order in passenger_orders:
+            passenger = passenger_order.passenger
+            seat = passenger_order.seat
+            passenger_order_data.append({
+                'passenger_name': passenger.name,
+                'passenger_id_type': passenger.id_type,
+                'ticket_type': passenger.ticket_type,
+                'carriage_num': seat.ticket.carriage.carriage_num,
+                'carriage_type': seat.ticket.carriage.type,
+                'seat_num': seat.seat_num,
+                'seat_location': seat.seat_location,
+                'price': passenger_order.price,
+            })
+
+        if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
+            order.order_status = 'EXP'
+            order.save()
+
+        departure_time = order.start_stop.arrival_time.strftime('%H:%M')
+        arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
+
+        order_data = {
+            'order_id': order.id,
+            'train_name': order.train.name,
+            'date': order.date,
+            'departure_station_name': order.start_stop.station.name,
+            'departure_time': departure_time,
+            'arrival_station_name': order.end_stop.station.name,
+            'arrival_time': arrival_time,
+            'total_price': order.total_price,
+            'order_status': order.order_status,
+            'create_time': order.create_time.strftime('%Y-%m-%d %H:%M'),
+            'passenger_order_data': passenger_order_data  # 列表
+        }
         message = '订单创建成功'
-        return Response({'message': message}, status=status.HTTP_201_CREATED)
+        return Response({'message': message, 'data': order_data}, status=status.HTTP_201_CREATED)
     except Exception as e:
         logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
