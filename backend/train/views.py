@@ -210,6 +210,9 @@ def query_ticket(request):
         date_str = data.get('date', None)
 
         train = Train.objects.filter(id=train_id).first()
+        if train is None:
+            message = '查询无此车次'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         carriage_data = {}  # 这个不是列表但类似列表，每个元素名为车厢(座位)的类型，其每个类型的内容格式相同
@@ -225,6 +228,9 @@ def query_ticket(request):
                         'count': 0
                     }
                 carriage_data[carriage.type]['count'] += ticket.remaining_count  # 累加每种座的剩余数
+        else:
+            message = '此车次该日不运营'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         message = '查询余票信息成功'
         return Response({'message': message, 'data': carriage_data}, status=status.HTTP_200_OK)
