@@ -443,16 +443,21 @@ def create_order_function(user_id, data):
         ticket = None
         seat = None
 
-        for carriage in carriages:
-            ticket = carriage.ticket_set.filter(date=date).first()
-            if seat_location is not None:
-                seat = ticket.seat_set.filter(seat_location=seat_location, is_available=True).first()  # 处理有预期座位位置的情况
-            else:
+        if seat_location is not None:
+            for carriage in carriages:
+                ticket = carriage.ticket_set.filter(date=date).first()
+                seat = ticket.seat_set.filter(seat_location=seat_location, is_available=True).first()
+                if seat is not None:
+                    available_carriage = carriage
+                    break
+        if seat is None:  # 如果没有指定座位位置，或者指定了座位位置但剩余为0，就随机分配
+            for carriage in carriages:
+                ticket = carriage.ticket_set.filter(date=date).first()
                 seat = ticket.seat_set.filter(is_available=True).first()
-            if seat is not None:
-                available_carriage = carriage
-                break
-        if seat is None:
+                if seat is not None:
+                    available_carriage = carriage
+                    break
+        if seat is None:  # 如果还没有分配到座位位置（一般不会有这种情况）
             message = '无可用座位'
             order.delete()
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
