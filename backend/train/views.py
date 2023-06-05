@@ -536,7 +536,7 @@ def get_order_list(request):
                     'carriage_type': seat.ticket.carriage.type,
                     'seat_num': seat.seat_num,
                     'seat_location': seat.seat_location,
-                    'price': passenger_order.price
+                    'price': passenger_order.price,
                 })
 
             if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
@@ -556,6 +556,7 @@ def get_order_list(request):
                 'arrival_time': arrival_time,
                 'total_price': order.total_price,
                 'order_status': order.order_status,
+                'create_time': order.create_time.strftime('%Y-%m-%d %H:%M'),
                 'passenger_order_data': passenger_order_data  # 列表
             })
         message = '获取订单列表成功'
@@ -717,7 +718,8 @@ def return_order(request):  # 这是取消订单
             message += '已发送通知邮件'
         except smtplib.SMTPException:
             message += '未成功发送通知邮件'
-        order.delete()
+        order.order_status = 'EXP'
+        order.save()
         return Response({'message': message}, status=status.HTTP_200_OK)
     except Exception as e:
         logger.error(str(e))
