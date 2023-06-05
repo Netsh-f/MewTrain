@@ -7,7 +7,7 @@
           <img src="" alt="">
           <span>MewTrain MewTrain MewTrain MewTrain </span>
         </div>
-        <el-button class="LogoutButton" type="info" @click="logout">退出</el-button>
+        <HeadItems></HeadItems>
       </el-header>
       <!-- 页面主体 -->
       <el-container>
@@ -29,26 +29,27 @@
           <el-icon><document /></el-icon>
           <span class="ItemName">列车信息查询</span>
         </el-menu-item>
-        <el-menu-item index="TicketOrder">
-          <el-icon><setting /></el-icon>
-          <span class="ItemName">购票界面</span>
-        </el-menu-item>
+        <el-sub-menu index="_">
+          <template #title>
+            <el-icon>
+              <icon-menu />
+            </el-icon>
+            <span class="ItemName">订单信息</span>
+          </template >
+          <el-menu-item-group>
+            <el-menu-item index="HistoryOrders" class="ItemName">全部订单</el-menu-item>
+            <el-menu-item index="NoTripOrderList" class="ItemName">未出行订单</el-menu-item>
+            <el-menu-item index="NoPayOrderList" class="ItemName">未支付订单</el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
         <el-sub-menu index="">
           <template #title>
             <el-icon><location /></el-icon>
             <span class="ItemName">管理员界面</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="mesdeal_home">
-              <span class="ItemName">
-                系统管理员
-              </span>
-            </el-menu-item>
-            <el-menu-item index="mesdeal_setting">
-              <span class="ItemName">
-                车次管理员
-              </span>
-            </el-menu-item>
+            <el-menu-item index="mesdeal1" class="ItemName">系统管理员</el-menu-item>
+            <el-menu-item index="trainAdjust1" class="ItemName">铁路系统员</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
       </el-menu>
@@ -62,12 +63,20 @@
     </el-container>
 </template>
 <script>
+import HeadItems from './self/HeadItems.vue'
+import {
+  Menu as IconMenu,
+} from '@element-plus/icons-vue'
 export default{
   methods:{
     logout(){
         window.sessionStorage.clear()
-        this.$router.push('/Login')
+        this.$router.push({name: 'Login'})
     }
+  },
+  components:{
+    HeadItems,
+    IconMenu
   }
 }
 </script>

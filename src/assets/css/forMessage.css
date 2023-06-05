@@ -10,10 +10,11 @@
     text-align: center;
     border-radius: 8px;
     overflow: hidden;
+    padding-bottom: 0%;
   }
   .card-header{
     background: #2c3a47;
-    padding: 60px 40px;
+    padding: 20% 20%;
   }
   .pic{
     display: inline-block;

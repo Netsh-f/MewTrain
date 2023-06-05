@@ -10,21 +10,27 @@
                     <el-autocomplete
                         class="inline-input"
                         v-model="searchForm.start_station"
-                        :fetch-suggestions="querySearch"
+                        :fetch-suggestions="query  => searchElements(query,index)"
                         placeholder="请输入始发站"
                         :trigger-on-focus="true"
-                        @select="handleSelect"
-                    ></el-autocomplete>
+                        @select="selectedItem => handleSelect(selectedItem,index)"
+                    ><template v-slot="{item}">
+                        {{item}}
+                    </template></el-autocomplete>
                 </div></el-col>
                 <el-col :span="6"><div class="grid-content bg-purple" style="margin-left: 20px">
                     <el-autocomplete
                         class="inline-input"
                         v-model="searchForm.end_station"
-                        :fetch-suggestions="querySearch"
+                        :fetch-suggestions="query  => searchElements2(query,index)"
                         placeholder="请输入终点站"
                         :trigger-on-focus="true"
-                        @select="handleSelect"
-                    ></el-autocomplete>
+                        @select="selectedItem => handleSelect2(selectedItem,index)"
+                    >
+                    <template v-slot="{item}">
+                        {{item}}
+                    </template>
+                </el-autocomplete>
                 </div></el-col>
                 <el-col :span="6"><div class="grid-content bg-purple" style="margin-left: 20px">
                     <div class="block">
@@ -76,94 +82,38 @@
                 </el-table-column>
                 <el-table-column
                     label="特等座/软卧"
-                    prop="high_seat_price">
+                    prop="high_seat_count">
                 </el-table-column>
                 <el-table-column
                     label="一等座/硬卧"
-                    prop="medium_seat_price">
+                    prop="medium_seat_count">
                 </el-table-column>
                 <el-table-column
                     label="二等座/硬座"
-                    prop="low_seat_price">
+                    prop="low_seat_count">
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                     <template v-slot:default="scope">
-                        <!-- 跳转至查询 -->
-                        <el-button
-                            size="mini"
-                            @click="handleSearch(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,scope.row.train_number)">查看余票</el-button>
-                        <!-- 跳转至购买 -->
                         <el-button
                             size="mini"
                             type="Success"
-                            @click="handleBuy(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
-                            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price)">预定</el-button>
+                            @click="check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
+                            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price)">预定
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <!-- Table -->
 
-            <el-dialog title="余座数" v-model="dialogTableVisible_GD" style="width: 1500px">
-                <el-table :data="high_seat_GD">
-                  <el-table-column property="carriage_number" label="车厢号" width="150"></el-table-column>
-                  <el-table-column property="seat_type" label="座位类型" width="200"></el-table-column>
-                  <el-table-column property="A_num" label="A座"></el-table-column>
-                  <el-table-column property="B_num" label="B座"></el-table-column>
-                  <el-table-column property="C_num" label="C座"></el-table-column>
-                </el-table>
-                <el-table :data="medium_seat_GD">
-                  <el-table-column property="carriage_number" label="车厢号" width="150"></el-table-column>
-                  <el-table-column property="seat_type" label="座位类型" width="200"></el-table-column>
-                  <el-table-column property="A_num" label="A座"></el-table-column>
-                  <el-table-column property="B_num" label="B座"></el-table-column>
-                  <el-table-column property="C_num" label="C座"></el-table-column>
-                  <el-table-column property="D_num" label="D座"></el-table-column>
-                </el-table>
-                <el-table :data="low_seat_GD">
-                  <el-table-column property="carriage_number" label="车厢号" width="150"></el-table-column>
-                  <el-table-column property="seat_type" label="座位类型" width="200"></el-table-column>
-                  <el-table-column property="A_num" label="A座"></el-table-column>
-                  <el-table-column property="B_num" label="B座"></el-table-column>
-                  <el-table-column property="C_num" label="C座"></el-table-column>
-                  <el-table-column property="D_num" label="D座"></el-table-column>
-                  <el-table-column property="E_num" label="E座"></el-table-column>
-                </el-table>
-              </el-dialog>
-
-
-            <el-dialog title="余座数" v-model="dialogTableVisible" style="width: 1500px">
-                <el-table :data="high_seat">
-
-                    <el-table-column property="carriage_number" label="车厢号" width="150"></el-table-column>
-                    <el-table-column property="seat_type" label="座位类型" width="200"></el-table-column>
-                    <el-table-column property="upper_num" label="上铺"></el-table-column>
-                    <el-table-column property="lower_num" label="下铺"></el-table-column>
-                </el-table>
-                <el-table :data="medium_seat">
-
-                    <el-table-column property="carriage_number" label="车厢号" width="150"></el-table-column>
-                    <el-table-column property="seat_type" label="座位类型" width="200"></el-table-column>
-                    <el-table-column property="upper_num" label="上铺"></el-table-column>
-                    <el-table-column property="middle_num" label="中铺"></el-table-column>
-                    <el-table-column property="lower_num" label="下铺"></el-table-column>
-                </el-table>
-                <el-table :data="low_seat">
-
-                    <el-table-column property="carriage_number" label="车厢号" width="150"></el-table-column>
-                    <el-table-column property="seat_type" label="座位类型" width="200"></el-table-column>
-                    <el-table-column property="A_num" label="A座"></el-table-column>
-                    <el-table-column property="B_num" label="B座"></el-table-column>
-                    <el-table-column property="C_num" label="C座"></el-table-column>
-                    <el-table-column property="D_num" label="D座"></el-table-column>
-                    <el-table-column property="E_num" label="E座"></el-table-column>
-                    <el-table-column property="F_num" label="F座"></el-table-column>
-                </el-table>
-            </el-dialog>
         </div>
+        <el-button @click="check1">点我点我</el-button>
+        <el-button @click="check2">123</el-button>
     </div>
 </template>
 <script>
-    import {queryTrainTicket,getAllStationName} from '../api/getData'
+    import axios from "axios";
+    // import { ElMessage } from 'element-plus'
+// import { AxiosBase } from '@/config/env';
     export default {
         data(){
             return {
@@ -174,8 +124,8 @@
                 searchForm:
                     {
                         start_station: '',
-                        end_station:"",
-                        datetime:""
+                        end_station:'',
+                        datetime:''
 
                     },
                 high_seat:[
@@ -250,93 +200,51 @@
                     desc: ''
                 },
                 formLabelWidth: '120px',
-                stationData:[],
+                stationData:["阿克苏", "阿拉善", "阿勒泰", "阿图什", "安康", "安庆", "鞍山", "安顺", "安溪", "安阳", "巴彦淖尔", "巴音郭楞蒙古自治州", "巴中", "白城", "百色", "白山", "白银", "蚌埠", "保定", "宝鸡", "保山", "包头", "北海", "北京", "本溪", "毕节", "璧山", "滨州", "博乐", "亳州", "沧州", "长春", "常德", "昌吉", "昌江", "长沙", "长寿", "长汀", "长治", "常州", "潮州", "郴州", "承德", "成都", "澄迈", "赤峰", "池州", "崇仁", "崇左", "楚雄", "滁州", "达川", "大理", "大连", "大庆", "大同", "达州", "大足", "丹东", "儋州", "德令哈", "德阳", "德州", "垫江", "定西", "东方", "东莞", "东营", "都匀", "鄂尔多斯", "峨山", "鄂州", "恩施", "二连浩特", "防城港", "丰都", "奉节", "凤阳", "佛山", "涪陵", "富平", "抚顺", "莆田", "阜新", "阜阳", "抚州", "福州", "赣州", "岗嘎", "格尔木", "个旧", "贡嘎", "固原", "广安", "广元", "广州", "贵港", "桂林", "贵阳", "哈尔滨", "哈密", "海北州", "海东", "海口", "海西州", "海晏", "邯郸", "汉中", "杭州", "鹤壁", "河池", "合川", "合肥", "鹤岗", "和田", "河源", "菏泽", "贺州", "黑河", "衡水", "衡阳", "呼和浩特", "葫芦岛", "呼伦贝尔", "湖州", "桦南", "华阴", "淮安", "淮北", "怀化", "淮南", "桓台", "黄冈", "黄山", "黄石", "惠州", "吉安", "吉林", "济南", "济宁", "吉首", "鸡西", "济源", "加查", "加格达奇", "佳木斯", "嘉兴", "嘉峪关", "建宁", "江边村", "江津", "江门", "焦作", "揭阳", "金昌", "晋城", "金华", "晋中", "锦州", "景德镇", "景洪", "荆门", "荆州", "九江", "酒泉", "喀什", "开封", "凯里", "克拉玛依", "库尔勒", "昆明", "拉萨", "来宾", "莱芜", "来舟", "兰州", "琅勃拉邦", "廊坊", "朗县", "老挝万荣", "乐东", "乐山", "丽江", "丽水", "连云港", "梁平", "聊城", "辽阳", "辽源", "临沧", "临川", "临汾", "临高", "林口", "临沂", "林芝", "陵水", "灵武", "六安", "六盘水", "柳州", "陇南", "龙岩", "娄底", "芦溪", "泸州", "洛阳", "吕梁", "马鞍山", "马桥河", "麦园", "茫崖", "茂名", "眉山", "梅州", "勐腊", "蒙自", "米林", "绵阳", "磨丁", "墨江", "牡丹江", "那曲", "南昌", "南充", "南涧", "南京", "南宁", "南平", "南通", "南阳", "内江", "宁波", "宁德", "宁洱", "盘锦", "攀枝花", "彭水", "平顶山", "平凉", "萍乡", "蒲城", "普洱", "濮阳", "蕲春", "綦江", "齐齐哈尔", "七台河", "潜江", "黔江", "秦皇岛", "钦州", "青岛", "青铜峡", "庆阳", "清远", "琼海", "曲靖", "衢州", "泉州", "日喀则", "日照", "荣昌", "三门峡", "三明", "三亚", "桑日", "厦门", "沙县", "山南", "汕头", "汕尾", "上海", "上杭", "商洛", "商丘", "上饶", "邵东", "韶关", "绍兴", "邵阳", "神农架", "沈阳", "深圳", "石河子", "石家庄", "十堰", "石柱", "石柱县", "石嘴山", "双鸭山", "朔州", "四平", "松原", "宿迁", "苏州", "宿州", "绥化", "遂宁", "随州", "塔城", "漯河", "泰安", "太原", "泰州", "台州", "唐山", "天津", "天门", "天水", "铁岭", "铜川", "通化", "通辽", "铜陵", "潼南", "铜仁", "吐鲁番", "万宁", "万象", "万州", "潍坊", "威海", "渭南", "文昌", "文山", "温州", "乌海", "武汉", "芜湖", "乌兰察布", "武隆", "乌鲁木齐", "巫山", "武威", "无锡", "武穴", "吴忠", "梧州", "西安", "西昌", "锡林郭勒", "西宁", "浠水", "咸宁", "仙桃", "咸阳", "香港", "湘潭", "襄阳", "孝感", "新乡", "信阳", "新余", "忻州", "兴安", "邢台", "兴义", "秀山", "许昌", "徐州", "宣城", "雅安", "延安", "延边", "盐城", "烟台", "阳江", "漾濞", "阳泉", "扬州", "宜宾", "宜昌", "伊春", "宜春", "伊宁", "益阳", "仪征", "银川", "营口", "鹰潭", "永川", "永平", "永州", "酉阳", "于都", "榆林", "玉林", "玉门", "玉溪", "元江", "岳阳", "运城", "云浮", "云阳", "枣庄", "扎囊", "湛江", "张家界", "张家口", "张掖", "漳州", "肇庆", "昭通", "朝阳", "镇江", "郑州", "重庆", "中山", "中卫", "周口", "珠海", "驻马店", "株洲", "淄博", "自贡", "资溪", "资阳", "遵义"],
             }
         },
         methods: {
-            async created(){
-            const res = await getAllStationName()
-            this.stationData = res.dataLists;
-        },
-            // queryString是用户在输入框中输入的文本字符串，用于进行搜索。cb是一个回调函数，用于在搜索完成时将搜索结果传递给自动完成组件。
-            //从"stationData"属性中获取所有的车站数据列表，存储在"houseNumberList"变量中。
-            //根据用户输入的queryString字符串，通过调用"createFilter"方法创建一个过滤函数，用于过滤出符合条件的车站数据列表。
-            async querySearch(queryString, cb) {
-                var houseNumberList = this.stationData;
-                let results = queryString ? houseNumberList.filter(this.createFilter(queryString)) : houseNumberList;
-                //延时
-                clearTimeout(this.timeout);
-                this.timeout = setTimeout(() => {
-                     cb(results);
-                }, 1000 * Math.random());
+            check2(){
+            axios.post('/api/user/login/', {            
+            username: 'user65',
+            password: '123456',
+          }).then((response) => {
+                    console.log(response.data.data.token);
+                    axios.get('/api/user/logout/',{
+                     headers:{
+                        'Authorization':response.data.data.token
+                     }
+                }).then((response) => {
+                    console.log(response);
+                    });
+                    })
 
-            },
-            //先调用this.$refs[formName].validate方法验证表单数据的有效性,有效再进行操作
-            async submitForm(formName) {
-                this.$refs[formName].validate(async (valid) => {
-                    if (valid) {
-                        let date;
-                        //将表单中的数据转换为date格式
-                        date= new Date(this.searchForm.datetime);
-
-                        let datetime2 = date.getFullYear()+'-'+this.checkTime(date.getMonth()+1)+'-'+this.checkTime(date.getDate());
-                        this.tableData = [];
-                        //调用异步请求方法queryTrainTicket，根据表单中填写的出发地、目的地和日期时间等信息，从后端API获取符合条件的列车信息。
-                        const res = await queryTrainTicket({train_start_station:this.searchForm.start_station , train_end_station:this.searchForm.end_station ,datetime :datetime2})
-                            if(res.status == 1)
-                            {
-                                this.$message({
-                                    type: 'success',
-                                    message: '查询成功'
-                                });
-                                this.tableData = [];
-                                for(let i = 0 ; i < res.trainTicketPriceInfoList.length ; i++ )
-                                {
-                                    const tableData = {};
-                                    tableData.train_no = res.trainTicketPriceInfoList[i].train_no;
-                                    tableData.train_number = res.trainTicketPriceInfoList[i].train_number;
-                                    tableData.start_station =res.trainTicketPriceInfoList[i].start_station;
-                                    tableData.end_station = res.trainTicketPriceInfoList[i].end_station;
-                                    tableData.start_time =res.trainTicketPriceInfoList[i].start_time;
-                                    tableData.arrive_time = res.trainTicketPriceInfoList[i].arrive_time;
-                                    tableData.high_seat_price = res.trainTicketPriceInfoList[i].high_seat_price;
-                                    tableData.medium_seat_price = res.trainTicketPriceInfoList[i].medium_seat_price ;
-                                    tableData.low_seat_price = res.trainTicketPriceInfoList[i].low_seat_price;
-                                    tableData.end_no = res.trainTicketPriceInfoList[i].end_no;
-                                    tableData.start_no =res.trainTicketPriceInfoList[i].start_no;
-
-                                    this.tableData.push(tableData);
-                                }
-                                console.log(this.tableData)
-                                this.TrainRank();
-                            }
-                            else if(res.status == 404)
-                            {
-                                this.$message({
-                                    type: 'error',
-                                    message: '没有符合条件的列车'
-                                });
-                            }else if(res.status == 406)
-                            {
-                                this.$message({
-                                    type: 'error',
-                                    message: '没有符合条件的列车'
-                                });
-                            }
-                            else {
-                                this.$message({
-                                    type: 'error',
-                                    message: '查询失败'
-                                });
-                            }
+                    .catch((error) => {
+                    console.log(error);
+                    console.log("这里真的有猫饼");
+                    if(error.response.status === 500){
+                    console.log("已经存在了猫猫");
                     }
-
-                });
+                    });
             },
+            
 
-        },
-        //对查询的信息进行排序
-        TrainRank()
+            check1(){
+                axios.get('/api/user/logout/',{
+                     header:{
+                         Authorization:''
+                     }
+                }).then((response) => {
+                    console.log(response);
+                    });
+            },
+            transferTime(time)
+            {
+                let time2 = time.split(":");
+                let second =  parseInt(time2[0]) *60   + parseInt(time2[1]);
+                return second;
+            },
+            TrainRank()
             {
                 if(this.value1 === false)
                 {
@@ -369,16 +277,15 @@
                     }
                 }
             },
-            handleBuy(index,datetime,train_no,start_no,end_no,train_number,high_seat_price,medium_seat_price,low_seat_price)
-            {
-                let date;
-                date= new Date(datetime);
-                console.log("date"+date);
-                console.log("train_no"+typeof train_number);
-                let datetime2 = date.getFullYear()+'-'+this.checkTime(date.getMonth()+1)+'-'+this.checkTime(date.getDate());
-                this.$router.push({
-                    path: '/TicketOrder',
-                    query: {
+            check(index,datetime,train_no,start_no,end_no,train_number,high_seat_price,medium_seat_price,low_seat_price)
+            {           
+                        
+                const date1 = new Date(this.searchForm.datetime)
+                        const year = date1.getFullYear()
+                        const month = String(date1.getMonth() + 1).padStart(2, '0')
+                        const day = String(date1.getDate()).padStart(2, '0')
+                        const datetime2=`${year}-${month}-${day}`
+                        const Object={
                         datetime: datetime2,
                         train_no: train_no,
                         start_no:start_no,
@@ -387,30 +294,158 @@
                         high_seat_price:high_seat_price,
                         medium_seat_price:medium_seat_price,
                         low_seat_price:low_seat_price
-                    }
-                    /*query: {
-                        key: 'key',
-                        msgKey: this.msg
-                    }*/
-                })
+                        }
+                        const Temp = JSON.stringify(Object)
+                        this.$router.push({
+                            name: "TicketOrder",
+                            params: {
+                            temp: Temp
+                            }
+                        })
             },
+            checkTime: (i) => {
+                    if (i < 10) {
+                        i = '0' + i;
+                    }
+                    return i;
+                 },
+            async created(){
+            const response = await axios.get('../assets/city_names.json');
+            this.stationData= response.data;
+            console.log(this.stationData)
+        },
+
+            // queryString是用户在输入框中输入的文本字符串，用于进行搜索。cb是一个回调函数，用于在搜索完成时将搜索结果传递给自动完成组件。
+            //从"stationData"属性中获取所有的车站数据列表，存储在"houseNumberList"变量中。
+            //根据用户输入的queryString字符串，通过调用"createFilter"方法创建一个过滤函数，用于过滤出符合条件的车站数据列表。
+            
+            //先调用this.$refs[formName].validate方法验证表单数据的有效性,有效再进行操作
+            
+            async submitForm(formName) {
+                this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+                        const date1 = new Date(this.searchForm.datetime)
+                        const year = date1.getFullYear()
+                        const month = String(date1.getMonth() + 1).padStart(2, '0')
+                        const day = String(date1.getDate()).padStart(2, '0')
+                        this.tableData = [];
+                        //调用异步请求方法queryTrainTicket，根据表单中填写的出发地、目的地和日期时间等信息，从后端API获取符合条件的列车信息。
+                        axios.post('/api/train/query_train/', {            
+                        departure_city:this.searchForm.start_station,
+                        arrival_city:this.searchForm.end_station,
+                        date:`${year}-${month}-${day}`,
+                    }) 
+                    .then((response) => {
+                                if(response.status==200){
+                                console.log("查询成功");
+                                }
+                                this.$message({
+                                    type: 'success',
+                                    message: '查询成功'
+                                });
+                                this.tableData = [];
+                                console.log(response.data.data)
+                                for(let i = 0 ; i < response.data.data.length ; i++ )
+                                {
+                                    if(response.data.data[i].train_type=='HSR'){
+                                    const tableData = {};
+                                    console.log(response.data.data[i].ticket.BUS)
+                                    tableData.train_no = response.data.data[i].train_type;
+                                    tableData.train_number = response.data.data[i].train_name;
+                                    tableData.start_station =response.data.data[i].departure_station_name;
+                                    tableData.end_station = response.data.data[i].arrival_station_name;
+                                    tableData.start_time =response.data.data[i].departure_time;
+                                    tableData.arrive_time = response.data.data[i].arrival_time;
+                                    tableData.high_seat_price = response.data.data[i].ticket.SND.price;
+                                    tableData.medium_seat_price= response.data.data[i].ticket.FST.price ;
+                                    tableData.low_seat_price = response.data.data[i].ticket.BUS.price;
+                                    console.log("下面是御座")
+                                    console.log(response.data.data[i].ticket.SND.count)
+                                    tableData.high_seat_count = response.data.data[i].ticket.SND.count;
+                                    tableData.medium_seat_count = response.data.data[i].ticket.FST.count ;
+                                    tableData.low_seat_count = response.data.data[i].ticket.BUS.count;
+                                    tableData.end_no = response.data.data[i].end_stop_id
+                                    tableData.start_no =response.data.data[i].start_stop_id;
+                                    this.tableData.push(tableData);
+                                    }
+                                    else{
+                                    const tableData = {};
+
+                                    tableData.train_no = response.data.data[i].train_type;
+                                    tableData.train_number = response.data.data[i].train_name;
+                                    tableData.start_station =response.data.data[i].departure_station_name;
+                                    tableData.end_station = response.data.data[i].arrival_station_name;
+                                    tableData.start_time =response.data.data[i].departure_time;
+                                    tableData.arrive_time = response.data.data[i].arrival_time;
+                                    tableData.high_seat_price = response.data.data[i].ticket.HAW.price;
+                                    tableData.medium_seat_count = response.data.data[i].ticket.HAZ.price ;
+                                    tableData.low_seat_count = response.data.data[i].ticket.SOF.price;
+
+                                    tableData.high_seat_count = response.data.data[i].ticket.HAW.count;
+                                    tableData.medium_seat_count = response.data.data[i].ticket.HAZ.count ;
+                                    tableData.low_seat_count = response.data.data[i].ticket.SOF.count;
+                                    tableData.end_no = response.data.data[i].end_stop_id
+                                    tableData.start_no =response.data.data[i].start_stop_id;
+                                    this.tableData.push(tableData);
+                                    }
+                                }
+                                console.log(this.tableData)
+                                this.TrainRank();
+                                })
+ 
+                            
+                            // else if(res.status == 404)
+                            // {
+                            //     this.$message({
+                            //         type: 'error',
+                            //         message: '没有符合条件的列车'
+                            //     });
+                            // }else if(res.status == 406)
+                            // {
+                            //     this.$message({
+                            //         type: 'error',
+                            //         message: '没有符合条件的列车'
+                            //     });
+                            // }
+                            // else {
+                            //     this.$message({
+                            //         type: 'error',
+                            //         message: '查询失败'
+                            //     });
+                            // }
+                    }
+
+                });
+            },
+                                
+            searchElements(query,index){
+                const result = this.stationData.filter(element => element.includes(query));
+                console.log(index)
+                return result;
+            },
+            handleSelect(selectedItem) {
+             this.searchForm.start_station = selectedItem;
+        },
+        searchElements2(query,index){
+                const result = this.stationData.filter(element => element.includes(query));
+                console.log(index)
+                return result;
+            },
+        handleSelect2(selectedItem) {
+             this.searchForm.end_station = selectedItem;
+        }
+        
+
+        },
+        //对查询的信息进行排序
+
             handelUpdate()
             {
                 this.TrainRank();
 
             },
-            createFilter(queryString) {
-                return (houseNumber) => {
-                    return (houseNumber.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
-                };
-            },
-            checkTime(i){
-                if(i<10){
-                    i = '0'+i
-                }
+           
 
-                return i
-            },
     }
 </script>
 
