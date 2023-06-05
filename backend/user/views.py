@@ -353,7 +353,7 @@ def logout(request):
         else:
             message = 'token无效'
             logger.info(message)
-            return Response({'message': message}, status=status.HTTP_200_OK)
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_200_OK)
     except Exception as e:
         logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
