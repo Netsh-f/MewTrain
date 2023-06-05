@@ -119,11 +119,13 @@ def update_user_info(request):
 
         user = User.objects.get(id=user_id)
 
-        username = data['username']
-        same_user = User.objects.filter(username=username).first()
-        if same_user is not None:
-            message = '用户名已存在'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        if 'username' in data:
+            username = data['username']
+            same_user = User.objects.filter(username=username).first()
+            if same_user is not None:
+                message = '用户名已存在'
+                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            user.username = username
 
         # 检查是否要修改密码
         if 'password' in data:
@@ -138,9 +140,6 @@ def update_user_info(request):
             # 更新密码为新密码
             user.password = make_password(new_password)
 
-        # 更新其他字段
-        if 'username' in data:
-            user.username = username
         if 'email' in data:
             user.email = data['email']
 
