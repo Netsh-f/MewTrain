@@ -252,6 +252,31 @@ def update_passenger(request):
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST'])
+def get_passenger_list(request):
+    try:
+        user_id = request.data.get('user_id')
+        user = User.objects.get(id=user_id)
+        passengers = user.passenger_set.all()
+
+        passenger_list = []
+        for passenger in passengers:
+            passenger_list.append({
+                'id': passenger.id,
+                'name': passenger.name,
+                'id_type': passenger.id_type,
+                'id_number': passenger.id_number,
+                'ticket_type': passenger.ticket_type,
+                'phone_region': passenger.phone_region,
+                'phone_number': passenger.phone_number,
+            })
+        message = '查询成功'
+        return Response({'message': message, 'passenger_list': passenger_list}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 def login(request):
