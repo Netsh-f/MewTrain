@@ -370,7 +370,9 @@ import router from "@/router"; // 导入Vue.js路由器
                     });
                     this.tableDatas = response.data.passengers;
                     console.log(this.tableDatas)
-                })
+                }).catch((error) => {
+                    console.log(error);
+                    });
                 
             },
             AddPassengerInfo(passenger_id,passenger_real_name,passenger_phone_number,passenger_id_number)
@@ -442,7 +444,9 @@ import router from "@/router"; // 导入Vue.js路由器
                         order1.train_name=response.data.data.train_name;
                         this.order.push(order1);
                         console.log(order1)
-                    })
+                    }).catch((error) => {
+                    console.log(error);
+                    });
                     this.show_order_list=true;
                 }
                 else{
