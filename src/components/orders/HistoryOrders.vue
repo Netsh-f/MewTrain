@@ -58,8 +58,14 @@
 
 <script>
 import axios from 'axios';
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox ,ElMessage} from 'element-plus'
+import { mapState } from "vuex";
+import router from '@/router';
 export default {
+    computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
     data() {
         return {
 
@@ -87,7 +93,12 @@ export default {
             console.log(id)
             axios.post('/api/train/remove_order/', {
                 order_id: id
-            })
+            },{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                })
+                // eslint-disable-next-line no-unused-vars
                 .then((response) => {
                     //console.log(response.data.data);
                     ElMessageBox.alert('订单删除成功', '删除成功', {
@@ -97,6 +108,15 @@ export default {
                     this.getLists();
                 })
                 .catch(function (error) {
+                    if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
                     console.log(error);
                     if (error.response.data.message === '订单不可删除') {
                         ElMessageBox.alert('无法删除已支付订单，请退款', '删除失败', {
@@ -110,7 +130,11 @@ export default {
         async getLists() {
             axios.post('/api/train/get_order_list/', {
                 user_id: 4
-            })
+            },{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                })
                 .then((response) => {
                     console.log(response)
                     this.tableData = [];
@@ -188,9 +212,18 @@ export default {
                     }
 
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                .catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
 
 
         }
@@ -199,21 +232,34 @@ export default {
     mounted() {
         axios.post('/api/train/get_order_list/', {
                 user_id: 4
-            })
+            },{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                })
                 .then((response) => {
                     console.log(response)
                     let list=response.data.data
                     this.count= Math.ceil(list.length/this.page_size);
                     this.getLists();
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                .catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
     }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .demo-table-expand {
     font-size: 0;
 }

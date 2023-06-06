@@ -116,8 +116,15 @@
 <script>
 
 import axios from 'axios';
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {  ElMessageBox,ElMessage} from 'element-plus'
+import { mapState } from "vuex";
+import router from '@/router';
 export default {
+  computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Passengers',
   data() {
     return {
@@ -228,7 +235,11 @@ export default {
             passenger_id: this.passengers[i].id,
             ticket_type: this.passengers[i].ticket_type,
             phone_number: this.passengers[i].phone_number,
-          })
+          },{
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
             .then((response) => {
               console.log(response);
               flag++;
@@ -240,7 +251,16 @@ export default {
               this.update();
             })
             .catch((error) => {
-              console.log(error);
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
             });
         }
       }
@@ -254,7 +274,11 @@ export default {
       axios.post('/api/user/remove_passenger/', {
         user_id: "4",
         passenger_id: id
-      })
+      },{
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
         .then((response) => {
           console.log(response);
           ElMessageBox.alert('已删除乘车人', '删除成功', {
@@ -270,7 +294,11 @@ export default {
     async update() {
       axios.post('/api/user/get_user_info/', {
         user_id: "4",
-      })
+      },{
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
         .then((response) => {
           this.passengers = response.data.passengers;
           for (let i = 0; i < this.passengers.length; i++) {
@@ -309,8 +337,17 @@ export default {
           }
         })
         .catch((error) => {
-          console.log(error);
-        });
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
     },
     isValidPhoneNumber(phoneNumber) {
       var regExp = /^1\d{10}$/;
@@ -372,8 +409,10 @@ export default {
         phone_region: this.new_passenger.phone_region,
         phone_number: this.new_passenger.phone_number
       }, {
-
-      })
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
         .then((response) => {
           console.log(response.data);
           ElMessageBox.alert('成功添加乘车人', '添加成功', {
@@ -385,6 +424,15 @@ export default {
         })
         .catch((error) => {
           console.log(error);
+          if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
           ElMessageBox.alert(error.response.data.message, '添加失败', {
             confirmButtonText: '确定',
             showClose:false

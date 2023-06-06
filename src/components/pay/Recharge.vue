@@ -7,6 +7,7 @@
 <script>
 import { ElMessageBox } from 'element-plus'
 export default {
+    // eslint-disable-next-line vue/multi-word-component-names
     name: 'Recharge',
     data(){
         return{

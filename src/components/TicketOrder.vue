@@ -209,8 +209,14 @@
 <script>
 import axios from 'axios';
 import router from "@/router"; // 导入Vue.js路由器
+import { mapState } from "vuex";
+import { ElMessage } from 'element-plus';
 
     export default {
+        computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
         name: "TicketOrder",
         data() {
             return {
@@ -277,6 +283,10 @@ import router from "@/router"; // 导入Vue.js路由器
                 axios.post('/api/train/query_ticket/',{
                     train_name:this.train_number,
                     date:this.datetime
+                },{
+                headers:{
+                   "Authorization":this.token
+                     }
                 }).then((response) => {
                     console.log(response)
                     if(this.train_no=="HSR")
@@ -357,12 +367,28 @@ import router from "@/router"; // 导入Vue.js路由器
                         type: 'message',
                         message: '查询成功'
                     });
+                }).catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
                 })
+                }
+            });
                        
             },
             async getPassenger()
             {
-                axios.post('/api/user/get_user_info/',{user_id:4}).then((response) => {
+                console.log(this.token)
+                axios.post('/api/user/get_user_info/',{user_id:4},{
+             headers:{
+                   "Authorization":this.token
+                     }
+                }).then((response) => {
                     console.log(response)
                     this.$message({
                         type: 'success',
@@ -371,8 +397,17 @@ import router from "@/router"; // 导入Vue.js路由器
                     this.tableDatas = response.data.passengers;
                     console.log(this.tableDatas)
                 }).catch((error) => {
-                    console.log(error);
-                    });
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
                 
             },
             AddPassengerInfo(passenger_id,passenger_real_name,passenger_phone_number,passenger_id_number)
@@ -420,7 +455,11 @@ import router from "@/router"; // 导入Vue.js路由器
                         end_stop_id:this.end_no,
                         passenger_ids:this.passengerIds,
                         seat_locations:this.checkList,
-                    }).then((response) => {
+                    },{
+             headers:{
+                   "Authorization":this.token
+                     }
+                }).then((response) => {
                         console.log(response)
                         for(let i=0;i<response.data.data.passenger_order_data.length;i++)
                         {
@@ -445,8 +484,17 @@ import router from "@/router"; // 导入Vue.js路由器
                         this.order.push(order1);
                         console.log(order1)
                     }).catch((error) => {
-                    console.log(error);
-                    });
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
                     this.show_order_list=true;
                 }
                 else{
@@ -468,7 +516,11 @@ import router from "@/router"; // 导入Vue.js路由器
                         end_stop_id:this.end_no,
                         passenger_ids:this.passengerIds,
                         seat_locations:this.checkList,
-                    }).then((response) => {
+                    },{
+             headers:{
+                   "Authorization":this.token
+                     }
+                }).then((response) => {
                         console.log(response)
                         for(let i=0;i<response.data.data.passenger_order_data.length;i++)
                         {
@@ -492,7 +544,18 @@ import router from "@/router"; // 导入Vue.js路由器
                         order1.train_name=response.data.data.train_name;
                         this.order.push(order1);
                         console.log(order1)
-                    })
+                    }).catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
                     this.show_order_list=true;
                     }}
             },
@@ -513,14 +576,26 @@ import router from "@/router"; // 导入Vue.js路由器
                 axios.post('/api/train/pay_order/',{
                     order_id:this.order[0].order_id,
                     user_id:4
+                },{
+             headers:{
+                   "Authorization":this.token
+                     }
                 }).then((response) => {
                     console.log(response)
                     this.active=3
 
-                }).catch((error) =>{
-                    console.log(error)
+                }).catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
                 }
-                )
+            });
             }
 
         },
@@ -557,7 +632,7 @@ import router from "@/router"; // 导入Vue.js路由器
     }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
     @import '../assets/mixin.less';
     .explain_text{
         margin-top: 20px;

@@ -24,10 +24,15 @@
 </template>
 
 <script>
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox} from 'element-plus'
 import PayTime from './PayTime'
 import axios from 'axios'
+import { mapState } from "vuex";
 export default {
+    computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
     name: 'PaymentMethod',
     data() {
         return {
@@ -40,12 +45,10 @@ export default {
                 user_id: 4,
                 amount:this.price
             }, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-                }
-            })
+                     headers:{
+                         "Authorization":this.token
+                     }
+                })
                 .then((response) => {
                     console.log(response.data);
                     let data = response.data;
@@ -56,8 +59,8 @@ export default {
                     this.IDnumber = data.passengers[0].id_number;
                 })
                 .catch((error) => {
-                    console.log(error);
-                });
+                console.log(error);
+            });
             ElMessageBox.alert('您已成功充值' + this.price + '元', '充值成功', {
                 confirmButtonText: '确定',
                 showClose:false

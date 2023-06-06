@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 const store = createStore({
     state: {
         token: null,
+        isLogin:false
       },
     mutations: {
         setToken(state, token) {
@@ -9,6 +10,10 @@ const store = createStore({
             state.token = token;
             console.log(state.token)
           },
+          setLogin(state,isLogin){
+            state.isLogin=isLogin
+          }
+          
     },
     actions: {},
 

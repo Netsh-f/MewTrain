@@ -38,9 +38,15 @@
 </template>
 
 <script>
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {  ElMessageBox,ElMessage} from 'element-plus'
 import axios from 'axios'
+import { mapState } from "vuex";
+import router from '@/router';
 export default {
+  computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
   name: 'ContactMethod',
   data() {
     return {
@@ -79,19 +85,29 @@ export default {
           email: this.person.email,
           user_id:4
         }, {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-          }
-        })
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
+          // eslint-disable-next-line no-unused-vars
           .then((response) => {
             ElMessageBox.alert('您已成功修改联系方式信息', '修改成功', {
               confirmButtonText: '确定',
               showClose:false
             })
           })
+          
+          // eslint-disable-next-line no-unused-vars
           .catch((error) => {
+            if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
             this.person.isedit = true;
             ElMessageBox.alert('用户名已被注册', '修改失败', {
               confirmButtonText: '确定',
@@ -111,15 +127,11 @@ export default {
   mounted() {
     axios.post('/api/user/get_user_info/', {
       user_id: "4",
-    }, {
-
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-      }
-    })
+    },  {
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
       .then((response) => {
         //console.log(response.data);
         let data = response.data;
@@ -128,9 +140,17 @@ export default {
         this.person.balance = data.balance;
       })
       .catch((error) => {
-        console.log(error);
-        
-      });
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
   }
 }
 </script>

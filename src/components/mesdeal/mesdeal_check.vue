@@ -214,6 +214,8 @@ import fornav from './fornav.vue';
 import { ElMessage } from 'element-plus'
 import { reactive,ref } from 'vue'
 import axios from 'axios';
+import router from '@/router';
+import { mapState } from "vuex";
 
 const asAddFlag = ref(false);
 const formLabelWidth = '140px';
@@ -233,6 +235,10 @@ const Pform = reactive({
     phone_number:'',
 })
 export default {
+    computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
     name: "My_mesdeal_check",
     created() {
         this.getTableData();
@@ -270,12 +276,10 @@ export default {
         getTableData(){
             //获取用户列表
             axios.get('/api/user/get_user_list/', {
-                headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-                }
-            }).then((response) => {
+                     headers:{
+                         "Authorization":this.token
+                     }
+                }).then((response) => {
                 this.userlist=response.data.users;
                 this.userlist = this.userlist.map(item => {
                     return { ...item, usertype: 'user' };
@@ -322,12 +326,25 @@ export default {
                 });
             }).catch((error) => {
                 console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
             });
         },
         PformCommit(){
             this.Pform.user_id=this.currut_id;
             console.log(this.Pform);
-            axios.post('/api/user/add_passenger/',this.Pform)
+            axios.post('/api/user/add_passenger/',this.Pform,{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                })
             .then((res)=>{
                 console.log(res);
                 ElMessage.success("添加乘车人成功");
@@ -380,7 +397,11 @@ export default {
         getPassengerData(id){
             axios.post('/api/user/get_passenger_list/',{
                 user_id:id,
-            }).then((res)=>{
+            },{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                }).then((res)=>{
                 this.passengerData=res.data.passenger_list;
             }).catch((e)=>{
                 console.log(e);
@@ -403,6 +424,10 @@ export default {
                     user_type:row.usertype,
                     username:row.username,
                     email:row.email,
+                },{
+                     headers:{
+                         "Authorization":this.token
+                     }
                 }).then((res)=>{
                 ElMessage.success("成功修改！");
                 console.log(res);
@@ -422,7 +447,11 @@ export default {
             axios.post('/api/user/remove_user/',{
                 user_id:row.id,
                 user_type:row.usertype,
-            }).then((res)=>{
+            },{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                }).then((res)=>{
                 console.log(res);
                 ElMessage({
                     message: '删除成功',
@@ -477,7 +506,11 @@ export default {
             this.form.username !== '' &&
             this.form.password !== '' &&
             this.form.email !== ''){
-                    axios.post('/api/user/add_user/',this.form)
+                    axios.post('/api/user/add_user/',this.form,{
+                     headers:{
+                         "Authorization":this.token
+                     }
+                })
                     .then((res)=>{
                         console.log(res.data.message);
                         Object.keys(form).forEach((key) => {form[key] = '';});

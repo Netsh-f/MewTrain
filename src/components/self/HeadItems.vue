@@ -17,6 +17,7 @@
 <script>
     import Head from './Head'
     import { ArrowDown } from '@element-plus/icons-vue'
+    import { mapMutations } from "vuex";
     export default{
         name:'HeadItems',
         components:{
@@ -25,6 +26,8 @@
             Head
         },
         methods:{
+          ...mapMutations(["setToken"]),
+          ...mapMutations(["setLogin"]),
             handleCommand(text){
                 if(text==='historyOrders'){
                     this.$router.push({
@@ -42,6 +45,8 @@
                     })
                 }
                 else if(text==='logout'){
+                    this.setToken(null)
+                    this.setLogin(false)
                     window.sessionStorage.clear()
                     this.$router.push('/Login')
                 }

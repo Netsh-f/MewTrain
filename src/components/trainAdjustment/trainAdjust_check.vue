@@ -231,11 +231,17 @@ import fornav from './fornav.vue'
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import axios from 'axios'
+import { mapState } from 'vuex'
+import router from '@/router'
 
 const asAddFlag = ref(false);
 const TicketFlag = ref(false);
 const formLabelWidth = '140px';
 export default {
+    computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
     name: "My_trainAdjust_check",
     created() {
         this.getTrainData();
@@ -299,24 +305,48 @@ export default {
     },
     methods:{
         getStopData(){
-            axios.get('/api/train/get_station_list/')
+            axios.get('/api/train/get_station_list/',{
+                     headers:{
+                        "Authorization":this.token
+                     }
+                })
                 .then((res)=>{
                     console.log(res);
                     this.stopData=res.data.stations;
-                }).catch((e)=>{
-                    console.log(e);
-                    ElMessage.error("好像有什么问题");
+                }).catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
                 })
+                }
+            });
         },
         getTrainData(){
-            axios.post('/api/train/get_train_list/')
+            axios.post('/api/train/get_train_list/',{},{
+                     headers:{
+                        "Authorization":this.token
+                     }
+                })
                 .then((res)=>{
                     console.log(res);
                     this.tableData=res.data.data;
-                }).catch((e)=>{
-                    console.log(e);
-                    ElMessage.error("好像有什么问题");
+                }).catch((error) => {
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
                 })
+                }
+            });
         },
         // 删除按钮点击事件处理程序
         asDelete(row) {
@@ -324,7 +354,11 @@ export default {
             // 删除车次
             axios.post('/api/train/remove_train/',{
                 train_name:row.train_name,
-            }).then((res)=>{
+            },{
+                     headers:{
+                        "Authorization":this.token
+                     }
+                }).then((res)=>{
                 console.log(res);
                 ElMessage({
                     message: '删除成功',
@@ -372,7 +406,11 @@ export default {
             ElMessage('取消添加');
         },
         formConfirm(){
-                axios.post('/api/train/add_train/',this.form)
+                axios.post('/api/train/add_train/',this.form,{
+                     headers:{
+                        "Authorization":this.token
+                     }
+                })
                 .then((res)=>{
                     console.log(res);
                     ElMessage.success("添加车次成功！");
@@ -393,7 +431,11 @@ export default {
             ElMessage('取消添加车票');
         },
         TicketConfirm(){
-            axios.post('/api/train/add_ticket/',this.Tform)
+            axios.post('/api/train/add_ticket/',this.Tform,{
+                     headers:{
+                        "Authorization":this.token
+                     }
+                })
             .then((res)=>{
                 console.log(res);
                 ElMessage({
@@ -461,6 +503,10 @@ export default {
                 axios.post('/api/train/add_station/', {
                     station_name:this.state,
                     city:this.city,
+                },{
+                     headers:{
+                        "Authorization":this.token
+                     }
                 }).then((response) => {
                         console.log(response.data);
                         ElMessage.success("添加成功！");

@@ -1,6 +1,4 @@
-##
-该组件为Home页右上方头像
-##
+<!-- eslint-disable vue/multi-word-component-names -->
 
 <template #headPicture>
     <div class="demo-type">
@@ -12,6 +10,7 @@
   
 <script>
 import axios from 'axios';
+import { ElMessage } from 'element-plus';
     export default {
         data(){
             return{
@@ -22,8 +21,10 @@ import axios from 'axios';
     axios.post('/api/user/get_user_info/', {
       user_id: "4",
     }, {
-
-    })
+             headers:{
+                   "Authorization":this.token
+                     }
+                })
       .then((response) => {
         //console.log(response.data);
         let data = response.data;
@@ -31,7 +32,11 @@ import axios from 'axios';
       })
       .catch((error) => {
         console.log(error);
-        
+        ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
       });
   }
    }

@@ -85,6 +85,8 @@ export default {
                     console.log(response.data);
                     const token = response.data.data.token;
                     store.commit("setToken", token);
+                    store.commit('setLogin',true)
+                    store.commit("setLogin",true)
                     router.push({ path: "/WELCOME" });
                     })
                     .catch((error) => {

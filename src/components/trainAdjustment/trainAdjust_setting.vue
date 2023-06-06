@@ -33,8 +33,13 @@
 import { ElMessage } from 'element-plus';
 import fornav from './fornav.vue';
 import axios from 'axios';
+import { mapState } from 'vuex';
 
 export default {
+    computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
     name: "My_trainAdjust_message",
     components: {
         fornav,
@@ -48,7 +53,11 @@ export default {
         },
         unsubscribe(){
             console.log("正在尝试注销账号");
-            axios.post('/api/user/logoff/')
+            axios.post('/api/user/logoff/',{},{
+                     headers:{
+                        "Authorization":this.token
+                     }
+                })
             .then((res)=>{
                 console.log(res);
             }).catch((e)=>{

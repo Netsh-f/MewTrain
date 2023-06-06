@@ -112,13 +112,15 @@
 </template>
 <script>
     import axios from "axios";
-    // import { ElMessage } from 'element-plus'
-
+    import { ElMessage } from 'element-plus'
+    import router from "@/router";
     import { mapState } from "vuex";
     export default {
         computed: {
     ...mapState(["token"]),
+    ...mapState(["isLogin"]),
   },
+
         data(){
             return {
                 value1: false,
@@ -214,15 +216,24 @@
             
 
             check1(){
-                axios.get('/api/user/logout/',{
-                     header:{
-                         Authorization:''
+                axios.post('/api/user/get_user_info/',{
+                     headers:{
+                        "Authorization":this.token
                      }
                 }).then((response) => {
                     console.log(response);
                     }).catch((error) => {
-                    console.log(error);
-                    });
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
             },
             TrainRank()
             {
@@ -309,7 +320,11 @@
                         departure_city:this.searchForm.start_station,
                         arrival_city:this.searchForm.end_station,
                         date:`${year}-${month}-${day}`,
-                    }) 
+                    },{
+             headers:{
+                   "Authorization":this.token
+                     }
+                }) 
                     .then((response) => {
                                 if(response.status==200){
                                 console.log("查询成功");
@@ -367,29 +382,17 @@
                                 console.log(this.tableData)
                                 this.TrainRank();
                                 }).catch((error) => {
-                                 console.log(error);
-                         });
- 
-                            
-                            // else if(res.status == 404)
-                            // {
-                            //     this.$message({
-                            //         type: 'error',
-                            //         message: '没有符合条件的列车'
-                            //     });
-                            // }else if(res.status == 406)
-                            // {
-                            //     this.$message({
-                            //         type: 'error',
-                            //         message: '没有符合条件的列车'
-                            //     });
-                            // }
-                            // else {
-                            //     this.$message({
-                            //         type: 'error',
-                            //         message: '查询失败'
-                            //     });
-                            // }
+                console.log(error);
+                if(error.response.status==401 || this.isLogin==false)
+                {
+                    router.push({ path: "/Login" });
+                    ElMessage({
+                    showClose: true,
+                    message: '登录失效,请重新登录',
+                    type: 'error',
+                })
+                }
+            });
                     }
 
                 });
@@ -426,7 +429,7 @@
     }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
     .demo-table-expand {
         font-size: 0;
     }
