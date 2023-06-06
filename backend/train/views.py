@@ -319,6 +319,95 @@ def remove_train(request):
 
 
 @api_view(['POST'])
+def query_train_via_station(request):
+    try:
+        data = request.data
+        departure_station = data.get('departure_station', None)
+        arrival_station = data.get('arrival_station', None)
+        departure_city = Station.objects.filter(name=departure_station).first().city
+        arrival_city = Station.objects.filter(name=arrival_station).first().city
+        date_str = data.get('date', None)
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        start_stops = Stop.objects.filter(station__city=departure_city)
+        end_stops = Stop.objects.filter(station__city=arrival_city)
+
+        trains = []  # 双重循环查找相同的车次，找到多个对的stop，效率未测试
+        for start_stop in start_stops:
+            for end_stop in end_stops:
+                if start_stop.train == end_stop.train and start_stop.sequence < end_stop.sequence:
+                    trains.append(start_stop.train)
+                    break
+
+        train_data = []  # 将返回一个列表
+        for train in trains:
+            carriage_data = {}  # 这个不是列表但类似列表，每个元素名为车厢(座位)的类型，其每个类型的内容格式相同
+            carriages = train.carriage_set.all()
+            total_duration = 0
+            if carriages[0].ticket_set.filter(date=date).first() is None:
+                continue
+            for carriage in carriages:
+                ticket = carriage.ticket_set.filter(date=date).first()
+                if ticket is None:
+                    # message = '存在未设置车票的车厢'
+                    # return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+                    continue
+                if carriage.type not in carriage_data:
+                    carriage_data[carriage.type] = {
+                        'price': carriage.price,
+                        'count': 0
+                    }
+                carriage_data[carriage.type]['count'] += ticket.remaining_count  # 累加每种座的剩余数
+
+            start_stop = start_stops.filter(train=train).first()
+            end_stop = end_stops.filter(train=train).first()
+            is_next_day = False
+            if start_stop and end_stop:
+                if end_stop.arrival_time >= start_stop.arrival_time:
+                    total_duration = datetime.combine(date, end_stop.arrival_time) - datetime.combine(date,
+                                                                                                      start_stop.arrival_time)
+                else:
+                    # 处理跨天情况，默认一列车总时长不会超过24小时
+                    is_next_day = True
+                    next_day = timedelta(days=1)
+                    total_duration = datetime.combine(date + next_day, end_stop.arrival_time) - datetime.combine(date,
+                                                                                                                 start_stop.arrival_time)
+
+            total_duration_seconds = total_duration.total_seconds()
+            hours = int(total_duration_seconds // 3600)
+            minutes = int((total_duration_seconds % 3600) // 60)
+            if minutes == 0:
+                duration_string = f"{hours}时整"
+            else:
+                duration_string = f"{hours}时{minutes}分"
+
+            departure_time = start_stop.arrival_time.strftime('%H:%M')
+            arrival_time = end_stop.arrival_time.strftime('%H:%M')
+
+            train_data.append({
+                'train_name': train.name,
+                'train_type': train.train_type,
+                'departure_station_name': start_stop.station.name,
+                'departure_time': departure_time,
+                'arrival_station_name': end_stop.station.name,
+                'arrival_time': arrival_time,
+                'is_next_day': is_next_day,  # 是否跨天
+                'total_duration': duration_string,
+                'ticket': carriage_data,
+                'start_stop_id': start_stop.id,  # create_order中会用到
+                'end_stop_id': end_stop.id  # create_order中会用到
+            })
+
+        message = '查询列车信息成功'
+        return Response({'message': message, 'data': train_data}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        logger.error(str(e))
+        message = '发生错误：{}'.format(str(e))
+        return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
 def query_train(request):
     try:
         data = request.data

@@ -40,12 +40,12 @@ def register(request):
 @api_view(['POST'])
 def get_user_info(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '请先登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        # user_id = request.session.get('user_id')
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = 'token失效'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             user = User.objects.get(id=user_id)
@@ -85,12 +85,12 @@ def get_user_info(request):
 @api_view(['POST'])
 def get_admin_info(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity not in ['system_admin', 'railway_admin']:
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        # user_id = request.session.get('user_id', None)
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = 'token失效'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         user = AbstractUser.objects.get(id=user_id)
         data = {
             'username': user.username,
@@ -106,17 +106,14 @@ def get_admin_info(request):
 @api_view(['POST'])
 def update_user_info(request):
     try:
-        # 检查用户身份
-        # identity = request.session.get('identity', None)
-        # if identity is None or identity != 'user':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = 'token失效'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # 获取请求体中的数据
         data = request.data
-        # user_id = request.session.get('user_id', None)
-        user_id = data.get('user_id')
-
         user = User.objects.get(id=user_id)
 
         if 'username' in data:
@@ -287,10 +284,6 @@ def get_passenger_list(request):
 @api_view(['POST'])
 def login(request):
     try:
-        # if request.session.get('is_login', None):
-        #     message = '不允许重复登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -308,16 +301,6 @@ def login(request):
                     return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
 
         if check_password(password, user.password):
-            # request.session['is_login'] = True
-            # request.session['user_id'] = user.id
-            # request.session['username'] = user.username
-            # if isinstance(user, SystemAdmin):
-            #     request.session['identity'] = 'system_admin'
-            # elif isinstance(user, RailwayAdmin):
-            #     request.session['identity'] = 'railway_admin'
-            # else:
-            #     request.session['identity'] = 'user'
-
             new_token = generate_token(user.id)
             data = {
                 'user_id': user.id,
@@ -338,13 +321,8 @@ def login(request):
 @api_view(['GET'])
 def logout(request):
     try:
-        # if not request.session.get('is_login', None):
-        #     message = '请先登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        # request.session.flush()
         user_token = request.META.get('HTTP_AUTHORIZATION', '')
         if verify_token(user_token):
-            # 获取用户ID
             user_id = get_identity_from_token(user_token)
             user = User.objects.filter(id=user_id).first()
             message = f'{user_id}:{user.username}登出成功'
