@@ -9,9 +9,8 @@
 
 <script setup>
 const imgwrap=[
-    {url:require('../assets/imgs/1.jpg')},
-    {url:require('../assets/imgs/2.jpg')},
-    {url:require('../assets/imgs/3.jpg')},
-    {url:require('../assets/imgs/10.jpg')},
+    {url:require('../assets/imgs/asgif.gif')},
+    {url:require('../assets/imgs/BA_Chise_ML.png')},
+    {url:require('../assets/imgs/background.png')},
 ];
 </script>
