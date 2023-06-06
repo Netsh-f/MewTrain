@@ -21,5 +21,6 @@ urlpatterns = [
     path('test_send_email/', views.test_send_email),
     path('get_station_list/', views.get_station_list),
     path('get_city_list/', views.get_city_list),
-    path('query_ticket/', views.query_ticket)
+    path('query_ticket/', views.query_ticket),
+    path('query_train_via_station/', views.query_train_via_station)
 ]
