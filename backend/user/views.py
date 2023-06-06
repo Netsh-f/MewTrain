@@ -44,8 +44,7 @@ def get_user_info(request):
         if verify_token(user_token):
             user_id = get_identity_from_token(user_token)
         else:
-            message = 'token失效'
-            logger.info(f'{message}, token={user_token}')
+            message = f'token失效, token={user_token}'
             return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
