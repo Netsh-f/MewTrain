@@ -363,6 +363,7 @@ def query_train_via_station(request):
                 'arrival_time': arrival_time,
                 'is_next_day': is_next_day,  # 是否跨天
                 'total_duration': duration_string,
+                'duration_seconds': total_duration_seconds,
                 'ticket': carriage_data,
                 'start_stop_id': start_stop.id,  # create_order中会用到
                 'end_stop_id': end_stop.id  # create_order中会用到
@@ -451,6 +452,7 @@ def query_train(request):
                 'arrival_time': arrival_time,
                 'is_next_day': is_next_day,  # 是否跨天
                 'total_duration': duration_string,
+                'duration_seconds': total_duration_seconds,
                 'ticket': carriage_data,
                 'start_stop_id': start_stop.id,  # create_order中会用到
                 'end_stop_id': end_stop.id  # create_order中会用到
