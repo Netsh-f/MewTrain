@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from backend import settings
 from user.models import User, Passenger
+from user.token import verify_token, get_identity_from_token
 from .models import Station, Train, Carriage, Stop, Ticket, Order, Seat, PassengerOrder
 from django.core.mail import send_mail
 
@@ -19,12 +20,6 @@ logger = logging.getLogger(__name__)
 @api_view(['POST'])
 def add_station(request):
     try:
-        # 检查用户身份
-        # identity = request.session.get('identity', None)
-        # if identity != 'railway_admin':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         # 获取请求体中的数据
         data = request.data
         station_name = data['station_name']
@@ -46,12 +41,7 @@ def add_station(request):
 @api_view(['GET'])
 def get_station_list(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'system_admin':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         stations = Station.objects.all()
-
         station_names = [station.name for station in stations]
 
         message = '获取车站列表成功'
@@ -78,11 +68,6 @@ def get_city_list(request):
 @api_view(['POST'])
 def add_train(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'railway_admin':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         data = request.data
         logger.info(data)
 
@@ -138,11 +123,6 @@ def add_train(request):
 @api_view(['POST'])
 def add_ticket(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'railway_admin':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         data = request.data
 
         start_date = datetime.strptime(data.get('start_date', None), "%Y-%m-%d")
@@ -244,11 +224,6 @@ def query_ticket(request):
 @api_view(['POST'])
 def get_train_list(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'railway_admin':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         trains = Train.objects.all()
         train_data = []
         for train in trains:
@@ -295,11 +270,6 @@ def get_train_list(request):
 @api_view(['POST'])
 def remove_train(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'railway_admin':
-        #     message = '无效权限'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         train_name = request.data.get('train_name', None)
 
         try:
@@ -578,13 +548,12 @@ def create_order_function(user_id, data):
 @api_view(['POST'])
 def create_order(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '用户未登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
-        # user_id = request.session.get('user_id')
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = f'token失效, token={user_token}'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         response = create_order_function(user_id, request.data)  # 下面要复用，所以写成了函数
 
         if isinstance(response, Response):
@@ -606,10 +575,6 @@ def create_order(request):
                 'seat_location': seat.seat_location,
                 'price': passenger_order.price,
             })
-
-        # if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
-        #     order.order_status = 'EXP'
-        #     order.save()
 
         departure_time = order.start_stop.arrival_time.strftime('%H:%M')
         arrival_time = order.end_stop.arrival_time.strftime('%H:%M')
@@ -638,13 +603,12 @@ def create_order(request):
 @api_view(['POST'])
 def get_order_list(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '用户未登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
-        # user_id = request.session.get('user_id')
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = f'token失效, token={user_token}'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.get(id=user_id)
         orders = user.order_set.all()
         order_data = []  # 将返回一个列表
@@ -696,12 +660,12 @@ def get_order_list(request):
 @api_view(['POST'])
 def pay_order(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '用户未登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        # user_id = request.session.get('user_id')
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = f'token失效, token={user_token}'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.get(id=user_id)
         data = request.data
         order_id = data.get('order_id', None)
@@ -754,10 +718,6 @@ def pay_order(request):
 @api_view(['POST'])
 def remove_order(request):  # 这是删除订单
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '用户未登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         data = request.data
         order_id = data.get('order_id', None)
         try:
@@ -790,12 +750,12 @@ def remove_order(request):  # 这是删除订单
 @api_view(['POST'])
 def return_order(request):  # 这是取消订单
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '用户未登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        # user_id = request.session.get('user_id')
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = f'token失效, token={user_token}'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.get(id=user_id)
         data = request.data
         order_id = data.get('order_id', None)
@@ -856,13 +816,12 @@ def return_order(request):  # 这是取消订单
 @api_view(['POST'])
 def rebook(request):
     try:
-        # identity = request.session.get('identity', None)
-        # if identity != 'user':
-        #     message = '用户未登录'
-        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-        # user_id = request.session.get('user_id')
-
-        user_id = request.data.get('user_id')
+        user_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if verify_token(user_token):
+            user_id = get_identity_from_token(user_token)
+        else:
+            message = f'token失效, token={user_token}'
+            return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.get(id=user_id)
 
         data = request.data
@@ -938,35 +897,3 @@ def rebook(request):
         logger.error(str(e))
         message = '发生错误：{}'.format(str(e))
         return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['GET'])
-def get_info(request):
-    data = {
-        "name": "MewTrain",
-        "staff": [
-            "GongYihui",
-            "ZhangWenjin",
-            "WangXi",
-            "WangZishen",
-            "YouShibo"
-        ]
-    }
-    message = '你好，前端'
-    return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def test_send_email(request):
-    try:
-        subject = '购票成功通知'
-        msg = f'尊敬的用户，您已成功购票。\n\n以下是您的购票详情：\n\n'
-        msg += f'车次：G103\n出发站：北京南\n到达站：枣庄\n\n'
-        msg += '祝您旅途愉快！'
-        send_mail(subject, msg, settings.EMAIL_HOST_USER, ['zwj1813@163.com'], fail_silently=False)
-        message = '已发送通知邮件'
-        print(message)
-        return Response({'message': message}, status=status.HTTP_200_OK)
-    except smtplib.SMTPException:
-        message = '未成功发送通知邮件'
-        return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
