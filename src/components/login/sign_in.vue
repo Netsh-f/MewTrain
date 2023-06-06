@@ -21,8 +21,7 @@
 <script>
 import axios from "axios";
 import { ref } from 'vue';
-import { ElMessage } from 'element-plus'
-
+import router from "@/router"; // 导入Vue.js路由器
 
 export default {
   setup() {
@@ -55,18 +54,11 @@ export default {
               'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
               'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
               },}).then((response) => {
-                    console.log(response.data);
-                    if(response.status==400){
-                    console.log("已经存在了猫猫");
-                    }
+                    console.log(response);
+                    router.push({ path: "/WELCOME" });
                     })
                     .catch((error) => {
                     console.log(error);
-                    console.log("这里真的有猫饼");
-                    if(error.response.status === 500){
-                    console.log("已经存在了猫猫");
-                    ElMessage.error('用户已存在')
-                    }
                     });
       }});
 

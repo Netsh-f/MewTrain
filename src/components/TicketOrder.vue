@@ -175,7 +175,7 @@
             </div>
         </el-row>
         <el-row  v-show="active === 2" >
-            <el-table :data="passenger_data" v-show="show_order_list" style="width: 1000px;margin-left: 80px;margin-top: 20px">
+            <el-table :data="order_data" v-show="show_order_list" style="width: 1000px;margin-left: 80px;margin-top: 20px">
                 <el-table-column property="passenger_name" label="乘客姓名" ></el-table-column>
                 <el-table-column property="ticket_type" label="车票类型" ></el-table-column>
                 <el-table-column property="seat_location" label="座位位置"></el-table-column>
@@ -201,14 +201,14 @@
             </div>
         </el-row>
 
-        <el-button type="primary" round @click="next" style="margin-left: 500px;margin-top: 30px">下一步</el-button>
+        <el-button type="primary" round @click="next" style="margin-left: 500px;margin-top: 30px" v-show="active != 2">下一步</el-button>
     </div>
 </template>
 
 
 <script>
 import axios from 'axios';
-
+import router from "@/router"; // 导入Vue.js路由器
 
     export default {
         name: "TicketOrder",
@@ -225,8 +225,6 @@ import axios from 'axios';
                 high_seat_price:"",
                 medium_seat_price:"",
                 low_seat_price:"",
-                url2:"https://39.105.44.114/zfb.JPG",
-                url1:"https://39.105.44.114/wx.JPG",
                 active:0,
                 choose_seat:0,
                 dialogTableVisible: false,
@@ -242,8 +240,8 @@ import axios from 'axios';
                 medium_seat_GD:[],
                 low_seat_GD:[],
                 tableDatas:[],
-                passenger_data:
-                [],
+                passenger_data:[],
+                order_data:[],
                 ticket_data: [],
                 dialogFormVisible_wx:false,
                 dialogFormVisible_zfb:false,
@@ -272,7 +270,7 @@ import axios from 'axios';
                 }
                 if(this.active == 4)
                 {
-                    this.$router.push('AllOrderList')
+                    router.push({ path: "/historyOrders" });
                 }
             },
             async getTicketCount(){
@@ -425,12 +423,13 @@ import axios from 'axios';
                         for(let i=0;i<response.data.data.passenger_order_data.length;i++)
                         {
                             let temp_passenger_data={};
-                            temp_passenger_data.passenger_name=response.data.data.passenger_order_data.passenger_name;
-                            temp_passenger_data.ticket_type=response.data.data.passenger_order_data.ticket_type;
-                            temp_passenger_data.seat_location=response.data.data.passenger_order_data.seat_location;
-                            temp_passenger_data.price=response.data.data.passenger_order_data.price;
-                            this.passenger_data.push(temp_passenger_data)
+                            temp_passenger_data.passenger_name=response.data.data.passenger_order_data[i].passenger_name;
+                            temp_passenger_data.ticket_type=response.data.data.passenger_order_data[i].ticket_type;
+                            temp_passenger_data.seat_location=response.data.data.passenger_order_data[i].seat_location;
+                            temp_passenger_data.price=response.data.data.passenger_order_data[i].price;
+                            this.order_data.push(temp_passenger_data)
                         }
+                        console.log(this.order_data)
                         let order1={};
                         order1.order_id=response.data.data.order_id;
                         order1.arrival_station_name=response.data.data.arrival_station_name;
@@ -444,6 +443,7 @@ import axios from 'axios';
                         this.order.push(order1);
                         console.log(order1)
                     })
+                    this.show_order_list=true;
                 }
                 else{
                     if(this.train_no=='REG')
@@ -469,12 +469,13 @@ import axios from 'axios';
                         for(let i=0;i<response.data.data.passenger_order_data.length;i++)
                         {
                             let temp_passenger_data={};
-                            temp_passenger_data.passenger_name=response.data.data.passenger_order_data.passenger_name;
-                            temp_passenger_data.ticket_type=response.data.data.passenger_order_data.ticket_type;
-                            temp_passenger_data.seat_location=response.data.data.passenger_order_data.seat_location;
-                            temp_passenger_data.price=response.data.data.passenger_order_data.price;
-                            this.passenger_data.push(temp_passenger_data)
+                            temp_passenger_data.passenger_name=response.data.data.passenger_order_data[i].passenger_name;
+                            temp_passenger_data.ticket_type=response.data.data.passenger_order_data[i].ticket_type;
+                            temp_passenger_data.seat_location=response.data.data.passenger_order_data[i].seat_location;
+                            temp_passenger_data.price=response.data.data.passenger_order_data[i].price;
+                            this.order_data.push(temp_passenger_data)
                         }
+                        console.log(this.order_data)
                         let order1={};
                         order1.order_id=response.data.data.order_id;
                         order1.arrival_station_name=response.data.data.arrival_station_name;
@@ -488,8 +489,8 @@ import axios from 'axios';
                         this.order.push(order1);
                         console.log(order1)
                     })
-                    }
-                }
+                    this.show_order_list=true;
+                    }}
             },
             deletepassenger(passenger_phone_number)
             {
@@ -510,7 +511,12 @@ import axios from 'axios';
                     user_id:4
                 }).then((response) => {
                     console.log(response)
-                })
+                    this.active=3
+
+                }).catch((error) =>{
+                    console.log(error)
+                }
+                )
             }
 
         },

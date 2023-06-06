@@ -20,6 +20,7 @@
     export default{
         name:'HeadItems',
         components:{
+            // eslint-disable-next-line vue/no-unused-components
             ArrowDown,
             Head
         },

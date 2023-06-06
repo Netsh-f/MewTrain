@@ -13,7 +13,6 @@
 <script>
 import axios from 'axios';
     export default {
-        name:'Head',
         data(){
             return{
                 userName:'aaaa'//此处应为用户名
