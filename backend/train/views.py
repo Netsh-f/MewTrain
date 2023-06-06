@@ -621,6 +621,7 @@ def get_order_list(request):
                 passenger = passenger_order.passenger
                 seat = passenger_order.seat
                 passenger_order_data.append({
+                    'passenger_id': passenger.id,
                     'passenger_name': passenger.name,
                     'passenger_id_type': passenger.id_type,
                     'ticket_type': passenger.ticket_type,
