@@ -28,10 +28,26 @@
                 </div>
             </div>
             <div class="profile-sidebar" :class="{ active: isFlipped }">
-                <div class="sidebar-content">
-                  <h1>用户信息</h1>
-                  <h1>姓名</h1>
-                </div>
+                <el-card shadow="hover" :style="{ height: '100%',width: '100%', margin: '0 auto' }" class="card-content" v-if="isFlipped">
+                    <div class="profile-info">
+                      <div class="info-row">
+                        <span class="label">用户名:</span>
+                        <span class="value">{{ username }}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="label">权限:</span>
+                        <span class="value">{{ permission }}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="label">年龄:</span>
+                        <span class="value">{{ age }}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="label">邮箱:</span>
+                        <span class="value">{{ email }}</span>
+                      </div>
+                    </div>
+                  </el-card>
             </div>
 
         
@@ -71,6 +87,10 @@ export default {
     name: "My_trainAdjust_message",
     data(){
         return{
+            username: 'GYH',
+            permission: 'Admin',
+            age: 19,
+            email: 'buaa@buaa.com',
             AdminName:'MewTrain Admin',
             isFlipped: false,
             moveToRight: false,

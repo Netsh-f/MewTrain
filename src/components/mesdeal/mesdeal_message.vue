@@ -28,10 +28,26 @@
                     </div>
                 </div>
                 <div class="profile-sidebar" :class="{ active: isFlipped }">
-                    <div class="sidebar-content">
-                      <h1>用户信息</h1>
-                      <h1>姓名</h1>
-                    </div>
+                    <el-card shadow="hover" :style="{ height: '100%',width: '100%', margin: '0 auto' }" class="card-content" v-if="isFlipped">
+                        <div class="profile-info">
+                          <div class="info-row">
+                            <span class="label">用户名:</span>
+                            <span class="value">{{ username }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="label">权限:</span>
+                            <span class="value">{{ permission }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="label">年龄:</span>
+                            <span class="value">{{ age }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="label">邮箱:</span>
+                            <span class="value">{{ email }}</span>
+                          </div>
+                        </div>
+                      </el-card>
                 </div>
 
             
@@ -74,6 +90,11 @@ export default {
     name: "My_mesdeal_message",
     data(){
         return{
+            username: 'GYH',
+            permission: 'Admin',
+            age: 19,
+            email: 'buaa@buaa.com',
+            AdminName:'MewTrain Admin',
             AdminName:'MewTrain Admin',
             isFlipped: false,
             moveToRight: false,
@@ -110,7 +131,10 @@ export default {
     display: flex;
     align-items: stretch;
 }
-  
+.card-content {
+    background-color: rgba(166, 205, 211, 0.7);
+    opacity: 0.9;
+  }
 .profile-sidebar {
     position: absolute;
     top: 10%;
@@ -119,16 +143,38 @@ export default {
     width: 60%;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
-    padding: 20px;
+    padding: 10px;
     transition: transform 0.3s, box-shadow 0.3s;
     transform: translateX(100%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    border-radius: 10px; /* 添加圆角 */
 }
   
 .profile-sidebar.active {
     transform: translateX(0);
     box-shadow: -10px 0 20px rgba(0, 0, 0, 0.2);
 }
-  
+  .info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.value {
+  font-size: 20px;
+}
 .sidebar-content {
 /* 侧边栏内容样式 */
 }
@@ -140,7 +186,7 @@ export default {
     transition: transform 0.3s, left 1s;
     perspective: 1000px;
     cursor: pointer;
-  }
+}
 .enlarged {
     transform: scale(3);
     padding:6px;
