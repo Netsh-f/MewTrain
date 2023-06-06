@@ -7,7 +7,6 @@ app_name = 'train'
 urlpatterns = [
     path('add_station/', views.add_station, name='add_station'),
     path('add_train/', views.add_train, name='add_train'),
-    path('get_info/', views.get_info, name='get_info'),
     path('add_ticket/', views.add_ticket, name='add_ticket'),
     path('get_train_list/', views.get_train_list, name='get_train_list'),
     path('remove_train/', views.remove_train, name='remove_train'),
@@ -18,7 +17,6 @@ urlpatterns = [
     path('remove_order/', views.remove_order, name='remove_order'),
     path('return_order/', views.return_order, name='return_order'),
     path('rebook/', views.rebook, name='rebook'),
-    path('test_send_email/', views.test_send_email),
     path('get_station_list/', views.get_station_list),
     path('get_city_list/', views.get_city_list),
     path('query_ticket/', views.query_ticket),
