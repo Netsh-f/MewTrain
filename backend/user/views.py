@@ -263,16 +263,19 @@ def login(request):
     try:
         username = request.data.get('username')
         password = request.data.get('password')
-
+        user_type = ''
         try:
             # 依次尝试查询User、SystemAdmin和RailwayAdmin模型，查找匹配的用户
             user = User.objects.get(username=username)
+            user_type = 'user'
         except User.DoesNotExist:
             try:
                 user = SystemAdmin.objects.get(username=username)
+                user_type = 'system_admin'
             except SystemAdmin.DoesNotExist:
                 try:
                     user = RailwayAdmin.objects.get(username=username)
+                    user_type = 'railway_admin'
                 except RailwayAdmin.DoesNotExist:
                     message = '用户不存在'
                     return Response({'message': message}, status=status.HTTP_404_NOT_FOUND)
@@ -283,6 +286,7 @@ def login(request):
                 'user_id': user.id,
                 'username': user.username,
                 'token': new_token,
+                'user_type': user_type,
             }
             message = '登录成功'
             return Response({'message': message, 'data': data}, status=status.HTTP_200_OK)
@@ -325,7 +329,7 @@ def logoff(request):
             message = f'token失效, token={user_token}'
             return Response({'message': message, 'token': user_token}, status=status.HTTP_401_UNAUTHORIZED)
         try:
-            user = User.objects\
+            user = User.objects \
                 .get(id=user_id)
         except User.DoesNotExist:
             message = '用户不存在'
