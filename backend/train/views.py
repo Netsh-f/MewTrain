@@ -630,6 +630,7 @@ def get_order_list(request):
                     'seat_num': seat.seat_num,
                     'seat_location': seat.seat_location,
                     'price': passenger_order.price,
+                    'is_rebooked': passenger_order.is_rebooked,
                 })
 
             if datetime.now() > datetime.combine(order.date, order.end_stop.arrival_time):  # 更新订单状态，判断是否为过期订单
