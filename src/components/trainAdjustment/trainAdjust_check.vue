@@ -201,7 +201,7 @@
                     </el-form-item>
                 </el-form>
                 <template #footer>
-                <span class="dialog-footer">
+                <span class="dialog-footer" z-index="1">
                     <el-button-group>
                         <el-button type="primary" @click="TicketCancel">取消</el-button>
                         <el-button type="primary" @click="TicketConfirm">确认</el-button>
@@ -527,8 +527,12 @@ export default {
 .custom-table {
     border-radius: 10px; /* 设置圆角半径 */
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    overflow: hidden; /* 确保阴影不会溢出 */
     opacity: 0.7; /* 设置透明度，调整参数以控制透明程度 */
-    z-index: -1;
+}
+.el-table-columnas {
+    position: relative;
+    z-index: 1;
 }
 .custom-table .el-table__body td {
     background-color: rgb(244, 244, 244);
