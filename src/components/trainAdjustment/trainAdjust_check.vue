@@ -330,11 +330,13 @@ export default {
                     message: '删除成功',
                     type: 'success',
                 })
-                this.getTrainData();
             }).catch((e)=>{
                 ElMessage.error(e);
                 console.log(e);
             })
+            setTimeout(() => {
+                this.getTrainData();
+            }, 1000);
         },
         async asSearch(){
             this.forSearch();
@@ -378,7 +380,9 @@ export default {
                 .catch((error)=>{
                     ElMessage.error("添加好像出了什么问题:"+error);
                 });
-                this.getTrainData();
+                setTimeout(() => {
+                    this.getTrainData();
+                }, 1000);
                 this.asAddFlag=false;
         },
         addTicket(){
@@ -462,12 +466,15 @@ export default {
                         ElMessage.success("添加成功！");
                         this.city='';
                         this.state='';
-                        this.getStopData();
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        ElMessage.error("好像有什么问题呢")
-                    });}
+                })
+                .catch((error) => {
+                    console.log(error);
+                    ElMessage.error("好像有什么问题呢")
+                });
+                setTimeout(() => {
+                    this.getStopData();
+                }, 1000);
+                }
             else{
                 ElMessage.error("不要空着表单！");
             }

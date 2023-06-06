@@ -331,12 +331,17 @@ export default {
             .then((res)=>{
                 console.log(res);
                 ElMessage.success("添加乘车人成功");
+                Object.keys(this.Pform).forEach(key => {
+                    this.Pform[key] = '';
+                });
             }).catch((e)=>{
                 console.log(e);
                 ElMessage.error("有点猫饼");
             });
             this.innerDrawer=false;
-            this.getPassengerData(this.currut_id);
+            setTimeout(() => {
+                this.getPassengerData(this.currut_id);
+            }, 1000);
         },
         PformCancel(){
             this.innerDrawer=false;
@@ -355,6 +360,9 @@ export default {
                 console.log(e);
                 ElMessage.error("显然有猫饼");
             });
+            setTimeout(() => {
+                this.getPassengerData(this.currut_id);
+            }, 1000);
         },
         openT(row){
             this.asForPassenger(row);
@@ -393,11 +401,14 @@ export default {
                 }).then((res)=>{
                 ElMessage.success("成功修改！");
                 console.log(res);
-                this.getTableData();
             }).catch((e)=>{
                 ElMessage.error(e);
                 console.log(e);
             })
+                
+            setTimeout(() => {
+                this.getTableData();
+            }, 1000);
         },
         // 删除按钮点击事件处理程序
         asDelete(row) {
@@ -412,11 +423,13 @@ export default {
                     message: '删除成功',
                     type: 'success',
                 })
-                this.getTableData();
             }).catch((e)=>{
                 ElMessage.error(e);
                 console.log(e);
             })
+            setTimeout(() => {
+                this.getTableData();
+            }, 1000);
         },
         async asSearch(){
             this.forSearch();
