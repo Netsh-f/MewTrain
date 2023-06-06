@@ -19,6 +19,12 @@
                             <el-table-column label="证件类型" prop="passenger_id_type" />
                             <el-table-column label="优惠类型" prop="ticket_type" />
                             <el-table-column label="车票价格" prop="price" />
+                            <el-table-column label="操作" width="200">
+                                <template #default="props2">
+                                    <el-button size="mini" type="success"
+                                        @click="handleTicketchanges2(props.row, props2.row)">改签</el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </template>
                 </el-table-column>
@@ -42,16 +48,15 @@
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                     <template #default="props">
-                        <el-button size="mini" type="success"
-                            @click="handleTicketchanges(scope.row.order_id, scope.row.start_date, scope.row.start_station_name,
-                                scope.row.end_station_name, scope.row.passenger_phone_number, scope.row.train_number)">改签</el-button>
+                        <el-button size="mini" type="success" @click="handleTicketchanges(props.row)">改签</el-button>
                         <el-button size="mini" type="success" @click="handleRefundTicket(props.row)">退票</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="Pagination">
-                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                    :current-page="currentPage" background :page-size="10" layout="total, prev, pager, next" :total="count">
+                <el-pagination :hide-on-single-page="true" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" :current-page="currentPage" background :page-size="page_size"
+                    layout="prev, pager, next" :page-count="count">
                 </el-pagination>
             </div>
 
@@ -61,14 +66,14 @@
 
 <script>
 import axios from 'axios';
-import { ElMessageBox,ElMessage } from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import { mapState } from "vuex";
 import router from '@/router';
 export default {
     computed: {
-    ...mapState(["token"]),
-    ...mapState(["isLogin"]),
-  },
+        ...mapState(["token"]),
+        ...mapState(["isLogin"]),
+    },
     data() {
         return {
 
@@ -90,47 +95,45 @@ export default {
             this.offset = (val - 1) * this.limit;
             this.getLists();
         },
-        handleRefundTicket(row) {
-
-            let id = row.order_id;
-            axios.post('/api/train/return_order/', {
-                order_id: id,
-                user_id: 4
-            },{
-                     headers:{
-                         "Authorization":this.token
-                     }
-                })
-                // eslint-disable-next-line no-unused-vars
-                .then((response) => {
-                    //console.log(response.data.data);
-                    ElMessageBox.alert('订单取消成功，钱款已退回余额', '取消成功', {
-                        confirmButtonText: '确定',
-                        showClose:false
-                    })
-                    this.getLists();
-                })
-                .catch((error) => {
-                console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
-            });
+        handleTicketchanges(row) {
+            let order = {
+                order_id: row.order_id,
+                date: row.date,
+                departure_station_name: row.departure_station_name,
+                arrival_station_name: row.arrival_station_name,
+                isall: true,
+                passengers: ''
+            }
+            let origin_order = JSON.stringify(order)
+            this.$router.push({
+                name: 'TicketChange',
+                params: { order: origin_order }
+            })
+        },
+        handleTicketchanges2(row, row2) {
+            console.log(row, row2)
+            let order = {
+                order_id: row.order_id,
+                date: row.date,
+                departure_station_name: row.departure_station_name,
+                arrival_station_name: row.arrival_station_name,
+                isall: false,
+                passengers: row2.passenger_name
+            }
+            let origin_order = JSON.stringify(order)
+            this.$router.push({
+                name: 'TicketChange',
+                params: { order: origin_order }
+            })
         },
         async getLists() {
             axios.post('/api/train/get_order_list/', {
                 user_id: 4
-            },{
-                     headers:{
-                         "Authorization":this.token
-                     }
-                })
+            }, {
+                headers: {
+                    "Authorization": this.token
+                }
+            })
                 .then((response) => {
                     console.log(response)
                     this.tableData = [];
@@ -204,43 +207,41 @@ export default {
                     }
                 })
                 .catch((error) => {
-                console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
-            });
+                    console.log(error);
+                    if (error.response.status == 401 || this.isLogin == false) {
+                        router.push({ path: "/Login" });
+                        ElMessage({
+                            showClose: true,
+                            message: '登录失效,请重新登录',
+                            type: 'error',
+                        })
+                    }
+                });
         }
     },
     mounted() {
         axios.post('/api/train/get_order_list/', {
-                user_id: 4
-            },{
-                     headers:{
-                         "Authorization":this.token
-                     }
-                })
-                .then((response) => {
-                    console.log(response)
-                    let list=response.data.data
-                    this.count= Math.ceil(list.length/this.page_size);
-                    this.getLists();
-                })
-                .catch((error) => {
+            user_id: 4
+        }, {
+            headers: {
+                "Authorization": this.token
+            }
+        })
+            .then((response) => {
+                console.log(response)
+                let list = response.data.data.filter(order => order.order_status === 'PAD')
+                this.count = Math.ceil(list.length / this.page_size);
+                this.getLists();
+            })
+            .catch((error) => {
                 console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
+                if (error.response.status == 401 || this.isLogin == false) {
                     router.push({ path: "/Login" });
                     ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
+                        showClose: true,
+                        message: '登录失效,请重新登录',
+                        type: 'error',
+                    })
                 }
             });
     }

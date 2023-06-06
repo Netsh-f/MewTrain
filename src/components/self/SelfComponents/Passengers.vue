@@ -1,12 +1,12 @@
 <template>
-  <div class="table">
+  <div class="table2">
     乘车人
     <a href="javascript:;" class="btn btn-edit" id="append_info_edit" @click="edit" v-show="!isedit">编辑</a>
     <a href="javascript:;" class="btn btn-edit" id="append_info_edit" @click="dialog = true" v-show="!isedit">新增</a>
     <a href="javascript:;" class="btn btn-edit" id="append_info_edit" @click="commitedit" v-show="isedit">提交</a>
     <a href="javascript:;" class="btn-edit" id="relation_way_edit" @click="exitedit" v-show="isedit">取消</a>
   </div>
-  <div v-for="pas in passengers" :key="pas" class="main">
+  <div v-for="pas in passengers" :key="pas" class="main2">
     <el-descriptions :column="3" border>
       <el-descriptions-item label="姓名" label-align="right" align="center" label-class-name="my-label"
         class-name="my-content" width="150px">
@@ -123,6 +123,7 @@ export default {
   computed: {
     ...mapState(["token"]),
     ...mapState(["isLogin"]),
+    ...mapState(["nowUserID"]),
   },
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Passengers',
@@ -272,7 +273,7 @@ export default {
     },
     delete2(id) {
       axios.post('/api/user/remove_passenger/', {
-        user_id: "4",
+        user_id: this.nowUserID,
         passenger_id: id
       },{
              headers:{
@@ -293,7 +294,7 @@ export default {
     },
     async update() {
       axios.post('/api/user/get_user_info/', {
-        user_id: "4",
+        user_id: this.nowUserID,
       },{
              headers:{
                    "Authorization":this.token
@@ -400,8 +401,9 @@ export default {
         flag=1;
       }
       if(flag===1)return;
+      console.log(this.nowUserID)
       axios.post('/api/user/add_passenger/', {
-        user_id: "4",
+        user_id: this.nowUserID,
         id_type: this.new_passenger.id_type,
         name: this.new_passenger.name,
         id_number: this.new_passenger.id_number,
@@ -419,6 +421,7 @@ export default {
             confirmButtonText: '确定',
             showClose:false
           })
+
           this.update();
           this.cancelForm();
         })
@@ -456,12 +459,12 @@ export default {
   padding: 0;
 }
 
-.table {
+.table2 {
   text-align: left;
   font-weight: bold;
 }
 
-.main {
+.main2 {
   margin-top: 15px;
 }
 

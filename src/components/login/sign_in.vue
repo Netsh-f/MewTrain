@@ -13,7 +13,7 @@
       <el-form-item prop="PassWord">
         <el-input v-model="UserLoginInfo.PassWord" type="password" placeholder="密码"></el-input>
       </el-form-item>
-      <el-button class="form__button button submit" type="primary" @click="submitForm" >SIGN IN</el-button>
+      <el-button class="form__button button submit" type="primary" @click="submitForm">SIGN IN</el-button>
     </el-form>
   </div>
 </template>
@@ -41,46 +41,50 @@ export default {
         { required: true, message: '请输入密码', trigger: 'blur' },
       ],
     };
-    const check=()=>{
-      console.log( axios.post('/api/user/login/'))
+    const check = () => {
+      console.log(axios.post('/api/user/login/'))
     }
     const submitForm = () => {
 
       form.value.validate(async (valid) => {
         if (valid) {
-            axios.post('/api/user/login/', {            
+          axios.post('/api/user/login/', {
             username: UserLoginInfo.value.Name,
             password: UserLoginInfo.value.PassWord,
-          }, {headers: {
+          }, {
+            headers: {
               'Access-Control-Allow-Origin': '*',
               'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
               'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-              },}).then((response) => {
-                    console.log(response);
-                    const token = response.data.data.token;
-                    console.log(token)
-                    store.commit("setToken", token);
-                    store.commit("setLogin",true)
-                    router.push({ path: "/WELCOME" });
-                    })
-                    .catch((error) => {
-                    console.log(error);
-                    });
-      }});
+            },
+          }).then((response) => {
+            console.log(response);
+            const token = response.data.data.token;
+            console.log(token)
+            store.commit("setToken", token);
+            store.commit("setLogin", true)
+            store.commit("setUserID", response.data.data.user_id)
+            router.push({ path: "/WELCOME" });
+          })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      });
 
 
     };
-  
 
 
-    return { UserLoginInfo, form, rules, submitForm ,check};
+
+    return { UserLoginInfo, form, rules, submitForm, check };
   },
 };
 </script>
 
 <style scoped>
 @import '../../assets/login.css';
-.el-input{
+
+.el-input {
   width: 550px;
-}
-</style>
+}</style>
