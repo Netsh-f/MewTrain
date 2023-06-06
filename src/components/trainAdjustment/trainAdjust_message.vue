@@ -9,7 +9,7 @@
             <div class="profile-card" :class="{ flipped: isFlipped, moveToLeft: moveToRight }" @click="flipCard">
                 <div class="card-header">
                     <div :class="{ pic: true, enlarged: !isFlipped }">
-                        <img src="../../assets/imgs/9.jpg" alt="">
+                        <img src="../../assets/imgs/head.jpeg" alt="">
                     </div>
                     <div v-if="isFlipped" class="name">{{ AdminName }}</div>
                     <div v-if="isFlipped" class="desc">Railway Administrator(Admin)</div>
