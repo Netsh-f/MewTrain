@@ -25,10 +25,8 @@ export default {
     data(){
         return{
             imgwrap:[
-                {url:require('../../assets/imgs/5.jpg')},
-                {url:require('../../assets/imgs/6.jpg')},
-                {url:require('../../assets/imgs/7.jpg')},
-                {url:require('../../assets/imgs/8.jpg')},
+                {url:require('../../assets/imgs/zc1.jpg')},
+                {url:require('../../assets/imgs/zc2.jpg')},
             ]
         }
     },
