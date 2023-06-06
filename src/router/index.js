@@ -23,6 +23,14 @@ const trainAdjust_message = () => import('../components/trainAdjustment/trainAdj
 const trainAdjust_setting = () => import('../components/trainAdjustment/trainAdjust_setting.vue')
 
 const routes= [
+  {
+    path: "/TicketOrder/:temp",
+    name: "TicketOrder",
+    component: TicketOrder,
+    meta: {
+      title: "车票订购"
+    },
+  },
     {
       path:'/Login',
       name: 'Login',
@@ -46,14 +54,6 @@ const routes= [
           meta: {
             title: "车票查询"
           }
-        },
-        {
-          path: "/TicketOrder/:temp",
-          name: "TicketOrder",
-          component: TicketOrder,
-          meta: {
-            title: "车票订购"
-          },
         },
         {
           path: "/WELCOME",

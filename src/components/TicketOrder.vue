@@ -3,7 +3,6 @@
         <meta  http-equiv="Cache-Control" content="no-cache,no-store,must-revlidate">
         <meta  http-equiv="Expires" content="O">
         <meta http-equiv="Pragma" content="no-cache">
-        <el-button @click="check">测试按钮</el-button>
         <el-steps :active="active" align-center style="margin-top: 10px">
             <el-step title="添加乘客" ></el-step>
             <el-step title="选择座位" ></el-step>
@@ -390,12 +389,21 @@ import { ElMessage } from 'element-plus';
                      }
                 }).then((response) => {
                     console.log(response)
+                    if(response.data.passengers.length==0){
                     this.$message({
+                        type: 'error',
+                        message: '没有乘车人，请先添加'
+                    });
+                    router.push({ path: "/WELCOME" });
+                }else{
+                this.$message({
                         type: 'success',
                         message: '成功'
                     });
+                    console.log(response)
                     this.tableDatas = response.data.passengers;
                     console.log(this.tableDatas)
+                }
                 }).catch((error) => {
                 console.log(error);
                 if(error.response.status==401 || this.isLogin==false)

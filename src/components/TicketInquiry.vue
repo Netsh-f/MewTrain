@@ -104,7 +104,6 @@
                 </el-table-column>
             </el-table>
             <!-- Table -->
-
         </div>
     </div>
 </template>
@@ -208,6 +207,9 @@
             }
         },
         methods: {
+            check1(){
+                console.log(this.token);
+            },
 
             TrainRank()
             {
