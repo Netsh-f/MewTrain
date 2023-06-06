@@ -45,7 +45,7 @@ export default {
     },
     methods: {
         returnLast(){
-            window.location.hash = '/'
+            window.location.hash = '/Home'
         },
         switchAccount(){
             window.location.hash = '/Login'
