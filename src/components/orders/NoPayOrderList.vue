@@ -112,8 +112,14 @@ export default {
                 user_id: 4
             })
                 .then((response) => {
+                    console.log(response)
                     this.tableData = [];
                     let data2 = response.data.data;
+                    if (data2.length !== 0) {
+                        data2.sort(function (a, b) {
+                            return b.create_time.localeCompare(a.create_time);
+                        });
+                    }
                     for (let i = this.offset; i < this.offset + this.limit; i++) {
                         if (i < data2.length) {
                             if (data2[i].order_status === 'UPD') {
@@ -176,11 +182,6 @@ export default {
                         }
 
                     }
-                    if (this.tableData.length !== 0) {
-                        this.tableData.sort(function (a, b) {
-                            return b.create_time.localeCompare(a.create_time);
-                        });
-                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -198,7 +199,18 @@ export default {
         }
     },
     mounted() {
-        this.getLists();
+        axios.post('/api/train/get_order_list/', {
+                user_id: 4
+            })
+                .then((response) => {
+                    console.log(response)
+                    let list=response.data.data
+                    this.count= Math.ceil(list.length/this.page_size);
+                    this.getLists();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
     }
 }
 </script>
