@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="mycon">
     <div class="blur-background"></div>
     <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
         href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/ ></fornav>
@@ -211,7 +211,7 @@
             </el-dialog>
 
 
-            <div class="input-container">
+            <div class="input-mycon">
                 <el-input class="input2" v-model="this.city" clearable placeholder="请输入城市名" float="right" size="large"></el-input>
                 <el-input class="input2" v-model="this.state" clearable placeholder="请输入站名" float="left" size="large">
                   <template #append>
@@ -486,7 +486,7 @@ export default {
     width: 102%;
     z-index: 1;
 }
-.input-container {
+.input-mycon {
     display: flex;
   }
 .input2{

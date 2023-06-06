@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="mycon">
     <div class="blur-background"></div>
     <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
     href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/ ></fornav>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="mycon">
   <div class="blur-background"></div>
     <div class="content">
       <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
