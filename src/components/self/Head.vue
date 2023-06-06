@@ -10,8 +10,13 @@
   
 <script>
 import axios from 'axios';
+import { mapState } from "vuex";
 import { ElMessage } from 'element-plus';
     export default {
+      computed: {
+    ...mapState(["token"]),
+    ...mapState(["isLogin"]),
+  },
         data(){
             return{
                 userName:'aaaa'//此处应为用户名
