@@ -365,9 +365,14 @@ export default {
             }, 1000);
         },
         openT(row){
-            this.asForPassenger(row);
-            this.table=true;
-            this.currut_id=row.id;
+            if(row.user_type==='user'){
+                this.asForPassenger(row);
+                this.table=true;
+                this.currut_id=row.id;
+            }
+            else{
+                ElMessage("Admin没有乘车人啦啊哈哈");
+            }
         },
         asForPassenger(row){
             this.getPassengerData(row.id);

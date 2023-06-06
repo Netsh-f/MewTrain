@@ -87,7 +87,7 @@ export default {
     name: "My_trainAdjust_message",
     data(){
         return{
-            username: 'GYH',
+            username: 'WXXXXX',
             permission: 'Admin',
             age: 19,
             email: 'buaa@buaa.com',

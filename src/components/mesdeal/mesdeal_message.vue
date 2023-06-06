@@ -90,7 +90,7 @@ export default {
     name: "My_mesdeal_message",
     data(){
         return{
-            username: 'GYH',
+            username: 'WXXXXX',
             permission: 'Admin',
             age: 19,
             email: 'buaa@buaa.com',
