@@ -59,7 +59,7 @@
                 </el-table-column>
                 <el-table-column label="到达时间" prop="arrive_time">
                 </el-table-column>
-                <el-table-column label="特等座/软卧" prop="high_seat_count">
+                <el-table-column label="商务/软卧" prop="high_seat_count">
                 </el-table-column>
                 <el-table-column label="一等座/硬卧" prop="medium_seat_count">
                 </el-table-column>
@@ -67,6 +67,10 @@
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                     <template v-slot:default="scope">
+                        <el-select v-model="carriage_type" placeholder="Select">
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"
+                                :disabled="item.disabled" />
+                        </el-select>
                         <el-button size="mini" type="Success" @click="submitChange(scope.row)">改签
                         </el-button>
                     </template>
@@ -82,12 +86,13 @@
 <script>
 import axios from "axios";
 // import { ElMessage } from 'element-plus'
-
+import router from '@/router';
 import { mapState } from "vuex";
+import { ElMessage, ElMessageBox } from "element-plus";
 export default {
     computed: {
         ...mapState(["token"]),
-    ...mapState(["isLogin"]),
+        ...mapState(["isLogin"]),
     },
     data() {
         return {
@@ -176,6 +181,23 @@ export default {
             formLabelWidth: '120px',
             stationData: ["阿克苏", "阿拉善", "阿勒泰", "阿图什", "安康", "安庆", "鞍山", "安顺", "安溪", "安阳", "巴彦淖尔", "巴音郭楞蒙古自治州", "巴中", "白城", "百色", "白山", "白银", "蚌埠", "保定", "宝鸡", "保山", "包头", "北海", "北京", "本溪", "毕节", "璧山", "滨州", "博乐", "亳州", "沧州", "长春", "常德", "昌吉", "昌江", "长沙", "长寿", "长汀", "长治", "常州", "潮州", "郴州", "承德", "成都", "澄迈", "赤峰", "池州", "崇仁", "崇左", "楚雄", "滁州", "达川", "大理", "大连", "大庆", "大同", "达州", "大足", "丹东", "儋州", "德令哈", "德阳", "德州", "垫江", "定西", "东方", "东莞", "东营", "都匀", "鄂尔多斯", "峨山", "鄂州", "恩施", "二连浩特", "防城港", "丰都", "奉节", "凤阳", "佛山", "涪陵", "富平", "抚顺", "莆田", "阜新", "阜阳", "抚州", "福州", "赣州", "岗嘎", "格尔木", "个旧", "贡嘎", "固原", "广安", "广元", "广州", "贵港", "桂林", "贵阳", "哈尔滨", "哈密", "海北州", "海东", "海口", "海西州", "海晏", "邯郸", "汉中", "杭州", "鹤壁", "河池", "合川", "合肥", "鹤岗", "和田", "河源", "菏泽", "贺州", "黑河", "衡水", "衡阳", "呼和浩特", "葫芦岛", "呼伦贝尔", "湖州", "桦南", "华阴", "淮安", "淮北", "怀化", "淮南", "桓台", "黄冈", "黄山", "黄石", "惠州", "吉安", "吉林", "济南", "济宁", "吉首", "鸡西", "济源", "加查", "加格达奇", "佳木斯", "嘉兴", "嘉峪关", "建宁", "江边村", "江津", "江门", "焦作", "揭阳", "金昌", "晋城", "金华", "晋中", "锦州", "景德镇", "景洪", "荆门", "荆州", "九江", "酒泉", "喀什", "开封", "凯里", "克拉玛依", "库尔勒", "昆明", "拉萨", "来宾", "莱芜", "来舟", "兰州", "琅勃拉邦", "廊坊", "朗县", "老挝万荣", "乐东", "乐山", "丽江", "丽水", "连云港", "梁平", "聊城", "辽阳", "辽源", "临沧", "临川", "临汾", "临高", "林口", "临沂", "林芝", "陵水", "灵武", "六安", "六盘水", "柳州", "陇南", "龙岩", "娄底", "芦溪", "泸州", "洛阳", "吕梁", "马鞍山", "马桥河", "麦园", "茫崖", "茂名", "眉山", "梅州", "勐腊", "蒙自", "米林", "绵阳", "磨丁", "墨江", "牡丹江", "那曲", "南昌", "南充", "南涧", "南京", "南宁", "南平", "南通", "南阳", "内江", "宁波", "宁德", "宁洱", "盘锦", "攀枝花", "彭水", "平顶山", "平凉", "萍乡", "蒲城", "普洱", "濮阳", "蕲春", "綦江", "齐齐哈尔", "七台河", "潜江", "黔江", "秦皇岛", "钦州", "青岛", "青铜峡", "庆阳", "清远", "琼海", "曲靖", "衢州", "泉州", "日喀则", "日照", "荣昌", "三门峡", "三明", "三亚", "桑日", "厦门", "沙县", "山南", "汕头", "汕尾", "上海", "上杭", "商洛", "商丘", "上饶", "邵东", "韶关", "绍兴", "邵阳", "神农架", "沈阳", "深圳", "石河子", "石家庄", "十堰", "石柱", "石柱县", "石嘴山", "双鸭山", "朔州", "四平", "松原", "宿迁", "苏州", "宿州", "绥化", "遂宁", "随州", "塔城", "漯河", "泰安", "太原", "泰州", "台州", "唐山", "天津", "天门", "天水", "铁岭", "铜川", "通化", "通辽", "铜陵", "潼南", "铜仁", "吐鲁番", "万宁", "万象", "万州", "潍坊", "威海", "渭南", "文昌", "文山", "温州", "乌海", "武汉", "芜湖", "乌兰察布", "武隆", "乌鲁木齐", "巫山", "武威", "无锡", "武穴", "吴忠", "梧州", "西安", "西昌", "锡林郭勒", "西宁", "浠水", "咸宁", "仙桃", "咸阳", "香港", "湘潭", "襄阳", "孝感", "新乡", "信阳", "新余", "忻州", "兴安", "邢台", "兴义", "秀山", "许昌", "徐州", "宣城", "雅安", "延安", "延边", "盐城", "烟台", "阳江", "漾濞", "阳泉", "扬州", "宜宾", "宜昌", "伊春", "宜春", "伊宁", "益阳", "仪征", "银川", "营口", "鹰潭", "永川", "永平", "永州", "酉阳", "于都", "榆林", "玉林", "玉门", "玉溪", "元江", "岳阳", "运城", "云浮", "云阳", "枣庄", "扎囊", "湛江", "张家界", "张家口", "张掖", "漳州", "肇庆", "昭通", "朝阳", "镇江", "郑州", "重庆", "中山", "中卫", "周口", "珠海", "驻马店", "株洲", "淄博", "自贡", "资溪", "资阳", "遵义"],
             origin_order: {},
+            old_date: '',
+            old_time: '',
+            carriage_type: '',
+            options: [
+                {
+                    value: '商务/软卧',
+                    label: '商务/软卧',
+                },
+                {
+                    value: '一等座/硬卧',
+                    label: '一等座/硬卧',
+                },
+                {
+                    value: '二等座/硬卧',
+                    label: '二等座/硬卧',
+                },
+            ]
         }
 
     },
@@ -330,32 +352,66 @@ export default {
             this.searchForm.end_station = selectedItem;
         },
         submitChange(new_order) {
-            if(this.origin_order.isall){
-                
+            let date1 = new Date(this.searchForm.datetime)
+            let year = date1.getFullYear()
+            let month = String(date1.getMonth() + 1).padStart(2, '0')
+            let day = String(date1.getDate()).padStart(2, '0')
+            /*check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
+            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price) */
+            console.log(new_order)
+            const new_date = `${year}-${month}-${day}`;
+            let carriage_type = '';
+            if (new_order.train_no === 'HSR') {
+                if (this.carriage_type === '商务/软卧') {
+                    carriage_type = "BUS"
+                }else if (this.carriage_type === '一等座/硬卧') {
+                    carriage_type = "FST"
+                } else if (this.carriage_type === '二等座/软卧') {
+                    carriage_type = "SND"
+                }
+            } else if (new_order.train_no === 'REG') {
+                if (this.carriage_type === '商务/软卧') {
+                    carriage_type = "SOF"
+                }else if (this.carriage_type === '一等座/硬卧') {
+                    carriage_type = "HAW"
+                } else if (this.carriage_type === '二等座/软卧') {
+                    carriage_type = "HAZ"
+                }
             }
-/*check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
-scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price) */
-
-
             axios.post('/api/train/rebook/', {
-                user_id: 4,
-                original_order_id: origin_order.order_id,
-                train_name: "G103",
-                carriage_type: "HAZ",
-                date: "2023-05-25",
-                start_stop_id: 1,
-                end_stop_id: 2,
-                passenger_ids: [7, 8],
+                original_order_id: this.origin_order.order_id,
+                train_name: new_order.train_number,
+                date: `${year}-${month}-${day}`,
+                carriage_type:carriage_type,
+                start_stop_id: new_order.start_no,
+                end_stop_id: new_order.end_no,
+                passenger_ids: this.origin_order.passengers,
                 seat_locations: []
+            }, {
+                headers: {
+                    "Authorization": this.token
+                }
             })
                 .then((response) => {
                     console.log(response)
-                    let list = response.data.data.filter(order => order.order_status === 'UPD')
-                    this.count = Math.ceil(list.length / this.page_size);
-                    this.getLists();
+                    ElMessageBox.alert('您已成功改签', '改签成功', {
+                        confirmButtonText: '确定',
+                        showClose: false
+                    })
+                    this.$router.push({
+                        name: 'WELCOME'
+                    })
                 })
                 .catch(function (error) {
                     console.log(error);
+                    if (error.response.status == 401 || this.isLogin == false) {
+                        router.push({ path: "/Login" });
+                        ElMessage({
+                            showClose: true,
+                            message: '登录失效,请重新登录',
+                            type: 'error',
+                        })
+                    }
                 });
         }
 
@@ -366,6 +422,7 @@ scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,sco
         console.log(this.origin_order)
         this.searchForm.start_station = this.origin_order.departure_station_name;
         this.searchForm.end_station = this.origin_order.arrival_station_name;
+        this.old_date = this.origin_order.date;
     },
     //对查询的信息进行排序
 

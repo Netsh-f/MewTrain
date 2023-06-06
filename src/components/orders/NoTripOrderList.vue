@@ -22,7 +22,7 @@
                             <el-table-column label="操作" width="200">
                                 <template #default="props2">
                                     <el-button size="mini" type="success"
-                                        @click="handleTicketchanges2(props.row, props2.row)">改签</el-button>
+                                        @click="handleTicketchanges2(props.row, props2.row, props2.$index)">改签</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -95,14 +95,49 @@ export default {
             this.offset = (val - 1) * this.limit;
             this.getLists();
         },
+        handleRefundTicket(row) {
+
+            let id = row.order_id;
+            axios.post('/api/train/return_order/', {
+                order_id: id,
+            }, {
+                headers: {
+                    "Authorization": this.token
+                }
+            })
+                .then((response) => {
+                    //console.log(response.data.data);
+                    ElMessageBox.alert('订单取消成功，钱款已退回余额', '取消成功', {
+                        confirmButtonText: '确定',
+                        showClose: false
+                    })
+                    this.getLists();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    if (error.response.status == 401 || this.isLogin == false) {
+                        router.push({ path: "/Login" });
+                        ElMessage({
+                            showClose: true,
+                            message: '登录失效,请重新登录',
+                            type: 'error',
+                        })
+                    }
+                });
+        },
         handleTicketchanges(row) {
+            console.log(row)
+            let passengers = []
+            for (let i = 0; i < row.passenger_order_data.length; i++) {
+                passengers.push(row.passenger_order_data[i].passenger_id
+)
+            }
             let order = {
                 order_id: row.order_id,
                 date: row.date,
                 departure_station_name: row.departure_station_name,
                 arrival_station_name: row.arrival_station_name,
-                isall: true,
-                passengers: ''
+                passengers: passengers
             }
             let origin_order = JSON.stringify(order)
             this.$router.push({
@@ -110,15 +145,14 @@ export default {
                 params: { order: origin_order }
             })
         },
-        handleTicketchanges2(row, row2) {
+        handleTicketchanges2(row, row2, index) {
             console.log(row, row2)
             let order = {
                 order_id: row.order_id,
                 date: row.date,
                 departure_station_name: row.departure_station_name,
                 arrival_station_name: row.arrival_station_name,
-                isall: false,
-                passengers: `[${row2.passenger_name}]`
+                passengers: [row2.passenger_id],
             }
             let origin_order = JSON.stringify(order)
             this.$router.push({

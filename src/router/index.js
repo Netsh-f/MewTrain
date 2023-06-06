@@ -21,6 +21,7 @@ const trainAdjust_home = () => import('../components/trainAdjustment/trainAdjust
 const trainAdjust_check = () => import('../components/trainAdjustment/trainAdjust_check.vue')
 const trainAdjust_message = () => import('../components/trainAdjustment/trainAdjust_message.vue')
 const trainAdjust_setting = () => import('../components/trainAdjustment/trainAdjust_setting.vue')
+const TicketChange = () => import('../components/TicketChange.vue')
 
 const routes= [
   {
@@ -141,6 +142,14 @@ const routes= [
           component:PayMethod, 
           meta: {
             title: "选择充值方式"
+          }
+        },
+        {
+          path: "/TicketChange/:order",
+          name: "TicketChange",
+          component: TicketChange,
+          meta: {
+            title: "车票改签"
           }
         },
       ],
