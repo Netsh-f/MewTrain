@@ -11,12 +11,13 @@
       </div>
     </div>
     <!-- 显示 -->
+
     <div class="form-list form-list-view" id="relation_way_view">
       <div class="form-item">
         <div class="form-label"><span class="required">*</span>用户名：</div>
         <div class="form-bd">
           <div class="form-bd-txt" v-show="!person.isedit">{{ person.username }}</div>
-          <input type="text" v-model="person.username" maxlength="30" v-show="person.isedit">
+          <input type="text" class="input" v-model="person.username" maxlength="30" v-show="person.isedit">
         </div>
       </div>
 
@@ -30,15 +31,36 @@
       <div class="form-item">
         <div class="form-label"><span class="required">*</span>余额：</div>
         <div class="form-bd">
-          <div class="form-bd-txt">{{ person.balance }}</div>
+          <div class="form-bd-txt" style="font-weight: 800;font-size: larger;">{{ person.balance }} 元</div>
         </div>
       </div>
     </div>
+    <a href="javascript:;" class="btn-edit" id="relation_way_edit" title="编辑联系方式" aria-label="编辑联系方式"
+      @click="() => dialog = true" style="margin-top: 15px;" v-show="!person.isedit">修改密码</a>
+    <el-drawer ref="drawerRef" v-model="dialog" title="修改密码" :before-close="handleClose" direction="rtl"
+      class="demo-drawer" size="40%">
+      <div class="demo-drawer__content">
+        <el-form>
+          <el-form-item label="旧密码" :label-width="formLabelWidth">
+            <el-input v-model="old_password" autocomplete="off" placeholder="请输入原密码" />
+          </el-form-item>
+          <el-form-item label="新密码" :label-width="formLabelWidth">
+            <el-input v-model="new_password" autocomplete="off" placeholder="请输入新密码" />
+          </el-form-item>
+        </el-form>
+        <div class="demo-drawer__footer" style="margin-top: 30px;">
+          <el-button @click="cancelForm">取消</el-button>
+          <el-button type="primary" :loading="loading" @click="changePassword">{{
+            loading ? '提交中 ...' : '提交'
+          }}</el-button>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script>
-import {  ElMessageBox,ElMessage} from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import axios from 'axios'
 import { mapState } from "vuex";
 import router from '@/router';
@@ -55,14 +77,17 @@ export default {
         email: '',
         balance: 0,
         isedit: false,
-
+        password: ''
       },
       temp: {
         username: '',
         email: '',
         balance: 0,
         isedit: false
-      }
+      },
+      dialog: false,
+      old_password: '',
+      new_password: ''
     }
   },
   methods: {
@@ -75,63 +100,102 @@ export default {
       if (this.person.email != '' && !emailRegex.test(this.person.email)) {
         ElMessageBox.alert('邮箱格式有误', '修改失败', {
           confirmButtonText: '确定',
-          showClose:false
+          showClose: false
         })
-      }  else {
+      } else {
         this.person.isedit = false;
 
         axios.post('/api/user/update_user_info/', {
           username: this.person.username,
           email: this.person.email,
-          user_id:4
+          user_id: 4
         }, {
-             headers:{
-                   "Authorization":this.token
-                     }
-                })
+          headers: {
+            "Authorization": this.token
+          }
+        })
           // eslint-disable-next-line no-unused-vars
           .then((response) => {
             ElMessageBox.alert('您已成功修改联系方式信息', '修改成功', {
               confirmButtonText: '确定',
-              showClose:false
+              showClose: false
             })
           })
-          
+
           // eslint-disable-next-line no-unused-vars
           .catch((error) => {
-            if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
+            if (error.response.status == 401 || this.isLogin == false) {
+              router.push({ path: "/Login" });
+              ElMessage({
+                showClose: true,
+                message: '登录失效,请重新登录',
+                type: 'error',
+              })
+            }
             this.person.isedit = true;
             ElMessageBox.alert('用户名已被注册', '修改失败', {
               confirmButtonText: '确定',
-              showClose:false
+              showClose: false
             })
           });
-
-
-
       }
     },
     exitedit() {
       this.person = { ...this.temp }
       this.person.isedit = false;
+    },
+    changePassword() {
+      if (this.old_password !== this.person.password) {
+        ElMessageBox.alert('密码错误', '修改失败', {
+          confirmButtonText: '确定',
+          showClose: false
+        });
+        this.old_password='';
+        this.new_password='';
+        this.dialog=false;
+        return;
+      }
+      axios.post('/api/user/update_user_info/', {
+        password: {
+          current_password: this.old_password,
+          new_password: this.new_password
+        }
+      }, {
+        headers: {
+          "Authorization": this.token
+        }
+      })
+        .then((response) => {
+          console.log(response.data);
+          ElMessageBox.alert('密码修改成功！', '修改成功', {
+          confirmButtonText: '确定',
+          showClose: false
+        });
+        this.old_password='';
+        this.new_password='';
+        this.dialog=false;
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.status == 401 || this.isLogin == false) {
+            router.push({ path: "/Login" });
+            ElMessage({
+              showClose: true,
+              message: '登录失效,请重新登录',
+              type: 'error',
+            })
+          }
+        });
     }
   },
   mounted() {
     axios.post('/api/user/get_user_info/', {
       user_id: "4",
-    },  {
-             headers:{
-                   "Authorization":this.token
-                     }
-                })
+    }, {
+      headers: {
+        "Authorization": this.token
+      }
+    })
       .then((response) => {
         //console.log(response.data);
         let data = response.data;
@@ -140,17 +204,16 @@ export default {
         this.person.balance = data.balance;
       })
       .catch((error) => {
-                console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
-            });
+        console.log(error);
+        if (error.response.status == 401 || this.isLogin == false) {
+          router.push({ path: "/Login" });
+          ElMessage({
+            showClose: true,
+            message: '登录失效,请重新登录',
+            type: 'error',
+          })
+        }
+      });
   }
 }
 </script>
@@ -237,5 +300,9 @@ export default {
   position: relative;
   font-weight: bold;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s, color ease-in-out 0.15s, background ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+}
+
+.input {
+  text-align: center;
 }
 </style>

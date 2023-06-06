@@ -4,10 +4,10 @@
       <!--  头部 -->
       <el-header>
         <div>
-          <img src="" alt="">
-          <span>MewTrain MewTrain MewTrain MewTrain </span>
+          <img class="logo" src="../assets/logo.png" alt="">
+
         </div>
-        <HeadItems></HeadItems>
+        <HeadItems class="headItem"></HeadItems>
       </el-header>
       <!-- 页面主体 -->
       <el-container>
@@ -136,5 +136,11 @@ export default{
     margin-bottom: 40px;
   }
   
+  .logo{
+    margin-left: 50px;
+  }
 
+  .headItem{
+    margin-right: 50px;
+  }
 </style>

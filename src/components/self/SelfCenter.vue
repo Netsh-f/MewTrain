@@ -65,7 +65,7 @@
 
 .line-dashed {
     height: 1px;
-    border-top: 1px dashed #dedede;
+    border-top: 1px dashed #383535;
     margin: 15px 0;
 }
 
