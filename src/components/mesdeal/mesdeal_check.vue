@@ -365,7 +365,7 @@ export default {
             }, 1000);
         },
         openT(row){
-            if(row.user_type==='user'){
+            if(row.usertype==='user'){
                 this.asForPassenger(row);
                 this.table=true;
                 this.currut_id=row.id;
