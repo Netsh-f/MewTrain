@@ -201,6 +201,7 @@
         </el-row>
 
         <el-button type="primary" round @click="next" style="margin-left: 500px;margin-top: 30px" v-show="active != 2">下一步</el-button>
+        <el-button type="primary" round @click="back" style="margin-left: 500px;margin-top: 30px">返回主界面</el-button>
     </div>
 </template>
 
@@ -255,6 +256,9 @@ import { ElMessage } from 'element-plus';
         },
 
         methods: {
+            back(){
+                router.push('/WELCOME')
+            },
             choose1(){this.choose_seat=0},
             choose2(){this.choose_seat=1},
             choose3(){this.choose_seat=2},
@@ -270,6 +274,15 @@ import { ElMessage } from 'element-plus';
                 }
                 if(this.active == 2)
                 {
+                    if(this.checkList.length==0)
+                    {
+                    ElMessage({
+                    showClose: true,
+                    message: '请选择座位',
+                    type: 'error',
+                })
+                this.active=1
+                    }
                     console.log("到达2")
                     this.handle();
                 }
