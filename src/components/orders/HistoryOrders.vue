@@ -47,8 +47,9 @@
                 </el-table-column>
             </el-table>
             <div class="Pagination">
-                <el-pagination :hide-on-single-page="true" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                    :current-page="currentPage" background :page-size="page_size" layout="prev, pager, next" :page-count="count" >
+                <el-pagination :hide-on-single-page="true" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" :current-page="currentPage" background :page-size="page_size"
+                    layout="prev, pager, next" :page-count="count">
                 </el-pagination>
             </div>
 
@@ -58,14 +59,14 @@
 
 <script>
 import axios from 'axios';
-import { ElMessageBox ,ElMessage} from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import { mapState } from "vuex";
 import router from '@/router';
 export default {
     computed: {
-    ...mapState(["token"]),
-    ...mapState(["isLogin"]),
-  },
+        ...mapState(["token"]),
+        ...mapState(["isLogin"]),
+    },
     data() {
         return {
 
@@ -75,7 +76,7 @@ export default {
             offset: 0,
             limit: 10,
             count: 0,
-            page_size:10,
+            page_size: 10,
             currentPage: 1,
         }
     },
@@ -90,39 +91,41 @@ export default {
         },
         handleDelete(index, row) {
             let id = row.order_id;
-            console.log(id)
+            console.log(row)
+            if (row.order_status === '已支付') {
+                ElMessageBox.alert('无法删除已支付订单，请退款', '删除失败', {
+                    confirmButtonText: '确定',
+                    showClose: false
+                })
+                return;
+            }
             axios.post('/api/train/remove_order/', {
                 order_id: id
-            },{
-                     headers:{
-                         "Authorization":this.token
-                     }
-                })
+            }, {
+                headers: {
+                    "Authorization": this.token
+                }
+            })
                 // eslint-disable-next-line no-unused-vars
                 .then((response) => {
                     //console.log(response.data.data);
                     ElMessageBox.alert('订单删除成功', '删除成功', {
                         confirmButtonText: '确定',
-                        showClose:false
+                        showClose: false
                     })
                     this.getLists();
                 })
                 .catch(function (error) {
-                    if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
+                    if (error.response.status == 401 || this.isLogin == false) {
+                        router.push({ path: "/Login" });
+                        ElMessage({
+                            showClose: true,
+                            message: '登录失效,请重新登录',
+                            type: 'error',
+                        })
+                    }
                     console.log(error);
                     if (error.response.data.message === '订单不可删除') {
-                        ElMessageBox.alert('无法删除已支付订单，请退款', '删除失败', {
-                            confirmButtonText: '确定',
-                            showClose:false
-                        })
                     }
                 });
         },
@@ -130,13 +133,13 @@ export default {
         async getLists() {
             axios.post('/api/train/get_order_list/', {
                 user_id: 4
-            },{
-                     headers:{
-                         "Authorization":this.token
-                     }
-                })
+            }, {
+                headers: {
+                    "Authorization": this.token
+                }
+            })
                 .then((response) => {
-                    console.log(response)
+                    //console.log(response)
                     this.tableData = [];
                     let data2 = response.data.data;
                     if (data2.length !== 0) {
@@ -213,17 +216,16 @@ export default {
 
                 })
                 .catch((error) => {
-                console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
-            });
+                    console.log(error);
+                    if (error.response.status == 401 || this.isLogin == false) {
+                        router.push({ path: "/Login" });
+                        ElMessage({
+                            showClose: true,
+                            message: '登录失效,请重新登录',
+                            type: 'error',
+                        })
+                    }
+                });
 
 
         }
@@ -231,28 +233,27 @@ export default {
     },
     mounted() {
         axios.post('/api/train/get_order_list/', {
-                user_id: 4
-            },{
-                     headers:{
-                         "Authorization":this.token
-                     }
-                })
-                .then((response) => {
-                    console.log(response)
-                    let list=response.data.data
-                    this.count= Math.ceil(list.length/this.page_size);
-                    this.getLists();
-                })
-                .catch((error) => {
+            user_id: 4
+        }, {
+            headers: {
+                "Authorization": this.token
+            }
+        })
+            .then((response) => {
+                //console.log(response)
+                let list = response.data.data
+                this.count = Math.ceil(list.length / this.page_size);
+                this.getLists();
+            })
+            .catch((error) => {
                 console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
+                if (error.response.status == 401 || this.isLogin == false) {
                     router.push({ path: "/Login" });
                     ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
+                        showClose: true,
+                        message: '登录失效,请重新登录',
+                        type: 'error',
+                    })
                 }
             });
     }

@@ -32,7 +32,7 @@ export default {
     },
     setup() {
         //const time = ref(Date.now() + 1000 * 60 * 10)
-        const time = ref(Date.now() + 1000 * 10*60);
+        const time = ref(Date.now() + 1000 * 10);
         return {
             time
         }

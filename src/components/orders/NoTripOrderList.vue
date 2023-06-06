@@ -118,7 +118,7 @@ export default {
                 departure_station_name: row.departure_station_name,
                 arrival_station_name: row.arrival_station_name,
                 isall: false,
-                passengers: row2.passenger_name
+                passengers: `[${row2.passenger_name}]`
             }
             let origin_order = JSON.stringify(order)
             this.$router.push({
