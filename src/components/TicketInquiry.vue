@@ -106,8 +106,6 @@
             <!-- Table -->
 
         </div>
-        <el-button @click="check1">点我点我</el-button>
-        <el-button @click="check2">123</el-button>
     </div>
 </template>
 <script>
@@ -210,31 +208,7 @@
             }
         },
         methods: {
-            check2(){
-                console.log(this.token);
-            },
-            
 
-            check1(){
-                axios.post('/api/user/get_user_info/',{
-                     headers:{
-                        "Authorization":this.token
-                     }
-                }).then((response) => {
-                    console.log(response);
-                    }).catch((error) => {
-                console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
-            });
-            },
             TrainRank()
             {
                 if(this.value1 === false)
@@ -267,6 +241,12 @@
                         }
                     }
                 }
+            },
+            transferTime(time)
+            {
+                let time2 = time.split(":");
+                let second =  parseInt(time2[0]) *60   + parseInt(time2[1]);
+                return second;
             },
             check(index,datetime,train_no,start_no,end_no,train_number,high_seat_price,medium_seat_price,low_seat_price)
             {           
@@ -354,6 +334,7 @@
                                     tableData.high_seat_count = response.data.data[i].ticket.SND.count;
                                     tableData.medium_seat_count = response.data.data[i].ticket.FST.count ;
                                     tableData.low_seat_count = response.data.data[i].ticket.BUS.count;
+                                    tableData.running_time=response.data.data[i].total_duration
                                     tableData.end_no = response.data.data[i].end_stop_id
                                     tableData.start_no =response.data.data[i].start_stop_id;
                                     this.tableData.push(tableData);
@@ -370,7 +351,7 @@
                                     tableData.high_seat_price = response.data.data[i].ticket.HAW.price;
                                     tableData.medium_seat_count = response.data.data[i].ticket.HAZ.price ;
                                     tableData.low_seat_count = response.data.data[i].ticket.SOF.price;
-
+                                    tableData.running_time=response.data.data[i].total_duration
                                     tableData.high_seat_count = response.data.data[i].ticket.HAW.count;
                                     tableData.medium_seat_count = response.data.data[i].ticket.HAZ.count ;
                                     tableData.low_seat_count = response.data.data[i].ticket.SOF.count;
@@ -382,15 +363,16 @@
                                 console.log(this.tableData)
                                 this.TrainRank();
                                 }).catch((error) => {
-                console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
+                            console.log(error);
+                            if(error.response!=null)
+                            if(error.response.status==401 || this.isLogin==false)
+                            {
+                                router.push({ path: "/Login" });
+                                ElMessage({
+                                showClose: true,
+                                message: '登录失效,请重新登录',
+                                type: 'error',
+                            })
                 }
             });
                     }

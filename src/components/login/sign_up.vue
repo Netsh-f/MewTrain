@@ -77,17 +77,22 @@ export default {
             username: UserRegisterInfo.value.Name,
             password: UserRegisterInfo.value.PassWord,
             email: UserRegisterInfo.value.Email
-          }, {headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-              'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-              },}).then((response) => {
+          }).then((response) => {
                     console.log(response.data);
+                    axios.post('/api/user/login/', {            
+              username: UserRegisterInfo.value.Name,
+              password: UserRegisterInfo.value.PassWord,
+          }).then((response) => {
+                    console.log(response);
                     const token = response.data.data.token;
+                    console.log(token)
                     store.commit("setToken", token);
-                    store.commit('setLogin',true)
                     store.commit("setLogin",true)
                     router.push({ path: "/WELCOME" });
+                    })
+                    .catch((error) => {
+                    console.log(error);
+                    });
                     })
                     .catch((error) => {
                     if(error.response.status === 400){
