@@ -28,11 +28,13 @@
 import axios from "axios";
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus'
-import router from "@/router";
+import router from "@/router"; // 导入Vue.js路由器
+import { useStore } from "vuex";
 
 export default {
   
   setup() {
+    const store = useStore();
     const UserRegisterInfo = ref({
       Name: '',
       Email: '',
@@ -81,6 +83,8 @@ export default {
               'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
               },}).then((response) => {
                     console.log(response.data);
+                    const token = response.data.data.token;
+                    store.commit("setToken", token);
                     router.push({ path: "/WELCOME" });
                     })
                     .catch((error) => {

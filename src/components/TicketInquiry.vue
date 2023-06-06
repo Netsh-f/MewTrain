@@ -113,8 +113,12 @@
 <script>
     import axios from "axios";
     // import { ElMessage } from 'element-plus'
-// import { AxiosBase } from '@/config/env';
+
+    import { mapState } from "vuex";
     export default {
+        computed: {
+    ...mapState(["token"]),
+  },
         data(){
             return {
                 value1: false,
@@ -205,27 +209,7 @@
         },
         methods: {
             check2(){
-            axios.post('/api/user/login/', {            
-            username: 'user65',
-            password: '123456',
-          }).then((response) => {
-                    console.log(response.data.data.token);
-                    axios.get('/api/user/logout/',{
-                     headers:{
-                        'Authorization':response.data.data.token
-                     }
-                }).then((response) => {
-                    console.log(response);
-                    });
-                    })
-
-                    .catch((error) => {
-                    console.log(error);
-                    console.log("这里真的有猫饼");
-                    if(error.response.status === 500){
-                    console.log("已经存在了猫猫");
-                    }
-                    });
+                console.log(this.token);
             },
             
 
@@ -236,13 +220,9 @@
                      }
                 }).then((response) => {
                     console.log(response);
+                    }).catch((error) => {
+                    console.log(error);
                     });
-            },
-            transferTime(time)
-            {
-                let time2 = time.split(":");
-                let second =  parseInt(time2[0]) *60   + parseInt(time2[1]);
-                return second;
             },
             TrainRank()
             {
@@ -309,11 +289,6 @@
                     }
                     return i;
                  },
-            async created(){
-            const response = await axios.get('../assets/city_names.json');
-            this.stationData= response.data;
-            console.log(this.stationData)
-        },
 
             // queryString是用户在输入框中输入的文本字符串，用于进行搜索。cb是一个回调函数，用于在搜索完成时将搜索结果传递给自动完成组件。
             //从"stationData"属性中获取所有的车站数据列表，存储在"houseNumberList"变量中。
@@ -391,7 +366,9 @@
                                 }
                                 console.log(this.tableData)
                                 this.TrainRank();
-                                })
+                                }).catch((error) => {
+                                 console.log(error);
+                         });
  
                             
                             // else if(res.status == 404)
