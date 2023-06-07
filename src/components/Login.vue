@@ -7,7 +7,7 @@
         <div class="switch" id="switch-cnt">
           <div class="switch__container is-hidden" id="switch-c1">
             <h2 class="switch__title title">第一次来？准备好！</h2>
-            <button class="switch__button button " @click="change" style="margin-top: 40px;">返回登陆</button>
+            <button class="switch__button button " @click="change" style="margin-top: 40px;">登陆</button>
           </div>
           <div class="switch__container " id="switch-c2">
             <h3 class="switch__title title" >欢迎来到MewTrain !</h3>

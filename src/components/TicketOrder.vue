@@ -140,11 +140,10 @@
             </el-table>
 
         </div>
-
-        <el-row v-show="active === 0">
-            <div>
-                <el-card class="box-card" v-for="(tableData, index) in tableDatas" :key="index"
-                    style="width: 1000px;margin-left: 80px;margin-top: 20px">
+        <div>
+        <el-row  v-show="active === 0" >
+            <div  class="rowContainer">
+                <el-card class="box-card"  v-for="(tableData, index) in tableDatas" :key="index" style="width: 1000px;margin-left: 80px;margin-top: 20px">
                     <template #header>
                         <div class="clearfix">
                             <span>{{ tableData.passenger_real_name }}</span>
@@ -178,7 +177,8 @@
                 </el-card>
             </div>
         </el-row>
-        <el-row v-show="active === 2">
+    </div>
+        <el-row  v-show="active === 2" >
             <el-table :data="order_data" v-show="show_order_list" style="width: 1000px;margin-left: 80px;margin-top: 20px">
                 <el-table-column property="passenger_name" label="乘客姓名"></el-table-column>
                 <el-table-column property="ticket_type" label="车票类型"></el-table-column>
@@ -259,34 +259,42 @@ export default {
         };
     },
 
-    methods: {
-        back() {
-            router.push('/WELCOME')
-        },
-        choose1() { this.choose_seat = 0 },
-        choose2() { this.choose_seat = 1 },
-        choose3() { this.choose_seat = 2 },
-        check() {
-            console.log(this.checkList)
-        },
-        next() {
-            this.active++;
-            if (this.active == 1) {
-                if (this.passenger_count == 0) {
-                    if (this.checkList.length == 0) {
-                        ElMessage({
-                            showClose: true,
-                            message: '请添加乘车人',
-                            type: 'error',
-                        })
-                    }
-                    this.active = 0
+        methods: {
+            back(){
+                router.push('/WELCOME')
+            },
+            choose1(){this.choose_seat=0},
+            choose2(){this.choose_seat=1},
+            choose3(){this.choose_seat=2},
+            check(){
+                console.log(this.checkList)
+            },
+            next() {
+                this.active ++;
+                if(this.active == 1)
+                {
+                    if(this.passenger_count==0)
+                    {
+                        if(this.checkList.length==0)
+                    {
+                    ElMessage({
+                    showClose: true,
+                    message: '请添加乘车人',
+                    type: 'error',
+                })}
+                        this.active=0
+                    }else{
+                    console.log("到达1")
+                    this.$message({
+                        type: 'message',
+                        message: '查询成功'
+                    });
+                    this.getTicketCount();}
                 }
-                console.log("到达1")
-                this.getTicketCount();
-            }
-            if (this.active == 2) {
-                if (this.checkList.length == 0) {
+                if(this.active == 2)
+                {
+                    if(this.checkList.length==0)
+                    {
                     ElMessage({
                         showClose: true,
                         message: '请选择座位',
@@ -371,21 +379,21 @@ export default {
                     this.medium_seat.push(high_temp1);
 
 
-                    let high_temp2 = {};
-                    high_temp2.carriage_number = response.data.data.HAZ.count;
-                    high_temp2.seat_type = "硬座";
-                    high_temp2.A_price = response.data.data.HAZ.price;
-                    high_temp2.B_price = response.data.data.HAZ.price;
-                    high_temp2.C_price = response.data.data.HAZ.price;
-                    high_temp2.D_price = response.data.data.HAZ.price;
-                    high_temp2.E_price = response.data.data.HAZ.price;
-                    high_temp2.F_price = response.data.data.HAZ.price;
-                    this.low_seat.push(high_temp2);
-
-
-                    this.dialogTableVisible = true
-                }
-            }).catch((error) => {
+                                let high_temp2 = {};
+                                high_temp2.carriage_number = response.data.data.HAZ.count;
+                                high_temp2.seat_type = "硬座";
+                                high_temp2.A_price = response.data.data.HAZ.price;
+                                high_temp2.B_price = response.data.data.HAZ.price;
+                                high_temp2.C_price = response.data.data.HAZ.price;
+                                high_temp2.D_price = response.data.data.HAZ.price;
+                                high_temp2.E_price = response.data.data.HAZ.price;
+                                high_temp2.F_price = response.data.data.HAZ.price;
+                                this.low_seat.push(high_temp2);
+                            
+                        
+                        this.dialogTableVisible = true
+                 }
+                }).catch((error) => {
                 console.log(error);
                 if (error.response.status == 401 || this.isLogin == false) {
                     router.push({ path: "/Login" });
@@ -649,69 +657,65 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import '../assets/mixin.less';
-
-.explain_text {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 20px;
-    color: #333;
-}
-
-.admin_set {
-    width: 60%;
-    background-color: #F9FAFC;
-    min-height: 400px;
-    margin: 20px auto 0;
-    border-radius: 10px;
-
-    ul>li {
-        padding: 20px;
-
-        span {
-            color: #666;
+    @import '../assets/mixin.less';
+    .rowContainer{
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    .explain_text{
+        margin-top: 20px;
+        text-align: center;
+        font-size: 20px;
+        color: #333;
+    }
+    .admin_set{
+        width: 60%;
+        background-color: #F9FAFC;
+        min-height: 400px;
+        margin: 20px auto 0;
+        border-radius: 10px;
+        ul > li{
+            padding: 20px;
+            span{
+                color: #666;
+            }
         }
     }
-}
-
-.admin_title {
-    margin-top: 20px;
-    font-size: 24px;
-    color: #666;
-    text-align: center;
-}
-
-.avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    margin-top: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.avatar-uploader .el-upload:hover {
-    border-color: #20a0ff;
-}
-
-.avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 120px;
-    height: 120px;
-    line-height: 120px;
-    text-align: center;
-}
-
-.avatar {
-    width: 120px;
-    height: 120px;
-    display: block;
-}
-
-.text {
-    font-size: 14px;
-}
+    .admin_title{
+        margin-top: 20px;
+        font-size: 24px;
+        color: #666;
+        text-align: center;
+    }
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        margin-top: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #20a0ff;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 120px;
+        height: 120px;
+        line-height: 120px;
+        text-align: center;
+    }
+    .avatar {
+        width: 120px;
+        height: 120px;
+        display: block;
+    }
+    .text {
+        font-size: 14px;
+    }
 
 .item {
     margin-bottom: 18px;
