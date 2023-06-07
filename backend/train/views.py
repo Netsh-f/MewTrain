@@ -138,6 +138,7 @@ def add_ticket(request):
         current_date = start_date
         while current_date <= end_date:
             if carriages[0].ticket_set.all().first() is not None:
+                current_date += timedelta(days=1)
                 continue
             for carriage in carriages:
                 ticket = Ticket.objects.create(
