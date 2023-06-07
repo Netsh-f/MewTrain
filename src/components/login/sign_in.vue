@@ -23,7 +23,7 @@ import axios from "axios";
 import { ref } from 'vue';
 import router from "@/router"; // 导入Vue.js路由器
 import { useStore } from "vuex";
-import { ElMessageBox } from "element-plus";
+import { ElMessage,ElMessageBox } from "element-plus";
 
 export default {
   setup() {
