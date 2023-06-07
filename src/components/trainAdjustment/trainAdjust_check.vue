@@ -19,7 +19,7 @@
                     <el-button :icon="Search" type="primary" float="left" @click="asAdd" width="10%">添加</el-button>
                 </el-button-group>
                 <!-- 添加表单弹出 -->
-                <el-dialog v-model="asAddFlag" title="录入车次信息" z-index="9999">
+                <el-dialog v-model="asAddFlag" title="录入车次信息">
                     <el-form :model="form"  label-width="50" label-position="left" size="large">
                         <el-form-item label="车次" :label-width="formLabelWidth">
                             <el-input v-model="form.train_name" autocomplete="off"/>
@@ -537,7 +537,6 @@ export default {
 .input3{
     padding: 0 6rem 0 8.75rem;
     width: 102%;
-    z-index: 1;
 }
 .input-mycon {
     display: flex;

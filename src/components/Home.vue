@@ -42,7 +42,7 @@
             <el-menu-item index="NoPayOrderList" class="ItemName">未支付订单</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
-        <el-sub-menu index="">
+        <!-- <el-sub-menu index="">
           <template #title>
             <el-icon><location /></el-icon>
             <span class="ItemName">管理员界面</span>
@@ -51,7 +51,7 @@
             <el-menu-item index="mesdeal1" class="ItemName">系统管理员</el-menu-item>
             <el-menu-item index="trainAdjust1" class="ItemName">铁路系统员</el-menu-item>
           </el-menu-item-group>
-        </el-sub-menu>
+        </el-sub-menu> -->
       </el-menu>
         </el-aside>
         <!-- 右侧内容主体 -->

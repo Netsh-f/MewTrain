@@ -6,14 +6,14 @@
     <h1 id="welcome">MewTrain欢迎您,尊敬的铁路系统员！</h1>
     <hr>
     <div class="table1">
-        <div class="block text-center">
-            <span class="demonstration"></span>
-            <el-carousel height="650px">
-            <el-carousel-item v-for="item in imgwrap" :key="item.url">
-                <el-image :src="item.url" close-on-press-escape="false">img1</el-image>
-            </el-carousel-item>
-            </el-carousel>
-        </div>
+      <div class="block text-center">
+          <span class="demonstration"></span>
+          <el-carousel height="650px" class="optimized-carousel">
+          <el-carousel-item v-for="item in imgwrap" :key="item.url">
+              <el-image :src="item.url" close-on-press-escape="false">img1</el-image>
+          </el-carousel-item>
+          </el-carousel>
+      </div>
     </div>
   </div>
 </template>
@@ -25,8 +25,10 @@ export default {
     data(){
         return{
             imgwrap:[
-                {url:require('../../assets/imgs/zc1.jpg')},
-                {url:require('../../assets/imgs/zc2.jpg')},
+              { url: require('../../assets/imgs/ChangSha1.jpg') },
+              { url: require('../../assets/imgs/TheGreatWall1.jpg') },
+              { url: require('../../assets/imgs/HongKong2.jpg') },
+              { url: require('../../assets/imgs/HongKong1.jpg') },
             ]
         }
     },
@@ -46,27 +48,33 @@ export default {
 .el-carousel__item h3 {
   color: #475669;
   opacity: 0.75;
-  line-height: 150px;
+  height: 100%;
   margin: 0;
   text-align: center;
 }
-
-.el-carousel__item:nth-child(2n) {
-}
-
-.el-carousel__item:nth-child(2n + 1) {
-}
 .table1{
-    padding: 0 0.5rem 0 6.75rem;
+    padding: 0 18.5rem 0 19.75rem;
     text-align: center;
 }
 
+.optimized-carousel {
+  width: 100%; /* 设置走马灯的宽度为100% */
+  height: 100%; /* 设置走马灯的高度为100% */
+  transform: scale(1); /* 缩小至90% */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 边缘模糊化加重影处理 */
+  perspective: 1000px; /* 加强立体效果 */
+}
+.el-image {
+  width: 100%; /* 设置图片的宽度为100% */
+  height: 100%; /* 设置图片的高度为100% */
+}
 .demo-image .block {
   padding: 30px 0;
   text-align: center;
   border-right: solid 1px var(--el-border-color);
   display: inline-block;
-  width: 20%;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   vertical-align: top;
 }

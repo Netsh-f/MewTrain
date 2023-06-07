@@ -128,6 +128,11 @@ export default {
     align-items: stretch;
 }
   
+.card-content {
+    background-color: rgba(166, 205, 211, 0.7);
+    opacity: 0.9;
+  }
+
 .profile-sidebar {
     position: absolute;
     top: 10%;
@@ -136,9 +141,15 @@ export default {
     width: 60%;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
-    padding: 20px;
+    padding: 10px;
     transition: transform 0.3s, box-shadow 0.3s;
     transform: translateX(100%);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    border-radius: 10px; /* 添加圆角 */
 }
   
 .profile-sidebar.active {
@@ -149,6 +160,24 @@ export default {
 .sidebar-content {
 /* 侧边栏内容样式 */
 }
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  
+  .label {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  
+  .value {
+    font-size: 20px;
+  }
 .profile-card {
     position: absolute;
     top: 55%;
@@ -183,9 +212,8 @@ left: 20.75rem; /* 资料卡的新位置 */
         transform: translate(-50%, -50%) rotateY(360deg);
     }
 }
-  
-  .profile-card:hover {
-    transform: translate(-50%, -50%) scale(1.03); /* 鼠标移上去时，将资料卡放大到原始大小的1.1倍，并保持居中 */
-  }
+.profile-card:hover {
+transform: translate(-50%, -50%) scale(1.03); /* 鼠标移上去时，将资料卡放大到原始大小的1.1倍，并保持居中 */
+}
   
 </style>

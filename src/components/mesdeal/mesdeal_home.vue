@@ -29,8 +29,10 @@ export default {
     data(){
         return{
             imgwrap:[
-                {url:require('../../assets/imgs/zc1.jpg')},
-                {url:require('../../assets/imgs/zc2.jpg')},
+              { url: require('../../assets/imgs/ChangSha1.jpg') },
+              { url: require('../../assets/imgs/TheGreatWall1.jpg') },
+              { url: require('../../assets/imgs/HongKong2.jpg') },
+              { url: require('../../assets/imgs/HongKong1.jpg') },
             ]
         }
     },
@@ -55,13 +57,19 @@ export default {
   text-align: center;
 }
 
-.optimized-carousel {
-  transform: scale(0.9); /* 缩小至90% */
+ .optimized-carousel {
+  width: 100%; /* 设置走马灯的宽度为100% */
+  height: 100%; /* 设置走马灯的高度为100% */
+  transform: scale(1); /* 缩小至90% */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 边缘模糊化加重影处理 */
   perspective: 1000px; /* 加强立体效果 */
 }
 
 
+.el-image {
+  width: 100%; /* 设置图片的宽度为100% */
+  height: 100%; /* 设置图片的高度为100% */
+}
 .table1{
     padding: 0 18.5rem 0 19.75rem;
     text-align: center;
@@ -72,7 +80,8 @@ export default {
   text-align: center;
   border-right: solid 1px var(--el-border-color);
   display: inline-block;
-  width: 20%;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   vertical-align: top;
 }
