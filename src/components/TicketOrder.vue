@@ -269,6 +269,17 @@ import { ElMessage } from 'element-plus';
                 this.active ++;
                 if(this.active == 1)
                 {
+                    if(this.passenger_count==0)
+                    {
+                        if(this.checkList.length==0)
+                    {
+                    ElMessage({
+                    showClose: true,
+                    message: '请添加乘车人',
+                    type: 'error',
+                })}
+                        this.active=0
+                    }
                     console.log("到达1")
                     this.getTicketCount();
                 }

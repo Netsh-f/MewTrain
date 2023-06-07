@@ -25,12 +25,10 @@ import axios from "axios";
 import { ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus'
 import router from "@/router"; // 导入Vue.js路由器
-import { useStore } from "vuex";
 
 export default {
 
   setup() {
-    const store = useStore();
     const UserRegisterInfo = ref({
       Name: '',
       Email: '',
@@ -84,21 +82,13 @@ export default {
             password: UserRegisterInfo.value.PassWord,
             email: UserRegisterInfo.value.Email
           }).then((response) => {
-            console.log(response.data);
-            axios.post('/api/user/login/', {
-              username: UserRegisterInfo.value.Name,
-              password: UserRegisterInfo.value.PassWord,
-            }).then((response) => {
-              console.log(response);
-              const token = response.data.data.token;
-              console.log(token)
-              store.commit("setToken", token);
-              store.commit("setLogin", true)
-              router.push({ path: "/WELCOME" });
-            })
-              .catch((error) => {
-                console.log(error);
-              });
+            console.log(response)
+            ElMessage({
+                    showClose: true,
+                    message: '注册成功',
+                    type: 'success',
+                })
+            router.push({ path: "/Login" });
           })
             .catch((error) => {
               if (error.response.status === 400) {
