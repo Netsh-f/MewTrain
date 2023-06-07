@@ -68,14 +68,28 @@ export default {
                     })
                     .catch((error) => {
                     console.log(error);
-                    if(error.response!=null)
+                    if(error.response!=null){
                     if(error.response.status==400){
                       ElMessage({
+                    showClose: true,
+                    message: '用户名或密码错误',
+                    type: 'error',
+                })
+                    }
+                    else if (error.response.status==404)
+                    ElMessage({
                     showClose: true,
                     message: '用户不存在',
                     type: 'error',
                 })
-                    }
+                else{
+                  ElMessage({
+                    showClose: true,
+                    message: '发生错误请重新输入',
+                    type: 'error',
+                })
+                }
+                  }
                     });
       }});
 

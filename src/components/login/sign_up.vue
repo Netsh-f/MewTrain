@@ -124,6 +124,13 @@ export default {
                   showClose: false
                 });
               }
+              else
+              {
+                  ElMessageBox.alert('未知错误', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+              }
             });
         }
       });
