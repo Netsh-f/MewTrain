@@ -138,9 +138,9 @@
             </el-table>
 
         </div>
-
+        <div>
         <el-row  v-show="active === 0" >
-            <div >
+            <div  class="rowContainer">
                 <el-card class="box-card"  v-for="(tableData, index) in tableDatas" :key="index" style="width: 1000px;margin-left: 80px;margin-top: 20px">
                     <template #header>
                     <div class="clearfix">
@@ -173,6 +173,7 @@
                 </el-card>
             </div>
         </el-row>
+    </div>
         <el-row  v-show="active === 2" >
             <el-table :data="order_data" v-show="show_order_list" style="width: 1000px;margin-left: 80px;margin-top: 20px">
                 <el-table-column property="passenger_name" label="乘客姓名" ></el-table-column>
@@ -280,9 +281,13 @@ import { ElMessage } from 'element-plus';
                     type: 'error',
                 })}
                         this.active=0
-                    }
+                    }else{
                     console.log("到达1")
-                    this.getTicketCount();
+                    this.$message({
+                        type: 'message',
+                        message: '查询成功'
+                    });
+                    this.getTicketCount();}
                 }
                 if(this.active == 2)
                 {
@@ -388,10 +393,6 @@ import { ElMessage } from 'element-plus';
                         
                         this.dialogTableVisible = true
                  }
-                 this.$message({
-                        type: 'message',
-                        message: '查询成功'
-                    });
                 }).catch((error) => {
                 console.log(error);
                 if(error.response.status==401 || this.isLogin==false)
@@ -675,6 +676,12 @@ import { ElMessage } from 'element-plus';
 
 <style lang="less" scoped>
     @import '../assets/mixin.less';
+    .rowContainer{
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
     .explain_text{
         margin-top: 20px;
         text-align: center;
