@@ -13,13 +13,13 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../imgs/whitebg.jpg');
+    background-image: url('../imgs/xqbj.jpg');
     /* background-image: url('https://webstatic.mihoyo.com/upload/op-public/2022/08/10/706e1d017fa0c693609803d9c82014a9_6896184362091703764.png'); */
     background-size: cover;
     background-repeat: repeat-y;
     transition: filter 0.5s ease;
     z-index: -1;
-    filter: blur(10px);
+    filter: blur(1px);/*模糊程度*/
 }
 
 
@@ -54,9 +54,10 @@ h1{
     text-align: center;
     /* 颜色渐变 */
     /* background-image: linear-gradient(to right, orange, purple); */
-    background-image:(--bg-color);
+    /* background-image:(--bg-color); */
     -webkit-background-clip: text;
     font-size: 30px;
+    color: #99CCFF;
 }
 
 a{

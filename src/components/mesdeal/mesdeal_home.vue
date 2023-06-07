@@ -59,7 +59,7 @@ export default {
 
  .optimized-carousel {
   width: 100%; /* 设置走马灯的宽度为100% */
-  height: 100%; /* 设置走马灯的高度为100% */
+  height: 600px; /* 设置走马灯的高度为100% */
   transform: scale(1); /* 缩小至90% */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 边缘模糊化加重影处理 */
   perspective: 1000px; /* 加强立体效果 */
@@ -73,6 +73,7 @@ export default {
 .table1{
     padding: 0 18.5rem 0 19.75rem;
     text-align: center;
+    
 }
 
 .demo-image .block {

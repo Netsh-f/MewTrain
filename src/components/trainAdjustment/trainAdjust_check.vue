@@ -352,7 +352,7 @@ export default {
                         const train_name2 = b.train_name;
                         const compareResult = train_name1.localeCompare(train_name2);
                         if (compareResult !== 0) {
-                            return -compareResult;
+                            return compareResult;
                         }
                         return 0; // 返回 0 表示 a 和 b 相等
                     });
