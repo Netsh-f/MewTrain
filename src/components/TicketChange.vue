@@ -59,7 +59,7 @@
                 </el-table-column>
                 <el-table-column label="到达时间" prop="arrive_time">
                 </el-table-column>
-                <el-table-column label="商务/软卧" prop="high_seat_count">
+                <el-table-column label="特等座/软卧" prop="high_seat_count">
                 </el-table-column>
                 <el-table-column label="一等座/硬卧" prop="medium_seat_count">
                 </el-table-column>
@@ -92,7 +92,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 export default {
     computed: {
         ...mapState(["token"]),
-        ...mapState(["isLogin"]),
+    ...mapState(["isLogin"]),
     },
     data() {
         return {
@@ -356,8 +356,8 @@ export default {
             let year = date1.getFullYear()
             let month = String(date1.getMonth() + 1).padStart(2, '0')
             let day = String(date1.getDate()).padStart(2, '0')
-            /*check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
-            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price) */
+/*check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
+scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price) */
             console.log(new_order)
             const new_date = `${year}-${month}-${day}`;
             let carriage_type = '';
