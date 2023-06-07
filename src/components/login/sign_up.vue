@@ -5,16 +5,16 @@
       <h2 class="form_title title">创建您的帐号，我们一起出发！</h2>
 
       <el-form-item prop="Name">
-        <el-input v-model="UserRegisterInfo.Name" type="text" placeholder="用户名"></el-input>
+        <el-input v-model="UserRegisterInfo.Name" type="text" placeholder="用户名" class="input_login"></el-input>
       </el-form-item>
       <el-form-item prop="Email">
-        <el-input v-model="UserRegisterInfo.Email" type="text" placeholder="邮箱"></el-input>
+        <el-input v-model="UserRegisterInfo.Email" type="text" placeholder="邮箱" class="input_login"></el-input>
       </el-form-item>
       <el-form-item prop="PassWord">
-        <el-input v-model="UserRegisterInfo.PassWord" type="password" placeholder="密码"></el-input>
+        <el-input v-model="UserRegisterInfo.PassWord" type="password" placeholder="密码" class="input_login"></el-input>
       </el-form-item>
       <el-form-item prop="RePassWord">
-        <el-input v-model="UserRegisterInfo.RePassWord" type="password" placeholder="确认密码"></el-input>
+        <el-input v-model="UserRegisterInfo.RePassWord" type="password" placeholder="确认密码" class="input_login"></el-input>
       </el-form-item>
       <button class="form__button button submit" type="primary" @click="submitForm" style="margin-top: 10px;">注册</button>
     </el-form>
@@ -137,7 +137,7 @@ export default {
 <style scoped>
 @import '../../assets/login.css';
 
-.el-input {
-  width: 400px;
+.input_login{
+    width: 250px;
 }
 </style>
