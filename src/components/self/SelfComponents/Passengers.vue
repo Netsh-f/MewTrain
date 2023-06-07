@@ -83,15 +83,15 @@
         <el-form-item label="地区" :label-width="formLabelWidth">
           <el-select v-model="new_passenger.phone_region" placeholder="请选择您所在的地区号">
             <el-option label="中国" value="86" />
-            <el-option label="美国" value="1" />
+            <el-option label="美国" value="01" />
             <el-option label="日本" value="81" />
             <el-option label="韩国" value="82" />
             <el-option label="英国" value="44" />
             <el-option label="法国" value="33" />
             <el-option label="德国" value="94" />
-            <el-option label="俄罗斯" value="1" />
+            <el-option label="俄罗斯" value="07" />
             <el-option label="越南" value="84" />
-            <el-option label="印度" value="7" />
+            <el-option label="印度" value="91" />
           </el-select>
         </el-form-item>
         <el-form-item label="优惠类型" :label-width="formLabelWidth">
