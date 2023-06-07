@@ -137,6 +137,8 @@ def add_ticket(request):
 
         current_date = start_date
         while current_date <= end_date:
+            if carriages[0].ticket_set.all().first() is not None:
+                continue
             for carriage in carriages:
                 ticket = Ticket.objects.create(
                     date=datetime.combine(current_date, datetime.min.time()),
@@ -843,6 +845,10 @@ def rebook(request):
         start_stop = Stop.objects.get(id=data.get('start_stop_id'))
         if original_order.start_stop.station.city != start_stop.station.city:
             message = '出发地与原订单不相同'
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        if datetime.now() - original_order.create_time > timedelta(hours=24):
+            message = '已超过24小时，无法改签'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         order = create_order_function(user_id, data)  # 这里复用了
