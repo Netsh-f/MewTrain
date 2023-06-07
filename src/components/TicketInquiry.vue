@@ -48,7 +48,7 @@
                 <el-switch
                     style="margin-top: 30px;margin-left: 20px"
                     v-model="value1"
-                    @click.self="handelUpdate()"
+                    @click="handelUpdate()"
                     inactive-text="按开车时间排序"
                     active-text="按运行时间排序">
                 </el-switch>
@@ -99,7 +99,7 @@
                             type="Success"
                             @click="check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
                             scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price
-                            ,scope.row.high_seat.count,scope.row.medium_seat.count,row.scope.low_seat_count)">预定
+                            ,scope.row.high_seat_count,scope.row.medium_seat_count,scope.row.low_seat_count)">预定
                         </el-button>
                     </template>
                 </el-table-column>
@@ -208,19 +208,26 @@
             }
         },
         methods: {
+            handelUpdate()
+            {
+                console.log(this.value1)
+                this.TrainRank();
+
+            },
             check1(){
                 console.log(this.token);
             },
 
             TrainRank()
             {
+                console.log(this.value1)
                 if(this.value1 === false)
                 {
                     for(let i = 0 ; i < this.tableData.length ; i++)
                     {
                         for(let j = 0 ; j <this.tableData.length - i -1 ; j++ )
                         {
-                            if(this.transferTime(this.tableData[j].start_time) >this.transferTime(this.tableData[j+1].start_time))
+                            if(this.tableData[j].start_time >this.tableData[j+1].start_time)
                             {
                                 let temp = this.tableData[j];
                                 this.tableData[j] = this.tableData[j+1];
@@ -235,7 +242,7 @@
                     {
                         for(let j = 0 ; j <this.tableData.length - i -1 ; j++ )
                         {
-                            if(this.transferTime(this.tableData[j].running_time) >this.transferTime(this.tableData[j+1].running_time))
+                            if(this.tableData[j].running_time >this.tableData[j+1].running_time)
                             {
                                 let temp = this.tableData[j];
                                 this.tableData[j] = this.tableData[j+1];
@@ -245,12 +252,7 @@
                     }
                 }
             },
-            transferTime(time)
-            {
-                let time2 = time.split(":");
-                let second =  parseInt(time2[0]) *60   + parseInt(time2[1]);
-                return second;
-            },
+
             check(index,datetime,train_no,start_no,end_no,train_number,high_seat_price,medium_seat_price,low_seat_price,high_seat_count,
             medium_seat_count,low_seat_count)
             {           
@@ -344,7 +346,7 @@
                                     tableData.high_seat_count = response.data.data[i].ticket.SND.count;
                                     tableData.medium_seat_count = response.data.data[i].ticket.FST.count ;
                                     tableData.low_seat_count = response.data.data[i].ticket.BUS.count;
-                                    tableData.running_time=response.data.data[i].total_duration
+                                    tableData.running_time=response.data.data[i].duration_seconds;
                                     tableData.end_no = response.data.data[i].end_stop_id
                                     tableData.start_no =response.data.data[i].start_stop_id;
                                     this.tableData.push(tableData);
@@ -361,7 +363,7 @@
                                     tableData.high_seat_price = response.data.data[i].ticket.HAW.price;
                                     tableData.medium_seat_count = response.data.data[i].ticket.HAZ.price ;
                                     tableData.low_seat_count = response.data.data[i].ticket.SOF.price;
-                                    tableData.running_time=response.data.data[i].total_duration
+                                    tableData.running_time=response.data.data[i].duration_seconds
                                     tableData.high_seat_count = response.data.data[i].ticket.HAW.count;
                                     tableData.medium_seat_count = response.data.data[i].ticket.HAZ.count ;
                                     tableData.low_seat_count = response.data.data[i].ticket.SOF.count;
@@ -411,11 +413,6 @@
         },
         //对查询的信息进行排序
 
-            handelUpdate()
-            {
-                this.TrainRank();
-
-            },
            
 
     }
