@@ -5,7 +5,7 @@
         <meta http-equiv="Pragma" content="no-cache">
 
         <el-form :model="searchForm"  ref="searchForm">
-            <el-row :gutter="20" style="margin-left: 180px;margin-top: 10px;width: 1000px">
+            <el-row :gutter="20" style="margin-left: 120px;margin-top: 10px;width: 1000px">
                 <el-col :span="6"><div class="grid-content bg-purple">
                     <el-autocomplete
                         class="inline-input"
@@ -42,7 +42,7 @@
                         </el-date-picker>
                     </div>
                 </div></el-col>
-                <el-col :span="6"><div class="grid-content bg-purple">
+                <el-col :span="4"><div class="grid-content bg-purple">
                     <!-- 点击时调用submitForm函数并传递 searchForm参数-->
                     <el-button type="primary" round  @click="submitForm('searchForm')">搜索</el-button>
                 </div></el-col>
@@ -314,7 +314,7 @@
                         arrival_city:this.searchForm.end_station,
                         date:`${year}-${month}-${day}`,
                     },{
-             headers:{
+                    headers:{
                    "Authorization":this.token
                      }
                 }) 
