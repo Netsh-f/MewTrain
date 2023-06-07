@@ -347,6 +347,15 @@ export default {
                 .then((res)=>{
                     console.log(res);
                     this.tableData=res.data.data;
+                    this.tableData.sort((a, b) => {
+                        const train_name1 = a.train_name;
+                        const train_name2 = b.train_name;
+                        const compareResult = train_name1.localeCompare(train_name2);
+                        if (compareResult !== 0) {
+                            return -compareResult;
+                        }
+                        return 0; // 返回 0 表示 a 和 b 相等
+                    });
                 }).catch((error) => {
                 console.log(error);
                 if(error.response.status==401 || this.isLogin==false)

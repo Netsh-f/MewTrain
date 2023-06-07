@@ -307,13 +307,6 @@ export default {
                     return { ...item, list: [] };
                 });
                 this.tableData.sort((a, b) => {
-                const userType1 = a.usertype;
-                const userType2 = b.usertype;
-                // 按照 user_type 进行比较
-                const compareResult = userType1.localeCompare(userType2);
-                if (compareResult !== 0) {
-                    return -compareResult;
-                }
                 // 如果 user_type 相等，则按照 id 进行比较
                 const id1 = a.id;
                 const id2 = b.id;
@@ -321,6 +314,13 @@ export default {
                     return -1; // 返回负数表示 a 排在 b 前面
                 } else if (id1 > id2) {
                     return 1; // 返回正数表示 a 排在 b 后面
+                }
+                const userType1 = a.usertype;
+                const userType2 = b.usertype;
+                // 按照 user_type 进行比较
+                const compareResult = userType1.localeCompare(userType2);
+                if (compareResult !== 0) {
+                    return -compareResult;
                 }
                 return 0; // 返回 0 表示 a 和 b 相等
                 });
