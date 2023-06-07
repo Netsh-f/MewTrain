@@ -129,10 +129,10 @@ def add_ticket(request):
         end_date = datetime.strptime(data.get('end_date', None), "%Y-%m-%d")  # 包含开始日期和结束日期，它们可以是同一天，将创建两个日期中间所有日期的票
         train_name = data.get('train_name', None)
         train = Train.objects.get(name=train_name)
-        # 重复判断
-        if Ticket.objects.filter(train=train):
-            message = '不可重复添加'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        # # 重复判断
+        # if Ticket.objects.filter(train=train):
+        #     message = '不可重复添加'
+        #     return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         carriages = train.carriage_set.all()
 
         current_date = start_date
