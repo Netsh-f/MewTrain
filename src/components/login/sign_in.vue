@@ -57,8 +57,14 @@ export default {
                     const token = response.data.data.token;
                     console.log(token)
                     store.commit("setToken", token);
-                    store.commit("setLogin",true)
-                    router.push({ path: "/WELCOME" });
+                    store.commit("setLogin",true);
+                    store.commit("setUserID",response.data.data.user_id);
+                    if(response.data.data.user_type==='user'){
+                    router.push({ path: "/WELCOME" });}
+                    else if(response.data.data.user_type==='system_admin'){
+                    router.push({ path:'/mesdeal1' });}
+                    else if(response.data.data.user_type==='railway_admin'){
+                    router.push({ path:'/trainAdjust1' });}
                     })
                     .catch((error) => {
                     console.log(error);
@@ -86,6 +92,6 @@ export default {
 <style scoped>
 @import '../../assets/login.css';
 .el-input{
-  width: 550px;
+  width: 200px;
 }
 </style>

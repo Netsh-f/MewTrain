@@ -64,7 +64,31 @@ export default {
     };
 
     const submitForm = () => {
-
+      if(UserRegisterInfo.value.Name===''){
+        ElMessageBox.alert('用户名不能为空', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }else if(UserRegisterInfo.value.Email===''){
+        ElMessageBox.alert('邮箱不能为空', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }else if(UserRegisterInfo.value.PassWord===''){
+        ElMessageBox.alert('密码不能为空', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }else if(UserRegisterInfo.value.RePassWord===''){
+        ElMessageBox.alert('密码不能为空', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }
       form.value.validate(async (valid) => {
         if (valid) {
 
@@ -83,11 +107,14 @@ export default {
             email: UserRegisterInfo.value.Email
           }).then((response) => {
             console.log(response)
-            ElMessage({
-                    showClose: true,
-                    message: '注册成功',
-                    type: 'success',
-                })
+                ElMessageBox.alert('用户注册成功', '注册成功', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            UserRegisterInfo.value.Name='';
+            UserRegisterInfo.value.Email='';
+            UserRegisterInfo.value.PassWord='';
+            UserRegisterInfo.value.RePassWord='';
             router.push({ path: "/Login" });
           })
             .catch((error) => {
