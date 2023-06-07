@@ -7,6 +7,7 @@ import store from './store'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import mitt from 'mitt'
 import './assets/global.css'
+import './assets/icon/right/iconfont.css'
 
 const app = createApp(App)
 

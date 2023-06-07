@@ -18,6 +18,7 @@
                         {{item}}
                     </template></el-autocomplete>
                 </div></el-col>
+                <i class="iconfont icon-jiantou_xiangyou_o" style=" font-size:50px;opacity: 0.5"></i>
                 <el-col :span="6"><div class="grid-content bg-purple" style="margin-left: 20px">
                     <el-autocomplete
                         class="inline-input"
