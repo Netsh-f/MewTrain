@@ -1,19 +1,14 @@
 <template>
   <div class="container b-container" id="b-container">
     <el-form class="form" ref="form" :model="UserLoginInfo" :rules="rules">
-      <h2 class="form_title title">Sign in to Website</h2>
-      <div class="form__icons">
-        <img class="form__icon" src=" ">
-        <img class="form__icon" src=" ">
-        <img class="form__icon" src=" ">
-      </div>
+      <h4 class="form_title title">请输入账号，共同开启列车旅程吧！</h4>
       <el-form-item prop="Name">
-        <el-input v-model="UserLoginInfo.Name" type="text" placeholder="用户名"></el-input>
+        <el-input v-model="UserLoginInfo.Name" type="text" placeholder="用户名" style="background-color: transparent;"></el-input>
       </el-form-item>
       <el-form-item prop="PassWord">
         <el-input v-model="UserLoginInfo.PassWord" type="password" placeholder="密码"></el-input>
       </el-form-item>
-      <el-button class="form__button button submit" type="primary" @click="submitForm">SIGN IN</el-button>
+      <el-button class="form__button button submit" type="primary" @click="submitForm">登录</el-button>
     </el-form>
   </div>
 </template>
@@ -23,7 +18,7 @@ import axios from "axios";
 import { ref } from 'vue';
 import router from "@/router"; // 导入Vue.js路由器
 import { useStore } from "vuex";
-
+import { ElMessageBox,ElMessage } from "element-plus";
 export default {
   setup() {
     const store = useStore();
@@ -67,6 +62,10 @@ export default {
             router.push({ path: "/WELCOME" });
           })
             .catch((error) => {
+              ElMessageBox.alert(error.response.data.message, '登陆失败', {
+                  confirmButtonText: '确定',
+                  showClose:false
+                });
               console.log(error);
             });
         }
@@ -74,9 +73,6 @@ export default {
 
 
     };
-
-
-
     return { UserLoginInfo, form, rules, submitForm, check };
   },
 };
@@ -86,5 +82,5 @@ export default {
 @import '../../assets/login.css';
 
 .el-input {
-  width: 550px;
+  width: 200px;
 }</style>

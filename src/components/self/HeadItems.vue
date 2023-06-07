@@ -9,10 +9,17 @@
           <el-dropdown-item command="selfCenter">个人中心</el-dropdown-item>
           <el-dropdown-item command="recharge">充值</el-dropdown-item>
           <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+          
         </el-dropdown-menu>
       </template>
     </el-dropdown>
+
+
+
   </template>
+
+
+
   
 <script>
     import Head from './Head'
@@ -20,6 +27,11 @@
     import { mapMutations } from "vuex";
     export default{
         name:'HeadItems',
+        data(){
+          return{
+            dialog:false,
+          }
+        },
         components:{
             // eslint-disable-next-line vue/no-unused-components
             ArrowDown,
