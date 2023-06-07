@@ -252,6 +252,7 @@ import { ElMessage } from 'element-plus';
                 dialogFormVisible_wx:false,
                 dialogFormVisible_zfb:false,
                 passengerIds:[],
+                seatType:"",
             };
         },
 
@@ -294,6 +295,7 @@ import { ElMessage } from 'element-plus';
                 })
                 this.active=1
                     }
+                    this.show_passenger=false,
                     console.log("到达2")
                     this.handle();
                 }
@@ -471,17 +473,18 @@ import { ElMessage } from 'element-plus';
                 console.log(this.checkList);
                 if(this.train_no=='HSR')
                 {
-                    const seatType="BUS";
+                    console.log("下面是choose_seat")
+                    console.log(this.choose_seat)
                     if(this.choose_seat==0)
                     this.seatType="BUS";
                     else if(this.choose_seat==1)
                     this.seatType="FST";
-                    else
+                    else if(this.choose_seat==2)
                     this.seatType="SND"
                     axios.post('/api/train/create_order/',{
                         user_id:4,
                         train_name:this.train_number,
-                        carriage_type:seatType,
+                        carriage_type:this.seatType,
                         date:this.datetime,
                         start_stop_id:this.start_no,
                         end_stop_id:this.end_no,
@@ -532,17 +535,16 @@ import { ElMessage } from 'element-plus';
                 else{
                     if(this.train_no=='REG')
                     {
-                        const seatType="SOF";
                         if(this.choose_seat==0)
                         this.seatType="SOF";
                         else if(this.choose_seat==1)
                         this.seatType="HAW";
-                        else
+                        else if(this.choose_seat==2)
                         this.seatType="HAZ"
                         axios.post('/api/train/create_order/',{
                         user_id:4,
                         train_name:this.train_number,
-                        carriage_type:seatType,
+                        carriage_type:this.seatType,
                         date:this.datetime,
                         start_stop_id:this.start_no,
                         end_stop_id:this.end_no,
