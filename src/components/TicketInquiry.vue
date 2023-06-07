@@ -98,7 +98,8 @@
                             size="mini"
                             type="Success"
                             @click="check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
-                            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price)">预定
+                            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price
+                            ,scope.row.high_seat.count,scope.row.medium_seat.count,row.scope.low_seat_count)">预定
                         </el-button>
                     </template>
                 </el-table-column>
@@ -109,7 +110,7 @@
 </template>
 <script>
     import axios from "axios";
-    import { ElMessage } from 'element-plus'
+    import { ElMessage,ElMessageBox } from 'element-plus'
     import router from "@/router";
     import { mapState } from "vuex";
     export default {
@@ -250,10 +251,16 @@
                 let second =  parseInt(time2[0]) *60   + parseInt(time2[1]);
                 return second;
             },
-            check(index,datetime,train_no,start_no,end_no,train_number,high_seat_price,medium_seat_price,low_seat_price)
+            check(index,datetime,train_no,start_no,end_no,train_number,high_seat_price,medium_seat_price,low_seat_price,high_seat_count,
+            medium_seat_count,low_seat_count)
             {           
-                        
-                const date1 = new Date(this.searchForm.datetime)
+                if(high_seat_count==0&& medium_seat_count==0&& low_seat_count==0){
+                    ElMessageBox.alert('改车次车票已经售完，请重新选择', {
+                    confirmButtonText: '确定',
+                    showClose: false
+                });
+                }       else{
+                        const date1 = new Date(this.searchForm.datetime)
                         const year = date1.getFullYear()
                         const month = String(date1.getMonth() + 1).padStart(2, '0')
                         const day = String(date1.getDate()).padStart(2, '0')
@@ -275,6 +282,7 @@
                             temp: Temp
                             }
                         })
+                    }
             },
             checkTime: (i) => {
                     if (i < 10) {

@@ -9,7 +9,7 @@
             <el-step title="付款"></el-step>
             <el-step title="订票成功"></el-step>
         </el-steps>
-        <el-table :data="passenger_data" v-show="show_passenger" style="width: 1000px;margin-left: 80px;margin-top: 20px">
+        <el-table :data="passenger_data" v-show="show_passenger" style="width: 1000px;margin-left: 200px;margin-top: 20px">
 
             <el-table-column property="passenger_real_name" label="乘客姓名"></el-table-column>
             <el-table-column property="passenger_phone_number" label="乘客电话号码"></el-table-column>
@@ -83,7 +83,7 @@
             </el-table>
 
         </div>
-        <div v-show="active === 1 && dialogTableVisible_GD" style="margin-top: 40px ;margin-left: 80px;">
+        <div v-show="active === 1 && dialogTableVisible_GD" style="margin-top: 40px ;margin-left: 200px;">
             <el-button @click="choose1">商务座</el-button>
             <el-button @click="choose2">一等座</el-button>
             <el-button @click="choose3">二等座</el-button>
@@ -201,7 +201,7 @@
                 </el-alert>
             </div>
         </el-row>
-        <el-button type="primary" round @click="back" style="margin-left: 250px;margin-top: 20px">返回主界面</el-button>
+        <el-button type="primary" round @click="back" style="margin-left: 200px;margin-top: 20px">返回主界面</el-button>
         <el-button type="primary" round @click="next" style="margin-left: 800px;margin-top: 20px" v-show="active != 2">下一步</el-button>
     </div>
 </template>
@@ -301,9 +301,18 @@ export default {
                     this.active = 1
                 }
                 else{
-                this.show_passenger = false,
                     console.log("到达2")
                 this.handle();
+                if(this.order_data.length==0)
+                {
+                  ElMessageBox.alert("您选择的车票已经售完,请重新选择", {
+                  confirmButtonText: '确定',
+                  showClose: false,
+                });
+                    this.active=1
+                }
+                else{
+                this.show_passenger = false}
                 }
             }
             if (this.active == 4) {
@@ -506,14 +515,6 @@ export default {
                     console.log(order1)
                 }).catch((error) => {
                     console.log(error);
-                    if (error.response.status == 401 || this.isLogin == false) {
-                        router.push({ path: "/Login" });
-                        ElMessage({
-                            showClose: true,
-                            message: '登录失效,请重新登录',
-                            type: 'error',
-                        })
-                    }
                 });
                 this.show_order_list = true;
             }
