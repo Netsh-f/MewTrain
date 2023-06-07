@@ -49,6 +49,7 @@
                         </div>
                       </el-card>
                 </div>
+                <!-- <img src="https://webstatic.mihoyo.com/upload/op-public/2023/05/30/e70210b1e339914842f4a19f6845abf7_237256773028712797.png" z-index="-1"/> -->
 
             
         </div>
@@ -122,6 +123,21 @@ export default {
 }
 </script>
 
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+.label {
+    margin-right: 10px;
+    font-weight: bold;
+    color:cornflowerblue;
+  }
+  
+.value {
+    font-family:Georgia;
+    font-size: 30px;
+    color: rgba(16, 45, 98, 0.758);
+}   
+</style>
+
 <style scoped>
 @import '../../assets/css/forMessage.css';
 @import 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css';
@@ -132,17 +148,21 @@ export default {
     align-items: stretch;
 }
 .card-content {
-    background-color: rgba(166, 205, 211, 0.7);
+    background-image: url("https://webstatic.mihoyo.com/upload/op-public/2023/05/30/e70210b1e339914842f4a19f6845abf7_237256773028712797.png"),url('https://webstatic.mihoyo.com/upload/op-public/2022/08/10/706e1d017fa0c693609803d9c82014a9_6896184362091703764.png');
+    
+    /*background-image: url('https://webstatic.mihoyo.com/upload/op-public/2022/08/10/706e1d017fa0c693609803d9c82014a9_6896184362091703764.png');*/
+    background-size:cover,auto;
+    background-position: center;
+    /*background-color: rgba(166, 205, 211, 0.7);*/
     opacity: 0.9;
   }
 .profile-sidebar {
     position: absolute;
-    top: 10%;
+    top: 25%;
     right: 0;
-    bottom: 10%;
+    bottom: 25%;
     width: 60%;
     background-color: rgba(0, 0, 0, 0.5);
-    color: #fff;
     padding: 10px;
     transition: transform 0.3s, box-shadow 0.3s;
     transform: translateX(100%);
@@ -150,7 +170,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 56vh;
     border-radius: 10px; /* 添加圆角 */
 }
   
@@ -158,23 +178,16 @@ export default {
     transform: translateX(0);
     box-shadow: -10px 0 20px rgba(0, 0, 0, 0.2);
 }
-  .info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 18px;
-  line-height: 1.5;
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    line-height: 1.5;
 }
 
-.label {
-  margin-right: 10px;
-  font-weight: bold;
-}
 
-.value {
-  font-size: 20px;
-}
 .sidebar-content {
 /* 侧边栏内容样式 */
 }
@@ -192,11 +205,11 @@ export default {
     padding:6px;
 }
 .flipped {
-animation-name: flip;
-animation-duration: 1s; /* 动画持续1秒 */
-animation-timing-function: linear;
-animation-iteration-count: 1; /* 动画重复两次 */
-left: 20.75rem; /* 资料卡的新位置 */
+    animation-name: flip;
+    animation-duration: 1s; /* 动画持续1秒 */
+    animation-timing-function: linear;
+    animation-iteration-count: 1; /* 动画重复两次 */
+    left: 20.75rem; /* 资料卡的新位置 */
 }
 .moveToLeft {
   animation: moveToLeft 0.5s forwards;
