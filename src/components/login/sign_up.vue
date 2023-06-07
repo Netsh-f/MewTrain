@@ -23,7 +23,7 @@
 <script>
 import axios from "axios";
 import { ref } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {  ElMessageBox } from 'element-plus'
 import router from "@/router"; // 导入Vue.js路由器
 
 export default {
@@ -138,6 +138,6 @@ export default {
 @import '../../assets/login.css';
 
 .el-input {
-  width: 200px;
+  width: 400px;
 }
 </style>
