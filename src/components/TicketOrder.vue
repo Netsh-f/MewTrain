@@ -200,9 +200,8 @@
                 </el-alert>
             </div>
         </el-row>
-
-        <el-button type="primary" round @click="next" style="margin-left: 500px;margin-top: 30px" v-show="active != 2">下一步</el-button>
-        <el-button type="primary" round @click="back" style="margin-left: 500px;margin-top: 30px">返回主界面</el-button>
+        <el-button type="primary" round @click="back" style="margin-left: 250px;margin-top: 20px">返回主界面</el-button>
+        <el-button type="primary" round @click="next" style="margin-left: 800px;margin-top: 20px" v-show="active != 2">下一步</el-button>
     </div>
 </template>
 
@@ -300,9 +299,11 @@ import { ElMessage } from 'element-plus';
                 })
                 this.active=1
                     }
+                    else{
                     this.show_passenger=false,
                     console.log("到达2")
                     this.handle();
+                    }
                 }
                 if(this.active == 4)
                 {
@@ -395,15 +396,6 @@ import { ElMessage } from 'element-plus';
                  }
                 }).catch((error) => {
                 console.log(error);
-                if(error.response.status==401 || this.isLogin==false)
-                {
-                    router.push({ path: "/Login" });
-                    ElMessage({
-                    showClose: true,
-                    message: '登录失效,请重新登录',
-                    type: 'error',
-                })
-                }
             });
                        
             },
@@ -677,7 +669,7 @@ import { ElMessage } from 'element-plus';
 <style lang="less" scoped>
     @import '../assets/mixin.less';
     .rowContainer{
-        margin: auto;
+        margin-left:100px;
         justify-content: center;
         align-items: center;
         height: 100%;
