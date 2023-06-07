@@ -18,7 +18,7 @@
                 </el-col>
                 <el-col :span="6">
                     <div class="grid-content bg-purple" style="margin-left: 20px">
-                        <el-autocomplete disabled class="inline-input" v-model="searchForm.end_station"
+                        <el-autocomplete  class="inline-input" v-model="searchForm.end_station"
                             :fetch-suggestions="query => searchElements2(query, index)" placeholder="请输入终点站"
                             :trigger-on-focus="true" @select="selectedItem => handleSelect2(selectedItem, index)">
                             <template v-slot="{ item }">
@@ -79,8 +79,6 @@
             <!-- Table -->
 
         </div>
-        <el-button @click="check1">点我点我</el-button>
-        <el-button @click="check2">123</el-button>
     </div>
 </template>
 <script>
@@ -404,7 +402,13 @@ scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,sco
                 })
                 .catch(function (error) {
                     console.log(error);
-                    if (error.response.status == 401 || this.isLogin == false) {
+                    if(error.response.status === 400){
+                        ElMessageBox.alert('已无座位，请重新选择', '改签失败', {
+                        confirmButtonText: '确定',
+                        showClose: false
+                    })
+                    }
+                    else if (error.response.status == 401 || this.isLogin == false) {
                         router.push({ path: "/Login" });
                         ElMessage({
                             showClose: true,

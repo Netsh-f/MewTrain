@@ -19,10 +19,14 @@
                             <el-table-column label="证件类型" prop="passenger_id_type" />
                             <el-table-column label="优惠类型" prop="ticket_type" />
                             <el-table-column label="车票价格" prop="price" />
-                            <el-table-column label="操作" width="200">
+                            <el-table-column label="操作" width="200" v-show="is_rebooked">
                                 <template #default="props2">
                                     <el-button size="mini" type="success"
-                                        @click="handleTicketchanges2(props.row, props2.row, props2.$index)">改签</el-button>
+                                        @click="handleTicketchanges2(props.row, props2.row, props2.$index)"
+                                        v-show='!props2.row.is_rebooked'>改签</el-button>
+                                    <el-button size="mini" type="primary"
+                                        @click="handleTicketchanges2(props.row, props2.row, props2.$index)"
+                                        v-show='props2.row.is_rebooked' disabled>已改签</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -96,7 +100,15 @@ export default {
             this.getLists();
         },
         handleRefundTicket(row) {
-
+            for(let i=0;i<row.passenger_order_data.length;i++){
+                if (row.passenger_order_data[i].is_rebooked) {
+                    ElMessageBox.alert('订单内已有乘车人改签，无法全部退款', '退款失败', {
+                        confirmButtonText: '确定',
+                        showClose: false
+                    });
+                    return;
+                }
+            }
             let id = row.order_id;
             axios.post('/api/train/return_order/', {
                 order_id: id,
@@ -129,8 +141,14 @@ export default {
             console.log(row)
             let passengers = []
             for (let i = 0; i < row.passenger_order_data.length; i++) {
-                passengers.push(row.passenger_order_data[i].passenger_id
-)
+                if (row.passenger_order_data[i].is_rebooked) {
+                    ElMessageBox.alert('订单内已有乘车人改签，无法全部改签', '改签失败', {
+                        confirmButtonText: '确定',
+                        showClose: false
+                    });
+                    return;
+                }
+                passengers.push(row.passenger_order_data[i].passenger_id)
             }
             let order = {
                 order_id: row.order_id,
@@ -239,6 +257,7 @@ export default {
                         }
 
                     }
+                    console.log(this.tableData)
                 })
                 .catch((error) => {
                     console.log(error);
@@ -254,6 +273,7 @@ export default {
         }
     },
     mounted() {
+
         axios.post('/api/train/get_order_list/', {
             user_id: 4
         }, {
