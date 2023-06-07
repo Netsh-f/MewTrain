@@ -138,6 +138,6 @@ export default {
 @import '../../assets/login.css';
 
 .el-input {
-  width: 200px;
+  width: 400px;
 }
 </style>

@@ -92,6 +92,6 @@ export default {
 <style scoped>
 @import '../../assets/login.css';
 .el-input{
-  width: 550px;
+  width: 400px;
 }
 </style>
