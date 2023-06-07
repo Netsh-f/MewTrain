@@ -607,6 +607,13 @@ import { ElMessage } from 'element-plus';
 
                 }).catch((error) => {
                 console.log(error);
+                if(error.response.status==402){
+                    ElMessage({
+                    showClose: true,
+                    message: '余额不足，请先充值',
+                    type: 'error',
+                })
+                }
                 if(error.response.status==401 || this.isLogin==false)
                 {
                     router.push({ path: "/Login" });

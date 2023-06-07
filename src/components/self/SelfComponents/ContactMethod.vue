@@ -145,15 +145,24 @@ export default {
       this.person.isedit = false;
     },
     changePassword() {
-      if (this.old_password !== this.person.password) {
-        ElMessageBox.alert('密码错误', '修改失败', {
-          confirmButtonText: '确定',
-          showClose: false
-        });
-        this.old_password='';
-        this.new_password='';
-        this.dialog=false;
-        return;
+      if(this.old_password===''){
+        ElMessageBox.alert('原密码不能为空', '修改失败', {
+            confirmButtonText: '确定',
+            showClose: false
+          });
+          return;
+      }else if(this.new_password===''){
+        ElMessageBox.alert('新密码不能为空', '修改失败', {
+            confirmButtonText: '确定',
+            showClose: false
+          });
+          return;
+      }else if(this.old_password===this.new_password){
+        ElMessageBox.alert('两次密码不能相同', '修改失败', {
+            confirmButtonText: '确定',
+            showClose: false
+          });
+          return;
       }
       axios.post('/api/user/update_user_info/', {
         password: {
@@ -168,16 +177,22 @@ export default {
         .then((response) => {
           console.log(response.data);
           ElMessageBox.alert('密码修改成功！', '修改成功', {
-          confirmButtonText: '确定',
-          showClose: false
-        });
-        this.old_password='';
-        this.new_password='';
-        this.dialog=false;
+            confirmButtonText: '确定',
+            showClose: false
+          });
+          this.old_password = '';
+          this.new_password = '';
+          this.dialog = false;
         })
         .catch((error) => {
           console.log(error);
-          if (error.response.status == 401 || this.isLogin == false) {
+          if (error.response.status == 400) {
+            ElMessageBox.alert('原密码不正确', '修改失败', {
+              confirmButtonText: '确定',
+              showClose: false
+            })
+          }
+          else if (error.response.status == 401 || this.isLogin == false) {
             router.push({ path: "/Login" });
             ElMessage({
               showClose: true,
