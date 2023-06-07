@@ -107,7 +107,7 @@ export default {
             email: UserRegisterInfo.value.Email
           }).then((response) => {
             console.log(response)
-                ElMessageBox.alert('用户注册成功', '注册成功', {
+                ElMessageBox.alert('用户注册成功,请返回登录', '注册成功', {
                   confirmButtonText: '确定',
                   showClose: false
                 });

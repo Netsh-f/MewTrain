@@ -59,6 +59,11 @@ export default {
             store.commit("setToken", token);
             store.commit("setLogin", true);
             store.commit("setUserID", response.data.data.user_id);
+            ElMessage({
+                    showClose: true,
+                    message: '登陆成功！',
+                    type: 'success',
+                })
             if (response.data.data.user_type === 'user') {
               router.push({ path: "/WELCOME" });
             }
