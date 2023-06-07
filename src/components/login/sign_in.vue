@@ -1,7 +1,7 @@
 <template>
   <div class="container b-container" id="b-container">
     <el-form class="form" ref="form" :model="UserLoginInfo" :rules="rules">
-      <h2 class="form_title title">Sign in to Website</h2>
+      <h2 class="form_title title">请输入帐号，共同开启列车旅程吧</h2>
       <div class="form__icons">
         <img class="form__icon" src=" ">
         <img class="form__icon" src=" ">
@@ -13,7 +13,7 @@
       <el-form-item prop="PassWord">
         <el-input v-model="UserLoginInfo.PassWord" type="password" placeholder="密码"></el-input>
       </el-form-item>
-      <el-button class="form__button button submit" type="primary" @click="submitForm" >SIGN IN</el-button>
+      <el-button class="form__button button submit" type="primary" @click="submitForm" >登录</el-button>
     </el-form>
   </div>
 </template>
@@ -92,6 +92,6 @@ export default {
 <style scoped>
 @import '../../assets/login.css';
 .el-input{
-  width: 200px;
+  width: 550px;
 }
 </style>
