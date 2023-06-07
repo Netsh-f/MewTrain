@@ -46,28 +46,28 @@ export default {
     },
     methods: {
         returnLast(){
-            window.location.hash = '/Home'
+            window.location.hash = '/Login'
         },
         switchAccount(){
             window.location.hash = '/Login'
         },
         unsubscribe(){
             console.log("正在尝试注销账号");
+        },
+        confirmForUnsub(){
             axios.post('/api/user/logoff/',{},{
                      headers:{
                         "Authorization":this.token
                      }
                 })
             .then((res)=>{
+                ElMessage({
+                    message:'注销成功！',
+                    type:'success',
+                })
                 console.log(res);
             }).catch((e)=>{
                 console.log(e);
-            })
-        },
-        confirmForUnsub(){
-            ElMessage({
-                message:'注销成功！',
-                type:'success',
             })
         },
     }
