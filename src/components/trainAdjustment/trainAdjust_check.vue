@@ -33,11 +33,11 @@
                         <!-- 动态添加的站点表单项 -->
                         <el-form-item v-for="(stop, index) in form.stops" :key="index" :label="'站点 ' + (index + 1)">
                             <el-row>
-                                <el-col :span="6">
+                                <!-- <el-col :span="6">
                                   <el-form-item label="序号">
                                     <el-input v-model="stop.sequence" autocomplete="off" />
                                   </el-form-item>
-                                </el-col>
+                                </el-col> -->
                                 <!-- 可能得需要实现站名自适应搜素补全 -->
                                 <el-col :span="6">
                                   <el-form-item label="站名">
@@ -68,11 +68,11 @@
                         <!-- 动态添加的车厢表单项 -->
                         <el-form-item v-for="(carriage, index) in form.carriages" :key="'carriage' + index" :label="'车厢 ' + (index + 1)">
                             <el-row>
-                                <el-col :span="12">
+                                <!-- <el-col :span="12">
                                   <el-form-item label="车厢号">
                                     <el-input v-model="carriage.carriage_num" autocomplete="off" />
                                   </el-form-item>
-                                </el-col>
+                                </el-col> -->
                                 <el-col :span="12" class="col-center">
                                   <el-form-item label="类型">
                                     <el-select v-model="carriage.carriage_type" placeholder="车厢类型" autocomplete="off" float="right">
@@ -260,7 +260,8 @@ export default {
             form:{
                 train_name: '',
                 train_type: '',
-                stops: [{
+                stops: [
+                {
                     sequence: '',
                     station_name: '',
                     arrival_time: '',
@@ -271,12 +272,23 @@ export default {
                 arrival_time: '',
                 duration: '',
                 }],
-                carriages: [{
+                carriages: [
+                {
                     carriage_num: '',
                     carriage_type: '',
                     total_num: '',
                     price: ''
-                }],
+                },{
+                    carriage_num: '',
+                    carriage_type: '',
+                    total_num: '',
+                    price: ''
+                },{
+                    carriage_num: '',
+                    carriage_type: '',
+                    total_num: '',
+                    price: ''
+                },],
             },
             Tform:{
                 train_name:'',
@@ -399,6 +411,12 @@ export default {
             });
         },
         asAdd(){
+            this.form.carriages.forEach((carriage, index) => {
+                carriage.carriage_num = index + 1;
+            });
+            this.form.stops.forEach((stop, index) => {
+                stop.sequence = index + 1;
+            });
             this.asAddFlag=true;
         },
         formCancel(){
@@ -444,6 +462,7 @@ export default {
                 });
             })
             .catch((error)=>{
+                console.log(error);
                 ElMessage.error("添加好像出了什么问题:"+error);
             });
             this.TicketFlag=false;
@@ -454,6 +473,9 @@ export default {
                 station_name: '',
                 arrival_time: '',
                 duration: '',
+            });
+            this.form.stops.forEach((stop, index) => {
+                stop.sequence = index + 1;
             });
         },
         removeStop(){
@@ -473,13 +495,16 @@ export default {
                 total_num:'',
                 price:'',
             });
+            this.form.carriages.forEach((carriage, index) => {
+                carriage.carriage_num = index + 1;
+            });
         },
         removeCarriage(){
-            if(this.form.carriages.length>1)
+            if(this.form.carriages.length>3)
                 this.form.carriages.pop();
             else{
                 ElMessage({
-                    message:'至少需要添加一个车厢！',
+                    message:'至少需要添加三个车厢！',
                     type:'error',
                 })
             }
