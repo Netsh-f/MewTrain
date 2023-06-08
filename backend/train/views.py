@@ -848,7 +848,12 @@ def rebook(request):
             message = '出发地与原订单不相同'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = create_order_function(user_id, data)  # 这里复用了
+        response = create_order_function(user_id, data)  # 这里复用了
+
+        if isinstance(response, Response):
+            return response
+
+        order = response
 
         origin_time = datetime.combine(original_order.date, original_order.start_stop.arrival_time)
         time = datetime.combine(order.date, order.start_stop.arrival_time)
