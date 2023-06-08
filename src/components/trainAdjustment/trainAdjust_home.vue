@@ -28,10 +28,11 @@ export default {
     data(){
         return{
             imgwrap:[
-              { url: require('../../assets/imgs/ChangSha1.jpg') },
-              { url: require('../../assets/imgs/TheGreatWall1.jpg') },
-              { url: require('../../assets/imgs/HongKong2.jpg') },
-              { url: require('../../assets/imgs/HongKong1.jpg') },
+    { url: require('../../assets/imgs/xz1.jpg') },
+    { url: require('../../assets/imgs/TheGreatWall1.jpg') },
+    { url: require('../../assets/imgs/xz3.jpg') },
+    { url: require('../../assets/imgs/xz4.jpg') },
+    { url: require('../../assets/imgs/HongKong1.jpg') },
             ]
         }
     },
