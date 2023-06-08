@@ -3,8 +3,10 @@
         <div class="blur-background"></div>
         <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
         href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/ ></fornav>
-        <h1>个人信息</h1>
-        <hr>
+        <div class="hcon">
+            <img src="../../assets/logo.png" alt="" class="lg">
+            <br><h1>个人信息</h1><br>
+        </div>
         <div class="table1">
             <div class="profile-card" :class="{ flipped: isFlipped, moveToLeft: moveToRight }" @click="flipCard">
                 <div class="card-header">
@@ -178,9 +180,6 @@ export default {
     box-shadow: -10px 0 20px rgba(0, 0, 0, 0.2);
 }
   
-.sidebar-content {
-/* 侧边栏内容样式 */
-}
 
 .info-row {
     display: flex;

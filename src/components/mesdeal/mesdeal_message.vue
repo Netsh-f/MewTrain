@@ -3,8 +3,10 @@
         <div class="blur-background"></div>
         <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
         href1=#/mesdeal1 href2=#/mesdeal2 href3=#/mesdeal3 href4=#/mesdeal4 href5=#/ ></fornav>
-        <h1>个人信息</h1>
-        <hr>
+        <div class="hcon">
+            <img src="../../assets/logo.png" alt="" class="lg">
+            <br><h1>个人信息</h1><br>
+        </div>
         <div class="table1">
                 <div class="profile-card" :class="{ flipped: isFlipped, moveToLeft: moveToRight }" @click="flipCard">
                     <div class="card-header">
@@ -187,10 +189,6 @@ export default {
     line-height: 1.5;
 }
 
-
-.sidebar-content {
-/* 侧边栏内容样式 */
-}
 .profile-card {
     position: absolute;
     top: 55%;

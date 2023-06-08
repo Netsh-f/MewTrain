@@ -2,9 +2,11 @@
   <div class="mycon">
     <div class="blur-background"></div>
     <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
-    href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/ ></fornav>
-    <h1 id="welcome">MewTrain欢迎您,尊敬的铁路系统员！</h1>
-    <hr>
+    href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/></fornav>
+    <div class="hcon">
+      <img src="../../assets/logo.png" alt="" class="lg">
+      <br><h1 id="welcome">MewTrain欢迎您,尊敬的铁路系统员！</h1><br>
+    </div>
     <div class="table1">
       <div class="block text-center">
           <span class="demonstration"></span>
@@ -41,6 +43,7 @@ export default {
 </script>
 
 <style scoped>
+
 .demonstration {
   color: var(--el-text-color-secondary);
 }
@@ -58,11 +61,13 @@ export default {
 }
 
 .optimized-carousel {
-  width: 100%; /* 设置走马灯的宽度为100% */
+  width: 1250px; /* 设置走马灯的宽度为100% */
   height: 600px; /* 设置走马灯的高度为100% */
   transform: scale(1); /* 缩小至90% */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 边缘模糊化加重影处理 */
   perspective: 1000px; /* 加强立体效果 */
+  border-radius: 40px;
+  margin-left: -20%;
 }
 .el-image {
   width: 100%; /* 设置图片的宽度为100% */
