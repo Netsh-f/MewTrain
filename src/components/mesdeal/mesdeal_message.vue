@@ -94,10 +94,10 @@ export default {
     name: "My_mesdeal_message",
     data(){
         return{
-            username: 'WXXXXX',
+            username: 'WX1',
             permission: 'Admin',
             age: 19,
-            email: 'buaa@buaa.com',
+            email: 'buaa1@buaa.com',
             AdminName:'MewTrain Admin',
             AdminName:'MewTrain Admin',
             isFlipped: false,

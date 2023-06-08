@@ -90,10 +90,10 @@ export default {
     name: "My_trainAdjust_message",
     data(){
         return{
-            username: 'WXXXXX',
+            username: 'WX2',
             permission: 'Admin',
             age: 19,
-            email: 'buaa@buaa.com',
+            email: 'buaa2@buaa.com',
             AdminName:'MewTrain Admin',
             isFlipped: false,
             moveToRight: false,
