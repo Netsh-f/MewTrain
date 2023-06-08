@@ -858,10 +858,10 @@ def rebook(request):
         logger.error(data)
         logger.error(f'original_order.date:{type(original_order.date)}')
         logger.error(f'original_order.start_stop.arrival_time:{type(original_order.start_stop.arrival_time)}')
-        logger.error(f'order.date.date:{type(order.date)}')
+        logger.error(f'order.date:{type(order.date)}')
         logger.error(f'order.start_stop.arrival_time:{type(order.start_stop.arrival_time)}')
         origin_time = datetime.combine(original_order.date, original_order.start_stop.arrival_time)
-        time = datetime.combine(order.date, order.start_stop.arrival_time)
+        time = datetime.combine(datetime.strptime(order.date, '%Y-%m-%d').date(), order.start_stop.arrival_time)
         if origin_time - time > timedelta(hours=24) or time - origin_time > timedelta(hours=24):
             message = '已超过24小时，无法改签'
             order.delete()
