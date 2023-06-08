@@ -40,13 +40,44 @@ export default {
 
     const rules = {
       Name: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
+        { required: true, message: '请输入用户名，长度在3-16之间', trigger: 'blur' },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length<3||value.length>16) {
+              callback(new Error("用户名长度应在3-16字符之间"));
+            } else {
+              callback();
+            }
+          },
+          trigger: "blur",
+        },
       ],
       Email: [
         { required: true, message: '请输入邮箱', trigger: 'blur' },
+        {
+          validator: (rule, value, callback) => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+              callback(new Error("邮箱格式有误"));
+            } else {
+              callback();
+            }
+          },
+          trigger: "blur",
+        },
       ],
       PassWord: [
-        { required: true, message: '请输入密码', trigger: 'blur' },
+        { required: true, message: '请输入密码，长度在8-16之间', trigger: 'blur' },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length<8||value.length>16) {
+              callback(new Error("密码长度应在8-16字符之间"));
+            } else {
+              callback();
+            }
+          },
+          trigger: "blur",
+        },
       ],
       RePassWord: [
         { required: true, message: '请确认密码', trigger: 'blur' },
@@ -84,6 +115,26 @@ export default {
             return;
       }else if(UserRegisterInfo.value.RePassWord===''){
         ElMessageBox.alert('密码不能为空', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }else if(UserRegisterInfo.value.RePassWord!==UserRegisterInfo.value.PassWord){
+        ElMessageBox.alert('两次输入的密码不一致', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }
+      else if(UserRegisterInfo.value.Name.length<3||UserRegisterInfo.value.Name.length>16){
+        ElMessageBox.alert('用户名长度应在3-16字符之间', '注册失败', {
+                  confirmButtonText: '确定',
+                  showClose: false
+                });
+            return;
+      }
+      else if(UserRegisterInfo.value.PassWord.length<8||UserRegisterInfo.value.PassWord.length>16){
+        ElMessageBox.alert('密码长度应在8-16字符之间', '注册失败', {
                   confirmButtonText: '确定',
                   showClose: false
                 });
