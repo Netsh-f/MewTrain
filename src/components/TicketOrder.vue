@@ -360,7 +360,7 @@
       <el-table
         :data="order_data"
         v-show="show_order_list"
-        style="width: 1000px; margin-left: 80px; margin-top: 20px"
+        style="width: 1000px; margin-left: 200px; margin-top: 20px"
       >
         <el-table-column
           property="passenger_name"
@@ -379,7 +379,7 @@
       <el-table
         :data="order"
         v-show="show_order_list"
-        style="width: 1000px; margin-left: 80px; margin-top: 20px"
+        style="width: 1000px; margin-left: 200px; margin-top: 20px"
       >
         <el-table-column property="order_id" label="订单号"></el-table-column>
         <el-table-column
@@ -390,12 +390,6 @@
         <el-table-column property="total_price" label="总价"></el-table-column>
       </el-table>
 
-      <el-button
-        type="primary"
-        @click="pay_success()"
-        style="margin-left: 500px"
-        >确认支付</el-button
-      >
     </el-row>
     <el-row v-show="active === 3">
       <div style="margin-top: 30px; margin-left: 50px; margin-right: 50px">
@@ -414,6 +408,13 @@
       style="margin-left: 200px; margin-top: 20px"
       >返回主界面</el-button
     >
+    <el-button
+    type="primary"
+    @click="pay_success()"
+    style="margin-left: 800px; margin-top: 20px"
+    v-show="active == 2"
+    >确认支付</el-button
+  >
     <el-button
       type="primary"
       round
