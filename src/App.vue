@@ -1,4 +1,5 @@
 <template>
+  <title>MewTrain</title>
   <div id="app">
     <router-view></router-view>
   </div>
