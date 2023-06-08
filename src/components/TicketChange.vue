@@ -18,7 +18,7 @@
                 </el-col>
                 <el-col :span="6">
                     <div class="grid-content bg-purple" style="margin-left: 20px">
-                        <el-autocomplete  class="inline-input" v-model="searchForm.end_station"
+                        <el-autocomplete class="inline-input" v-model="searchForm.end_station"
                             :fetch-suggestions="query => searchElements2(query, index)" placeholder="请输入终点站"
                             :trigger-on-focus="true" @select="selectedItem => handleSelect2(selectedItem, index)">
                             <template v-slot="{ item }">
@@ -41,8 +41,12 @@
                         <el-button type="primary" round @click="submitForm('searchForm')">搜索</el-button>
                     </div>
                 </el-col>
-                <el-switch style="margin-top: 30px;margin-left: 20px" v-model="value1" @click.self="handelUpdate()"
-                    inactive-text="按开车时间排序" active-text="按运行时间排序">
+                <el-switch
+                    style="margin-top: 30px;margin-left: 20px"
+                    v-model="value1"
+                    @click="handelUpdate()"
+                    inactive-text="按开车时间排序"
+                    active-text="按运行时间排序">
                 </el-switch>
             </el-row>
         </el-form>
@@ -90,7 +94,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 export default {
     computed: {
         ...mapState(["token"]),
-    ...mapState(["isLogin"]),
+        ...mapState(["isLogin"]),
     },
     data() {
         return {
@@ -200,6 +204,13 @@ export default {
 
     },
     methods: {
+        handelUpdate()
+            {
+                console.log(this.value1)
+                console.log(this.tableData)
+                this.TrainRank();
+
+            },
         check2() {
             console.log(this.token);
         },
@@ -216,30 +227,40 @@ export default {
                 console.log(error);
             });
         },
-        TrainRank() {
-            if (this.value1 === false) {
-                for (let i = 0; i < this.tableData.length; i++) {
-                    for (let j = 0; j < this.tableData.length - i - 1; j++) {
-                        if (this.transferTime(this.tableData[j].start_time) > this.transferTime(this.tableData[j + 1].start_time)) {
-                            let temp = this.tableData[j];
-                            this.tableData[j] = this.tableData[j + 1];
-                            this.tableData[j + 1] = temp;
+        TrainRank()
+            {
+                console.log(this.value1)
+                if(this.value1 === false)
+                {
+                    for(let i = 0 ; i < this.tableData.length ; i++)
+                    {
+                        for(let j = 0 ; j <this.tableData.length - i -1 ; j++ )
+                        {
+                            if(this.tableData[j].start_time >this.tableData[j+1].start_time)
+                            {
+                                let temp = this.tableData[j];
+                                this.tableData[j] = this.tableData[j+1];
+                                this.tableData[j+1] = temp;
+                            }
                         }
                     }
                 }
-            }
-            else {
-                for (let i = 0; i < this.tableData.length; i++) {
-                    for (let j = 0; j < this.tableData.length - i - 1; j++) {
-                        if (this.transferTime(this.tableData[j].running_time) > this.transferTime(this.tableData[j + 1].running_time)) {
-                            let temp = this.tableData[j];
-                            this.tableData[j] = this.tableData[j + 1];
-                            this.tableData[j + 1] = temp;
+                else
+                {
+                    for(let i = 0 ; i < this.tableData.length ; i++)
+                    {
+                        for(let j = 0 ; j <this.tableData.length - i -1 ; j++ )
+                        {
+                            if(this.tableData[j].running_time >this.tableData[j+1].running_time)
+                            {
+                                let temp = this.tableData[j];
+                                this.tableData[j] = this.tableData[j+1];
+                                this.tableData[j+1] = temp;
+                            }
                         }
                     }
                 }
-            }
-        },
+            },
         checkTime: (i) => {
             if (i < 10) {
                 i = '0' + i;
@@ -298,6 +319,7 @@ export default {
                                     tableData.low_seat_count = response.data.data[i].ticket.BUS.count;
                                     tableData.end_no = response.data.data[i].end_stop_id
                                     tableData.start_no = response.data.data[i].start_stop_id;
+                                    tableData.running_time=response.data.data[i].duration_seconds;
                                     this.tableData.push(tableData);
                                 }
                                 else {
@@ -354,15 +376,22 @@ export default {
             let year = date1.getFullYear()
             let month = String(date1.getMonth() + 1).padStart(2, '0')
             let day = String(date1.getDate()).padStart(2, '0')
-/*check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
-scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price) */
+            /*check(scope.$index,searchForm.datetime,scope.row.train_no,scope.row.start_no,scope.row.end_no,
+            scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,scope.row.low_seat_price) */
             console.log(new_order)
             const new_date = `${year}-${month}-${day}`;
             let carriage_type = '';
-            if (new_order.train_no === 'HSR') {
+            if (this.carriage_type === '') {
+                ElMessageBox.alert('请选择座位类型', '改签失败', {
+                    confirmButtonText: '确定',
+                    showClose: false
+                })
+                return;
+            }
+            else if (new_order.train_no === 'HSR') {
                 if (this.carriage_type === '商务/软卧') {
                     carriage_type = "BUS"
-                }else if (this.carriage_type === '一等座/硬卧') {
+                } else if (this.carriage_type === '一等座/硬卧') {
                     carriage_type = "FST"
                 } else if (this.carriage_type === '二等座/软卧') {
                     carriage_type = "SND"
@@ -370,7 +399,7 @@ scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,sco
             } else if (new_order.train_no === 'REG') {
                 if (this.carriage_type === '商务/软卧') {
                     carriage_type = "SOF"
-                }else if (this.carriage_type === '一等座/硬卧') {
+                } else if (this.carriage_type === '一等座/硬卧') {
                     carriage_type = "HAW"
                 } else if (this.carriage_type === '二等座/软卧') {
                     carriage_type = "HAZ"
@@ -380,7 +409,7 @@ scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,sco
                 original_order_id: this.origin_order.order_id,
                 train_name: new_order.train_number,
                 date: `${year}-${month}-${day}`,
-                carriage_type:carriage_type,
+                carriage_type: carriage_type,
                 start_stop_id: new_order.start_no,
                 end_stop_id: new_order.end_no,
                 passenger_ids: this.origin_order.passengers,
@@ -402,11 +431,18 @@ scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,sco
                 })
                 .catch(function (error) {
                     console.log(error);
-                    if(error.response.status === 400){
-                        ElMessageBox.alert('已无座位，请重新选择', '改签失败', {
-                        confirmButtonText: '确定',
-                        showClose: false
-                    })
+                    if (error.response.status === 400) {
+                        if (error.response.data.message === '已超过24小时，无法改签') {
+                            ElMessageBox.alert('发车时间超过原订单发车时间24小时', '改签失败', {
+                                confirmButtonText: '确定',
+                                showClose: false
+                            })
+                        } else {
+                            ElMessageBox.alert('已无座位，请重新选择', '改签失败', {
+                                confirmButtonText: '确定',
+                                showClose: false
+                            })
+                        }
                     }
                     else if (error.response.status == 401 || this.isLogin == false) {
                         router.push({ path: "/Login" });
@@ -429,11 +465,6 @@ scope.row.train_number,scope.row.high_seat_price,scope.row.medium_seat_price,sco
         this.old_date = this.origin_order.date;
     },
     //对查询的信息进行排序
-
-    handelUpdate() {
-        this.TrainRank();
-
-    },
 
 
 }
