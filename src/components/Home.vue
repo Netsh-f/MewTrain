@@ -19,13 +19,13 @@
         @open="handleOpen"
         @close="handleClose"
         router="true">
-        <el-menu-item index="WELCOME">
+        <el-menu-item index="/WELCOME">
           <template #title>
             <el-icon><location /></el-icon>
             <span class="ItemName">首页</span>
           </template> 
         </el-menu-item>
-        <el-menu-item index="TicketInquiry">
+        <el-menu-item index="/TicketInquiry">
           <el-icon><document /></el-icon>
           <span class="ItemName">列车信息查询</span>
         </el-menu-item>
@@ -37,9 +37,9 @@
             <span class="ItemName">订单信息</span>
           </template >
           <el-menu-item-group>
-            <el-menu-item index="HistoryOrders" class="ItemName">全部订单</el-menu-item>
-            <el-menu-item index="NoTripOrderList" class="ItemName">未出行订单</el-menu-item>
-            <el-menu-item index="NoPayOrderList" class="ItemName">未支付订单</el-menu-item>
+            <el-menu-item index="/HistoryOrders" class="ItemName">全部订单</el-menu-item>
+            <el-menu-item index="/NoTripOrderList" class="ItemName">未出行订单</el-menu-item>
+            <el-menu-item index="/NoPayOrderList" class="ItemName">未支付订单</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
         <!-- <el-sub-menu index="">
