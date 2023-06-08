@@ -5,6 +5,7 @@
       <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
       href1=#/mesdeal1 href2=#/mesdeal2 href3=#/mesdeal3 href4=#/mesdeal4 href5=#/ ></fornav>
       <div class="hcon">
+        <img src="../../assets/cat.png" alt="" class="flg">
         <img src="../../assets/logo.png" alt="" class="lg">
         <br><h1 id="welcome">MewTrain欢迎您,尊敬的系统管理员！</h1><br>
       </div>
@@ -30,10 +31,11 @@ export default {
     data(){
         return{
             imgwrap:[
-              { url: require('../../assets/imgs/ChangSha1.jpg') },
-              { url: require('../../assets/imgs/TheGreatWall1.jpg') },
-              { url: require('../../assets/imgs/HongKong2.jpg') },
-              { url: require('../../assets/imgs/HongKong1.jpg') },
+    { url: require('../../assets/imgs/xz1.jpg') },
+    { url: require('../../assets/imgs/TheGreatWall1.jpg') },
+    { url: require('../../assets/imgs/xz3.jpg') },
+    { url: require('../../assets/imgs/xz4.jpg') },
+    { url: require('../../assets/imgs/HongKong1.jpg') },
             ]
         }
     },
