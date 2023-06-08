@@ -38,7 +38,7 @@
                 </a>
             </nav>
         </div>
-    </div>>
+    </div>
 
 </template>
 

@@ -3,8 +3,10 @@
         <div class="blur-background"></div>
         <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
         href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/ ></fornav>
-        <h1>设置</h1>
-        <hr>
+        <div class="hcon">
+            <img src="../../assets/logo.png" alt="" class="lg">
+            <br><h1>设置</h1><br>
+        </div>
         <div class="table1">
             <el-button type="primary" plain size="large" @click="returnLast">返回上级</el-button>
         </div>

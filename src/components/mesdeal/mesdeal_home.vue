@@ -4,10 +4,11 @@
     <div class="content">
       <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
       href1=#/mesdeal1 href2=#/mesdeal2 href3=#/mesdeal3 href4=#/mesdeal4 href5=#/ ></fornav>
-      <el-header>
-        <h1 id="welcome">MewTrain欢迎您,尊敬的系统管理员！</h1>
-      </el-header>
-      <hr>
+      <div class="hcon">
+        <img src="../../assets/logo.png" alt="" class="lg">
+        <br><h1 id="welcome">MewTrain欢迎您,尊敬的系统管理员！</h1><br>
+      </div>
+      <br>
       <div class="table1">
           <div class="block text-center">
               <span class="demonstration"></span>
@@ -58,11 +59,13 @@ export default {
 }
 
  .optimized-carousel {
-  width: 100%; /* 设置走马灯的宽度为100% */
+  width: 1250px; /* 设置走马灯的宽度为100% */
   height: 600px; /* 设置走马灯的高度为100% */
   transform: scale(1); /* 缩小至90% */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 边缘模糊化加重影处理 */
   perspective: 1000px; /* 加强立体效果 */
+  border-radius: 40px;
+  margin-left: -20%;
 }
 
 

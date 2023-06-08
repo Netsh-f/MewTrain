@@ -3,7 +3,10 @@
     <div class="blur-background"></div>
     <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
         href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/ ></fornav>
-    <h1>车次调控</h1>
+    <div class="hcon">
+        <img src="../../assets/logo.png" alt="" class="lg">
+        <br><h1>车次调控</h1><br>
+    </div>
     <div style="text-align:center;vertical-align:middel;">
         <el-input class="input3" v-model="message" clearable placeholder="请输入相应信息进行查询" float="left" size="large">
             <template #prepend>
@@ -122,7 +125,7 @@
         <el-form :model="searchForm"  ref="searchForm">
         </el-form>
         <el-table :data="tableData" border style="width: 100%" 
-        height="550px"
+        height="530px"
         :row-style="{height:'75px'}"
         :cell-style="{padding:'20px', whiteSpace: 'nowrap'}"
         :header-cell-style="{'text-align':'center',background:'rgb(15, 73, 137,.2)',color:'#333333','font-size': '14px','font-family': 'PingFang SC','font-weight': '700','border-color': '#CFDBFB'}"
