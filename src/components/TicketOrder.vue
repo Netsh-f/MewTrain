@@ -65,7 +65,7 @@
 
     <div
       v-show="active === 1 && dialogTableVisible"
-      style="margin-top: 40px; margin-left: 80px"
+      style="margin-top: 40px; margin-left: 200px"
     >
       <el-button @click="choose1">软卧</el-button>
       <el-button @click="choose2">硬卧</el-button>
@@ -390,6 +390,12 @@
         <el-table-column property="total_price" label="总价"></el-table-column>
       </el-table>
 
+      <el-button
+        type="primary"
+        @click="pay_success()"
+        style="margin-left: 500px"
+        >确认支付</el-button
+      >
     </el-row>
     <el-row v-show="active === 3">
       <div style="margin-top: 30px; margin-left: 50px; margin-right: 50px">
@@ -408,13 +414,6 @@
       style="margin-left: 200px; margin-top: 20px"
       >返回主界面</el-button
     >
-    <el-button
-    type="primary"
-    @click="pay_success()"
-    style="margin-left: 800px; margin-top: 20px"
-    v-show="active == 2"
-    >确认支付</el-button
-  >
     <el-button
       type="primary"
       round
