@@ -212,6 +212,7 @@
             handelUpdate()
             {
                 console.log(this.value1)
+                console.log(this.tableData)
                 this.TrainRank();
 
             },
@@ -221,7 +222,6 @@
 
             TrainRank()
             {
-                console.log(this.value1)
                 if(this.value1 === false)
                 {
                     for(let i = 0 ; i < this.tableData.length ; i++)
