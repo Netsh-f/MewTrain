@@ -118,10 +118,11 @@ def update_user_info(request):
 
         if 'username' in data:
             username = data['username']
-            same_user = User.objects.filter(username=username).first()
-            if same_user is not None:
-                message = '用户名已存在'
-                return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            if username != user.username:
+                same_user = User.objects.filter(username=username).first()
+                if same_user is not None:
+                    message = '用户名已存在'
+                    return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
             user.username = username
 
         # 检查是否要修改密码
