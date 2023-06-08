@@ -4,6 +4,7 @@
         <fornav msg1=信息管理 msg2=主页 msg3=个人信息 msg4=信息查询 msg5=设置
         href1=#/mesdeal1 href2=#/mesdeal2 href3=#/mesdeal3 href4=#/mesdeal4 href5=#/ ></fornav>
         <div class="hcon">
+            <img src="../../assets/cat.png" alt="" class="flg">
             <img src="../../assets/logo.png" alt="" class="lg">
             <br><h1>设置</h1><br>
         </div>
