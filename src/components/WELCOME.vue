@@ -10,6 +10,7 @@
     </div>
   </template>
   
+  
   <script setup>
   const imgwrap = [
     { url: require('../assets/imgs/ChangSha1.jpg') },
