@@ -46,6 +46,7 @@ export default {
       console.log(axios.post('/api/user/login/'))
     }
     const submitForm = () => {
+
       form.value.validate(async (valid) => {
         if (valid) {
           axios.post('/api/user/login/', {

@@ -339,14 +339,14 @@
                                     tableData.end_station = response.data.data[i].arrival_station_name;
                                     tableData.start_time =response.data.data[i].departure_time;
                                     tableData.arrive_time = response.data.data[i].arrival_time;
-                                    tableData.high_seat_price = response.data.data[i].ticket.SND.price;
+                                    tableData.high_seat_price = response.data.data[i].ticket.BUS.price;
                                     tableData.medium_seat_price= response.data.data[i].ticket.FST.price ;
-                                    tableData.low_seat_price = response.data.data[i].ticket.BUS.price;
+                                    tableData.low_seat_price = response.data.data[i].ticket.SND.price;
                                     console.log("下面是御座")
                                     console.log(response.data.data[i].ticket.SND.count)
-                                    tableData.high_seat_count = response.data.data[i].ticket.SND.count;
+                                    tableData.high_seat_count = response.data.data[i].ticket.BUS.count;
                                     tableData.medium_seat_count = response.data.data[i].ticket.FST.count ;
-                                    tableData.low_seat_count = response.data.data[i].ticket.BUS.count;
+                                    tableData.low_seat_count = response.data.data[i].ticket.SND.count;
                                     tableData.running_time=response.data.data[i].duration_seconds;
                                     tableData.end_no = response.data.data[i].end_stop_id
                                     tableData.start_no =response.data.data[i].start_stop_id;
@@ -361,13 +361,13 @@
                                     tableData.end_station = response.data.data[i].arrival_station_name;
                                     tableData.start_time =response.data.data[i].departure_time;
                                     tableData.arrive_time = response.data.data[i].arrival_time;
-                                    tableData.high_seat_price = response.data.data[i].ticket.HAW.price;
+                                    tableData.high_seat_price = response.data.data[i].ticket.SOF.price;
                                     tableData.medium_seat_count = response.data.data[i].ticket.HAZ.price ;
-                                    tableData.low_seat_count = response.data.data[i].ticket.SOF.price;
+                                    tableData.low_seat_count = response.data.data[i].ticket.HAW.price;
                                     tableData.running_time=response.data.data[i].duration_seconds
-                                    tableData.high_seat_count = response.data.data[i].ticket.HAW.count;
+                                    tableData.high_seat_count = response.data.data[i].ticket.SOF.count;
                                     tableData.medium_seat_count = response.data.data[i].ticket.HAZ.count ;
-                                    tableData.low_seat_count = response.data.data[i].ticket.SOF.count;
+                                    tableData.low_seat_count = response.data.data[i].ticket.HAW.count;
                                     tableData.end_no = response.data.data[i].end_stop_id
                                     tableData.start_no =response.data.data[i].start_stop_id;
                                     this.tableData.push(tableData);
