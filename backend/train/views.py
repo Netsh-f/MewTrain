@@ -848,11 +848,14 @@ def rebook(request):
             message = '出发地与原订单不相同'
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        if datetime.now() - original_order.create_time > timedelta(hours=24):
-            message = '已超过24小时，无法改签'
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
-
         order = create_order_function(user_id, data)  # 这里复用了
+
+        origin_time = datetime.combine(original_order.date, original_order.start_stop.arrival_time)
+        time = datetime.combine(order.date, order.start_stop.arrival_time)
+        if origin_time - time > timedelta(hours=24) or time - origin_time > timedelta(hours=24):
+            message = '已超过24小时，无法改签'
+            order.delete()
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         if isinstance(order, Response):
             return order
