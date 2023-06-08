@@ -3,7 +3,9 @@
     <el-container class="home-container">
       <!--  头部 -->
       <el-header>
+          
         <div>
+          <img class="logo2"  src="../assets/cat.png" alt="">
           <img class="logo" src="../assets/logo.png" alt="">
 
         </div>
@@ -81,6 +83,12 @@ export default{
 }
 </script>
 <style lang="less" scoped>
+.logo2{
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  margin-left: 10%;
+}
   .ItemName{
     color: white;
   }
