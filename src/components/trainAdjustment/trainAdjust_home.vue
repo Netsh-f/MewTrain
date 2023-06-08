@@ -4,6 +4,7 @@
     <fornav msg1=车次调控 msg2=主页 msg3=个人信息 msg4=列车信息 msg5=设置
     href1=#/trainAdjust1 href2=#/trainAdjust2 href3=#/trainAdjust3 href4=#/trainAdjust4 href5=#/></fornav>
     <div class="hcon">
+      <img src="../../assets/cat.png" alt="" class="flg">
       <img src="../../assets/logo.png" alt="" class="lg">
       <br><h1 id="welcome">MewTrain欢迎您,尊敬的铁路系统员！</h1><br>
     </div>

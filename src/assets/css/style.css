@@ -47,11 +47,17 @@
 .hcon h1 {
 position: relative;
 }
-
+.flg {
+    top: -10px;
+    position: absolute;
+    width: 5%;
+    height: 100%;
+    margin-left: 50px;
+}
 .lg {
-position: absolute;
-top: 0;
-left: 100px;
+    position: absolute;
+    top: 0;
+    left: 100px;
 }
   
 *,::before,::after{
